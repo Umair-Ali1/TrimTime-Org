@@ -1645,6 +1645,24 @@ async function doRegister() {
       const salonName = document.getElementById('regSalon')?.value.trim() || nameParts[0] + "'s Salon";
       await _setupNewOwnerSalon(data.user.id, salonName);
     }
+    if (role === 'employee') {
+      const inviteCode = document.getElementById('regInvite')?.value.trim().toUpperCase();
+      if (!inviteCode) return showErr('Please enter the invite code you received from your salon owner.');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Joining salon...';
+      const { data: salon, error: salonErr } = await _supabase.from('saloons').select('id').eq('invite_code', inviteCode).single();
+      if (salonErr || !salon) return showErr('Invalid invite code. Ask your salon owner for the correct code.');
+      const fullName = first.trim();
+      const initials = nameParts.map(p => p[0]).slice(0, 2).join('').toUpperCase();
+      const { error: empErr } = await _supabase.from('employees').insert({
+        user_id:   data.user.id,
+        saloon_id: salon.id,
+        name:      fullName,
+        role:      'Barber',
+        status:    'available',
+        avatar:    initials
+      });
+      if (empErr) return showErr('Failed to join salon: ' + empErr.message);
+    }
     // If email confirmation is off, session is live — go straight to dashboard
     if (data.session) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
