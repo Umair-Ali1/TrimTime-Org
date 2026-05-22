@@ -15,6 +15,18 @@
   </div>
 </div>
 
+<div class="modal-bg" id="logoutModal">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">👋</div>
+    <div style="font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;margin-bottom:8px">Sign Out?</div>
+    <div style="font-size:14px;color:var(--text3);margin-bottom:24px">You'll need to log in again to access your account.</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeModal('logoutModal')">Cancel</button>
+      <button class="btn" style="flex:1;justify-content:center;background:var(--red)" onclick="_confirmLogout()">Sign Out</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="addServiceModal">
   <div class="modal">
     <div class="modal-head"><div class="modal-title">✂️ Add New Service</div><span class="modal-close" onclick="closeModal('addServiceModal')">✕</span></div>

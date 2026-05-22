@@ -188,7 +188,8 @@ function _clearAuthForms() {
     if (el) el.classList.remove('show');
   });
 }
-async function doLogout() { await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; _clearAuthForms(); showPage('pgLogin'); toast('Signed out.','info'); }
+function doLogout() { openModal('logoutModal'); }
+async function _confirmLogout() { closeModal('logoutModal'); await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; _clearAuthForms(); showPage('pgLogin'); toast('Signed out successfully.','info'); }
 
 // ════ HOME ════
 function setChip(f, el) {
@@ -902,6 +903,7 @@ function openRatingModal(salon, bookingId, barber) {
   modalRating = 0; setModalRating(0);
   document.getElementById('ratingModal').classList.add('show');
 }
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function setModalRating(n) {
   modalRating = n;
