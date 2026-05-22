@@ -1582,56 +1582,71 @@ function selectRegRole(el, role) {
 }
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
+  const pass  = document.getElementById('loginPass').value;
   const errEl = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
+  const btn   = document.getElementById('loginBtn');
+  const resetBtn = () => { btn.classList.remove('btn-loading'); btn.innerHTML = 'Login'; };
+  const showErr  = msg => { resetBtn(); errEl.textContent = msg; errEl.classList.add('show'); };
   errEl.classList.remove('show');
-  if (!email || !pass) { errEl.textContent='Please enter email and password'; errEl.classList.add('show'); return; }
+  if (!email || !pass) return showErr('Please enter your email and password.');
   btn.classList.add('btn-loading');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Logging in...';
-  const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
-  if (error) {
-    btn.classList.remove('btn-loading'); btn.innerHTML = 'Login';
-    errEl.textContent = error.message; errEl.classList.add('show'); return;
+  try {
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) return showErr(error.message);
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Loading your account...';
+    if (email === 'admin@trimtime.com') {
+      const { data: existing } = await _supabase.from('profiles').select('id').eq('id', data.user.id).single();
+      if (!existing) await _supabase.from('profiles').upsert({ id: data.user.id, role: 'admin', first_name: 'Admin', last_name: 'TrimTime' });
+    }
+    await loadUserAndRoute(data.user);
+    resetBtn();
+  } catch (e) {
+    showErr('Unexpected error: ' + e.message);
   }
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Loading your account...';
-  if (email === 'admin@trimtime.com') {
-    const { data: existing } = await _supabase.from('profiles').select('id').eq('id', data.user.id).single();
-    if (!existing) await _supabase.from('profiles').upsert({ id: data.user.id, role: 'admin', first_name: 'Admin', last_name: 'TrimTime' });
-  }
-  await loadUserAndRoute(data.user);
-  btn.classList.remove('btn-loading'); btn.innerHTML = 'Login';
 }
 async function doRegister() {
   const first = document.getElementById('regFirst').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const phone = document.getElementById('regPhone').value.trim();
-  const pass = document.getElementById('regPass').value;
-  const role = document.querySelector('.role-card.selected')?.dataset.role || 'customer';
+  const pass  = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPass2').value;
+  const role  = document.querySelector('.role-card.selected')?.dataset.role || 'customer';
   const errEl = document.getElementById('regError');
   const sucEl = document.getElementById('regSuccess');
-  const btn = document.getElementById('regBtn');
+  const btn   = document.getElementById('regBtn');
+  const resetBtn = () => { btn.classList.remove('btn-loading'); btn.innerHTML = 'Create Account'; };
+  const showErr  = msg => { resetBtn(); errEl.textContent = msg; errEl.classList.add('show'); };
   errEl.classList.remove('show'); sucEl.classList.remove('show');
-  if (!first || !email || !pass) { errEl.textContent='Please fill in all required fields'; errEl.classList.add('show'); return; }
-  if (pass.length < 6) { errEl.textContent='Password must be at least 6 characters'; errEl.classList.add('show'); return; }
+  if (!first || !email || !pass) return showErr('Please fill in all required fields.');
+  if (pass.length < 6)           return showErr('Password must be at least 6 characters.');
+  if (pass !== pass2)            return showErr('Passwords do not match.');
   btn.classList.add('btn-loading');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Creating your account...';
-  const { data, error } = await _supabase.auth.signUp({ email, password: pass });
-  if (error) {
-    btn.classList.remove('btn-loading'); btn.innerHTML = 'Create Account';
-    errEl.textContent=error.message; errEl.classList.add('show'); return;
+  try {
+    const { data, error } = await _supabase.auth.signUp({ email, password: pass });
+    if (error) return showErr(error.message);
+    if (!data.user) return showErr('This email may already be registered. Try logging in instead.');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Setting up profile...';
+    const nameParts = first.trim().split(' ');
+    const { error: profErr } = await _supabase.from('profiles').upsert({
+      id: data.user.id, role,
+      first_name: nameParts[0],
+      last_name:  nameParts.slice(1).join(' '),
+      phone, city: ''
+    });
+    if (profErr) return showErr('Database error: ' + profErr.message + '. Make sure the schema SQL has been run in Supabase.');
+    if (role === 'owner') {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Creating your salon...';
+      const salonName = document.getElementById('regSalon')?.value.trim() || nameParts[0] + "'s Salon";
+      await _setupNewOwnerSalon(data.user.id, salonName);
+    }
+    resetBtn();
+    sucEl.textContent = 'Account created! You can now sign in.'; sucEl.classList.add('show');
+    setTimeout(() => { document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value = email; }, 1500);
+  } catch (e) {
+    showErr('Unexpected error: ' + e.message);
   }
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Setting up profile...';
-  const nameParts = first.trim().split(' ');
-  await _supabase.from('profiles').upsert({ id:data.user.id, role, first_name:nameParts[0], last_name:nameParts.slice(1).join(' '), phone, city:'' });
-  if (role === 'owner') {
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Creating your salon...';
-    const salonName = document.getElementById('regSalon')?.value.trim() || nameParts[0]+"'s Salon";
-    await _setupNewOwnerSalon(data.user.id, salonName);
-  }
-  btn.classList.remove('btn-loading'); btn.innerHTML = 'Create Account';
-  sucEl.textContent='Account created! You can now sign in.'; sucEl.classList.add('show');
-  setTimeout(()=>{ document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value=email; }, 1500);
 }
 async function _setupNewOwnerSalon(ownerId, salonName) {
   const code='TT-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.floor(1000+Math.random()*9000);
