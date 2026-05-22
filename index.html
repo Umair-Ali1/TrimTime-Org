@@ -1641,9 +1641,18 @@ async function doRegister() {
       const salonName = document.getElementById('regSalon')?.value.trim() || nameParts[0] + "'s Salon";
       await _setupNewOwnerSalon(data.user.id, salonName);
     }
-    resetBtn();
-    sucEl.textContent = 'Account created! You can now sign in.'; sucEl.classList.add('show');
-    setTimeout(() => { document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value = email; }, 1500);
+    // If email confirmation is off, session is live — go straight to dashboard
+    if (data.session) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
+      await loadUserAndRoute(data.user);
+      resetBtn();
+    } else {
+      // Email confirmation is on — ask them to verify then log in
+      resetBtn();
+      sucEl.textContent = 'Account created! Check your email to confirm, then log in.';
+      sucEl.classList.add('show');
+      setTimeout(() => { document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value = email; }, 2000);
+    }
   } catch (e) {
     showErr('Unexpected error: ' + e.message);
   }
