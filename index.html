@@ -1308,22 +1308,21 @@ input[type=range]{width:100%;accent-color:var(--p)}
                 <h2 id="empHeroName">Loading...</h2>
                 <p id="empHeroRole">Barber</p>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-                  <span style="color:rgba(255,255,255,.9);font-size:16px;letter-spacing:2px">★★★★★</span>
-                  <span style="font-family:'Poppins',sans-serif;font-weight:700;color:#fff">4.9</span>
-                  <span style="font-size:13px;color:rgba(255,255,255,.7)">(127 reviews)</span>
+                  <span id="empHeroStars" style="color:rgba(255,255,255,.9);font-size:16px;letter-spacing:2px">—</span>
+                  <span id="empHeroRating" style="font-family:'Poppins',sans-serif;font-weight:700;color:#fff">—</span>
+                  <span id="empHeroReviewCount" style="font-size:13px;color:rgba(255,255,255,.7)">(0 reviews)</span>
                 </div>
                 <div class="kpi-row" style="background:rgba(255,255,255,.1);border-radius:10px;margin-top:12px;gap:0">
-                  <div class="kpi"><div class="kpi-n" style="color:#fff">127</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Reviews</div></div>
+                  <div class="kpi"><div class="kpi-n" style="color:#fff" id="empKpiReviews">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Reviews</div></div>
                   <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empTotalCust">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Customers</div></div>
-                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff">98%</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">On Time</div></div>
-                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff">2</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Missed</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empKpiOnTime">—</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">On Time</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empKpiMissed">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Cancelled</div></div>
                 </div>
               </div>
             </div>
             <div style="text-align:right">
               <div class="earn-lbl">This Month</div>
               <div class="earn-big" id="empMonthEarn">Rs. 0</div>
-              <div class="earn-up">↑ 18% vs last month</div>
             </div>
           </div>
           <div class="g2 fade-up">
@@ -2195,15 +2194,29 @@ async function refreshEmpDash() {
   const profNm = document.getElementById('empProfName'); if (profNm) profNm.value = fullName;
   const profRl = document.getElementById('empProfRole'); if (profRl) profRl.value = jobRole;
   const profPh = document.getElementById('empProfPhone'); if (profPh) profPh.value = currentUser.phone || '';
-  // Stats
+  // Rating from employee record
+  const rating = emp?.rating || null;
+  const ratingStars = rating ? '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating)) : '—';
+  const heroStars = document.getElementById('empHeroStars'); if (heroStars) heroStars.textContent = ratingStars;
+  const heroRating = document.getElementById('empHeroRating'); if (heroRating) heroRating.textContent = rating ? rating.toFixed(1) : '—';
+  // Stats from bookings
   const { data: assigned } = await _supabase.from('bookings').select('*').eq('barber', fullName).order('created_at', {ascending:false});
-  const bks = assigned || [];
-  const today = new Date().toISOString().split('T')[0];
+  const bks       = assigned || [];
+  const completed = bks.filter(b => b.status === 'completed');
+  const cancelled = bks.filter(b => b.status === 'cancelled');
+  const onTimePct = bks.length > 0 ? Math.round((completed.length / bks.length) * 100) : 0;
+  const today     = new Date().toISOString().split('T')[0];
   const todayAssigned = bks.filter(b => b.date === today);
-  const earnings = bks.filter(b => b.status === 'completed').reduce((a, b) => a + (b.price || 0) * 0.6, 0);
-  document.getElementById('empOrdersBadge').textContent = todayAssigned.length;
+  const earnings  = completed.reduce((a, b) => a + (b.price || 0) * 0.6, 0);
+  // Reviews — 0 until a reviews table is added
+  const reviewCount = 0;
+  const rc = document.getElementById('empHeroReviewCount'); if (rc) rc.textContent = `(${reviewCount} reviews)`;
+  const kr = document.getElementById('empKpiReviews');      if (kr) kr.textContent = reviewCount;
   document.getElementById('empTotalCust').textContent   = bks.length;
+  document.getElementById('empOrdersBadge').textContent = todayAssigned.length;
   document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earnings).toLocaleString();
+  const ko = document.getElementById('empKpiOnTime');  if (ko) ko.textContent = bks.length > 0 ? onTimePct + '%' : '—';
+  const km = document.getElementById('empKpiMissed');  if (km) km.textContent = cancelled.length;
   ['empEarnToday','empEarnMonth','empEarnTotal'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Rs. ' + Math.round(earnings).toLocaleString(); });
   document.getElementById('empDashDate').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
   empIsAvail = STORE.get('available') ?? true; updateAvailToggle();
