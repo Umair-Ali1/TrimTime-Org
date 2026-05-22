@@ -784,6 +784,7 @@ input[type=range]{width:100%;accent-color:var(--p)}
             Continue with Google
           </button>
           <div style="margin-top:16px;text-align:center;font-size:14px;color:var(--text3)">Don't have an account? <a style="color:var(--p);font-weight:600;cursor:pointer" onclick="document.querySelectorAll('.ftab')[1].click()">Sign Up</a></div>
+          <div style="margin-top:12px;text-align:center"><a style="font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="browseAsGuest()">Just browsing? View salons without an account <i class="fas fa-arrow-right" style="font-size:11px"></i></a></div>
         </div>
 
         <!-- REGISTER -->
@@ -813,6 +814,7 @@ input[type=range]{width:100%;accent-color:var(--p)}
             Continue with Google
           </button>
           <div style="margin-top:14px;text-align:center;font-size:14px;color:var(--text3)">Already have an account? <a style="color:var(--p);font-weight:600;cursor:pointer" onclick="document.querySelectorAll('.ftab')[0].click()">Login</a></div>
+          <div style="margin-top:12px;text-align:center"><a style="font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="browseAsGuest()">Just browsing? View salons without an account <i class="fas fa-arrow-right" style="font-size:11px"></i></a></div>
         </div>
       </div>
     </div>
@@ -831,10 +833,10 @@ input[type=range]{width:100%;accent-color:var(--p)}
       <span class="hn-link" onclick="showPage('pgBooking')">Book Now</span>
       <span class="hn-link" onclick="showPage('pgUserDash')">Dashboard</span>
     </div>
-    <div class="hn-right" style="margin-left:auto">
-      <div class="icon-btn"><span><i class="fas fa-bell"></i></span><span class="dot"></span></div>
-      <div class="icon-btn"><span>❤️</span></div>
-      <div class="nav-av" id="homeAv" onclick="showPage('pgUserDash')">AK</div>
+    <div class="hn-right" style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="icon-btn" id="homeNotifBtn" style="display:none"><span><i class="fas fa-bell"></i></span><span class="dot"></span></div>
+      <button class="btn btn-sm btn-outline" id="homeLoginBtn" style="display:none" onclick="showPage('pgLogin')"><i class="fas fa-right-to-bracket"></i> Login</button>
+      <div class="nav-av" id="homeAv" onclick="showPage('pgUserDash')" style="display:none">AK</div>
     </div>
   </nav>
   <div class="home-hero">
@@ -1740,8 +1742,21 @@ async function refreshHomeStats() {
   set('statRating',   avg);
   set('statBookings', bookingCount ?? '—');
 }
+function browseAsGuest() {
+  showPage('pgHome');
+  renderSaloons();
+}
 async function renderSaloons() {
   refreshHomeStats();
+  // Show correct nav items based on login state
+  const loggedIn = !!currentUser;
+  const av = document.getElementById('homeAv');
+  const loginBtn = document.getElementById('homeLoginBtn');
+  const notifBtn = document.getElementById('homeNotifBtn');
+  if (av)       { av.style.display       = loggedIn ? 'flex' : 'none'; }
+  if (loginBtn) { loginBtn.style.display  = loggedIn ? 'none' : 'flex'; }
+  if (notifBtn) { notifBtn.style.display  = loggedIn ? 'flex' : 'none'; }
+  if (loggedIn && av) av.textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
   const { data: saloons } = await _supabase.from('saloons').select('*').order('rating', { ascending: false });
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let list = (saloons || []).filter(s => {
@@ -1766,12 +1781,9 @@ async function renderSaloons() {
         <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book Now</button></div>
       </div>
     </div>`).join('') || '<p style="color:var(--text3);padding:24px">No salons found.</p>';
-  if (currentUser) {
-    const av = document.getElementById('homeAv');
-    if (av) av.textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-  }
 }
 async function bookSaloon(id) {
+  if (!currentUser) { toast('Please log in to book a salon.', 'error'); showPage('pgLogin'); return; }
   const { data: salon } = await _supabase.from('saloons').select('*').eq('id', id).single();
   currentBookingSaloon = salon;
   showPage('pgBooking');
