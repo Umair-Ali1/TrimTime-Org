@@ -859,11 +859,11 @@ input[type=range]{width:100%;accent-color:var(--p)}
     <span class="chip" onclick="setChip('kids',this)">Kids Cut</span>
   </div>
   <div class="stats-row">
-    <div class="st-item"><div class="st-ico"><i class="fas fa-store"></i></div><div><div class="st-n">120</div><div class="st-l">Total Salons</div></div></div>
-    <div class="st-item"><div class="st-ico"><i class="fas fa-users"></i></div><div><div class="st-n">540</div><div class="st-l">Total Users</div></div></div>
-    <div class="st-item"><div class="st-ico"><i class="fas fa-chair"></i></div><div><div class="st-n">1,840</div><div class="st-l">Open Seats Today</div></div></div>
-    <div class="st-item"><div class="st-ico"><i class="fas fa-star"></i></div><div><div class="st-n">4.8</div><div class="st-l">Avg Rating</div></div></div>
-    <div class="st-item"><div class="st-ico"><i class="fas fa-bolt"></i></div><div><div class="st-n">~3 min</div><div class="st-l">Avg Booking Time</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-store"></i></div><div><div class="st-n" id="statSalons">—</div><div class="st-l">Total Salons</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-users"></i></div><div><div class="st-n" id="statUsers">—</div><div class="st-l">Total Users</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-chair"></i></div><div><div class="st-n" id="statSeats">—</div><div class="st-l">Open Seats Today</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-star"></i></div><div><div class="st-n" id="statRating">—</div><div class="st-l">Avg Rating</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-bolt"></i></div><div><div class="st-n" id="statBookings">—</div><div class="st-l">Total Bookings</div></div></div>
   </div>
   <div class="home-main">
     <aside class="filter-sidebar">
@@ -1247,19 +1247,21 @@ input[type=range]{width:100%;accent-color:var(--p)}
         <div id="oSettings" class="sub-page">
           <div style="margin-bottom:24px"><h2 style="font-size:24px">Salon Settings</h2></div>
           <div class="card" style="max-width:560px">
-            <div class="field"><label class="label">Salon Name</label><input class="input" value="Royal Cuts Studio"></div>
-            <div class="field"><label class="label">City</label><input class="input" value="Lahore"></div>
-            <div class="field"><label class="label">Address</label><input class="input" value="Gulberg III, Lahore"></div>
+            <div class="field"><label class="label">Salon Name</label><input class="input" id="settSalonName" placeholder="Your salon name"></div>
             <div class="g2">
-              <div class="field"><label class="label">Opening Time</label><input class="input" type="time" value="09:00"></div>
-              <div class="field"><label class="label">Closing Time</label><input class="input" type="time" value="21:00"></div>
+              <div class="field"><label class="label">City</label><input class="input" id="settCity" placeholder="City"></div>
+              <div class="field"><label class="label">Area / Neighbourhood</label><input class="input" id="settArea" placeholder="e.g. DHA Phase 5"></div>
             </div>
-            <div class="field"><label class="label">Working Days</label>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-                <span class="chip on">Mon</span><span class="chip on">Tue</span><span class="chip on">Wed</span><span class="chip on">Thu</span><span class="chip on">Fri</span><span class="chip">Sat</span><span class="chip">Sun</span>
-              </div>
+            <div class="field"><label class="label">Address</label><input class="input" id="settAddress" placeholder="Street address"></div>
+            <div class="field">
+              <label class="label">Salon Image URL</label>
+              <input class="input" id="settImageUrl" placeholder="https://example.com/photo.jpg" oninput="previewSettImg(this.value)">
+              <div style="font-size:12px;color:var(--text3);margin-top:4px">Paste a direct image link — shown on the Discover page.</div>
             </div>
-            <button class="btn" onclick="toast('Settings saved!','success')">Save Settings</button>
+            <div id="settImgPreview" style="display:none;margin-bottom:16px;border-radius:10px;overflow:hidden;max-height:200px">
+              <img id="settImgTag" style="width:100%;height:200px;object-fit:cover" src="" alt="Preview">
+            </div>
+            <button class="btn" onclick="saveSalonSettings()"><i class="fas fa-floppy-disk"></i>&nbsp; Save Settings</button>
           </div>
         </div>
       </div>
@@ -1661,7 +1663,7 @@ async function doRegister() {
 }
 async function _setupNewOwnerSalon(ownerId, salonName) {
   const code='TT-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.floor(1000+Math.random()*9000);
-  const { data: salon } = await _supabase.from('saloons').insert({ owner_id:ownerId, name:salonName, area:'Lahore', city:'Lahore', rating:4.5, reviews:0, price_from:300, icon:'✂️', is_open:true, tags:['hair','beard'], invite_code:code }).select().single();
+  const { data: salon } = await _supabase.from('saloons').insert({ owner_id:ownerId, name:salonName, area:'Lahore', city:'Lahore', rating:4.5, reviews:0, price_from:300, icon:'✂️', image_url:'', is_open:true, tags:['hair','beard'], invite_code:code }).select().single();
   if (!salon) return;
   await _supabase.from('services').insert([
     { saloon_id:salon.id, icon:'✂️', name:'Hair Cutting', price:300, duration:'30–45 min', active:true },
@@ -1696,7 +1698,32 @@ function setChip(f, el) {
   el.classList.add('on');
   renderSaloons();
 }
+async function refreshHomeStats() {
+  const [
+    { count: saloonCount },
+    { count: userCount },
+    { count: seatCount },
+    { data: ratingData },
+    { count: bookingCount }
+  ] = await Promise.all([
+    _supabase.from('saloons').select('*', { count: 'exact', head: true }),
+    _supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    _supabase.from('seats').select('*', { count: 'exact', head: true }).eq('status', 'available'),
+    _supabase.from('saloons').select('rating'),
+    _supabase.from('bookings').select('*', { count: 'exact', head: true })
+  ]);
+  const avg = ratingData?.length
+    ? (ratingData.reduce((sum, s) => sum + (s.rating || 0), 0) / ratingData.length).toFixed(1)
+    : '—';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('statSalons',   saloonCount  ?? '—');
+  set('statUsers',    userCount    ?? '—');
+  set('statSeats',    seatCount    ?? '—');
+  set('statRating',   avg);
+  set('statBookings', bookingCount ?? '—');
+}
 async function renderSaloons() {
+  refreshHomeStats();
   const { data: saloons } = await _supabase.from('saloons').select('*').order('rating', { ascending: false });
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let list = (saloons || []).filter(s => {
@@ -1710,10 +1737,13 @@ async function renderSaloons() {
   if (!container) return;
   container.innerHTML = list.map(s => `
     <div class="salon-card" onclick="bookSaloon('${s.id}')">
-      <div class="salon-img">${s.icon||'💈'}<div class="salon-status${s.is_open?'':' closed'}">${s.is_open?'Open':'Closed'}</div></div>
+      <div class="salon-img" style="${s.image_url?'background:none;padding:0':''}">
+        ${s.image_url?`<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-scissors\\' style=\\'font-size:40px;color:var(--p)\\'></i><div class=\\'salon-status${s.is_open?'':' closed'}\\'>${s.is_open?'Open':'Closed'}</div>'">`:`<i class="fas fa-scissors" style="font-size:40px;color:var(--p)"></i>`}
+        <div class="salon-status${s.is_open?'':' closed'}">${s.is_open?'Open':'Closed'}</div>
+      </div>
       <div class="salon-body">
         <div class="salon-name">${s.name}</div>
-        <div class="salon-loc">📍 ${s.area||'Lahore'}, ${s.city||'Lahore'}</div>
+        <div class="salon-loc"><i class="fas fa-location-dot" style="color:var(--p);margin-right:4px"></i>${s.area||'Lahore'}, ${s.city||'Lahore'}</div>
         <div class="salon-meta"><span class="salon-rating">★ ${s.rating||4.5}</span><span>(${s.reviews||0} reviews)</span></div>
         <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book Now</button></div>
       </div>
@@ -1988,10 +2018,13 @@ async function renderFavCards() {
   const { data: saloons } = await _supabase.from('saloons').select('*').limit(3);
   document.getElementById('favCards').innerHTML=(saloons||[]).map(s=>`
     <div class="salon-card" onclick="bookSaloon('${s.id}')">
-      <div class="salon-img">${s.icon||'💈'}<div class="salon-status${s.is_open?'':' closed'}">${s.is_open?'Open':'Closed'}</div></div>
+      <div class="salon-img" style="${s.image_url?'background:none;padding:0':''}">
+        ${s.image_url?`<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover">`:`<i class="fas fa-scissors" style="font-size:40px;color:var(--p)"></i>`}
+        <div class="salon-status${s.is_open?'':' closed'}">${s.is_open?'Open':'Closed'}</div>
+      </div>
       <div class="salon-body">
         <div class="salon-name">${s.name}</div>
-        <div class="salon-loc">📍 ${s.area||'Lahore'}</div>
+        <div class="salon-loc"><i class="fas fa-location-dot" style="color:var(--p);margin-right:4px"></i>${s.area||'Lahore'}</div>
         <div class="salon-meta"><span class="salon-rating">★ ${s.rating||4.5}</span><span>(${s.reviews||0})</span></div>
         <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book</button></div>
       </div>
@@ -2180,6 +2213,35 @@ function showOwnerSub(id) {
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('#ownerSidebar .nav-link').forEach(l=>l.classList.remove('active'));
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon?.invite_code||'TT-XXXX-0000';
+  if (id === 'oSettings' && currentSaloon) {
+    const set = (eid, val) => { const el = document.getElementById(eid); if (el) el.value = val || ''; };
+    set('settSalonName', currentSaloon.name);
+    set('settCity',      currentSaloon.city);
+    set('settArea',      currentSaloon.area);
+    set('settAddress',   currentSaloon.address);
+    set('settImageUrl',  currentSaloon.image_url);
+    previewSettImg(currentSaloon.image_url || '');
+  }
+}
+function previewSettImg(url) {
+  const box = document.getElementById('settImgPreview');
+  const img = document.getElementById('settImgTag');
+  if (!box || !img) return;
+  if (url) { img.src = url; box.style.display = 'block'; }
+  else      { box.style.display = 'none'; }
+}
+async function saveSalonSettings() {
+  const name     = document.getElementById('settSalonName').value.trim();
+  const city     = document.getElementById('settCity').value.trim();
+  const area     = document.getElementById('settArea').value.trim();
+  const address  = document.getElementById('settAddress').value.trim();
+  const imageUrl = document.getElementById('settImageUrl').value.trim();
+  if (!name) return toast('Salon name is required.', 'error');
+  if (!currentSaloon?.id) return toast('No salon found.', 'error');
+  const { error } = await _supabase.from('saloons').update({ name, city, area, address, image_url: imageUrl }).eq('id', currentSaloon.id);
+  if (error) return toast('Save failed: ' + error.message, 'error');
+  currentSaloon = { ...currentSaloon, name, city, area, address, image_url: imageUrl };
+  toast('Settings saved!', 'success');
 }
 
 // ════ EMPLOYEE DASHBOARD ════

@@ -25,12 +25,15 @@ CREATE TABLE IF NOT EXISTS saloons (
   reviews    INTEGER DEFAULT 0,
   price_from INTEGER DEFAULT 300,
   icon       TEXT DEFAULT '✂️',
+  image_url  TEXT DEFAULT '',
   is_open    BOOLEAN DEFAULT TRUE,
   tags       TEXT[] DEFAULT '{}',
   address    TEXT,
   invite_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+-- Add image_url to existing installs (safe to run multiple times)
+ALTER TABLE saloons ADD COLUMN IF NOT EXISTS image_url TEXT DEFAULT '';
 
 -- 3. SERVICES
 CREATE TABLE IF NOT EXISTS services (
@@ -111,13 +114,13 @@ ALTER TABLE reviews   DISABLE ROW LEVEL SECURITY;
 -- The demo owner account is auto-created the first time you click
 -- "Owner" on the Quick Demo Login. This seed adds extra saloons
 -- so the Discover page looks populated.
-INSERT INTO saloons (name, area, city, rating, reviews, price_from, icon, is_open, tags)
+INSERT INTO saloons (name, area, city, rating, reviews, price_from, icon, image_url, is_open, tags)
 VALUES
-  ('Prestige Barbers',     'DHA Phase 5',  'Lahore', 4.8, 218, 400, '💈', TRUE,  ARRAY['hair','facial']),
-  ('Modern Cuts',          'Johar Town',   'Lahore', 4.6, 156, 200, '🪒', FALSE, ARRAY['hair','beard','kids']),
-  ('The Gentleman''s Club','Model Town',   'Lahore', 4.9, 412, 600, '🎩', TRUE,  ARRAY['hair','beard','facial','massage']),
-  ('Style Zone',           'Bahria Town',  'Lahore', 4.5,  89, 150, '⭐', TRUE,  ARRAY['hair','kids']),
-  ('Elite Grooming',       'Cantt',        'Lahore', 4.7, 203, 500, '👑', TRUE,  ARRAY['facial','massage','hair'])
+  ('Prestige Barbers',     'DHA Phase 5',  'Lahore', 4.8, 218, 400, '💈', 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80', TRUE,  ARRAY['hair','facial']),
+  ('Modern Cuts',          'Johar Town',   'Lahore', 4.6, 156, 200, '🪒', 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&q=80', FALSE, ARRAY['hair','beard','kids']),
+  ('The Gentleman''s Club','Model Town',   'Lahore', 4.9, 412, 600, '🎩', 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80', TRUE,  ARRAY['hair','beard','facial','massage']),
+  ('Style Zone',           'Bahria Town',  'Lahore', 4.5,  89, 150, '⭐', 'https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&q=80', TRUE,  ARRAY['hair','kids']),
+  ('Elite Grooming',       'Cantt',        'Lahore', 4.7, 203, 500, '👑', 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80', TRUE,  ARRAY['facial','massage','hair'])
 ON CONFLICT DO NOTHING;
 
 -- ════ ADMIN ACCOUNT SETUP ════
