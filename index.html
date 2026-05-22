@@ -2081,7 +2081,8 @@ async function refreshOwnerDash() {
   document.getElementById('ownerToday').textContent=todayBks.length;
   document.getElementById('ownerRevenue').textContent='Rs. '+revenue.toLocaleString();
   document.getElementById('ownerBannerMsg').innerHTML=`<strong>${todayBks.length} bookings</strong> today · Revenue: Rs. ${revenue.toLocaleString()}`;
-  document.getElementById('ownerOrdersBadge').textContent=bks.filter(b=>b.status==='confirmed'||b.status==='pending').length;
+  const activeOwnerBks = bks.filter(b=>b.status==='confirmed'||b.status==='pending');
+  document.getElementById('ownerOrdersBadge').textContent = activeOwnerBks.length || '';
   document.getElementById('ownerDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   ['earnToday','earnMonth','earnTotal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Rs. '+revenue.toLocaleString(); });
   if (currentUser) {
@@ -2305,7 +2306,8 @@ async function refreshEmpDash() {
   const kr = document.getElementById('empKpiReviews');      if (kr) kr.textContent = reviewCount;
   renderEmpReviews(empReviews||[]);
   document.getElementById('empTotalCust').textContent   = bks.length;
-  document.getElementById('empOrdersBadge').textContent = todayAssigned.length;
+  const activeEmpBks = bks.filter(b => b.status === 'confirmed' || b.status === 'pending');
+  document.getElementById('empOrdersBadge').textContent = activeEmpBks.length || '';
   document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earnings).toLocaleString();
   const ko = document.getElementById('empKpiOnTime');  if (ko) ko.textContent = bks.length > 0 ? onTimePct + '%' : '—';
   const km = document.getElementById('empKpiMissed');  if (km) km.textContent = cancelled.length;
