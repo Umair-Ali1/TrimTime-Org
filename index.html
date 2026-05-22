@@ -1303,10 +1303,10 @@ input[type=range]{width:100%;accent-color:var(--p)}
         <div id="eOverview" class="sub-page active">
           <div class="emp-hero fade-up">
             <div style="display:flex;align-items:center;gap:16px">
-              <div class="emp-hero-av">US</div>
+              <div class="emp-hero-av" id="empHeroAv">MT</div>
               <div class="emp-hero-info">
-                <h2>Usman Sheikh</h2>
-                <p>Senior Barber · Royal Cuts Studio</p>
+                <h2 id="empHeroName">Loading...</h2>
+                <p id="empHeroRole">Barber</p>
                 <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
                   <span style="color:rgba(255,255,255,.9);font-size:16px;letter-spacing:2px">★★★★★</span>
                   <span style="font-family:'Poppins',sans-serif;font-weight:700;color:#fff">4.9</span>
@@ -1372,11 +1372,11 @@ input[type=range]{width:100%;accent-color:var(--p)}
         <div id="eSubProfile" class="sub-page">
           <div style="margin-bottom:24px"><h2 style="font-size:24px">My Profile</h2></div>
           <div class="card" style="max-width:500px">
-            <div class="prof-av" style="background:var(--g2)">US</div>
-            <div class="field"><label class="label">Full Name</label><input class="input" value="Usman Sheikh"></div>
-            <div class="field"><label class="label">Role</label><input class="input" value="Senior Barber" readonly></div>
-            <div class="field"><label class="label">Phone</label><input class="input" value="+92 333 5678901"></div>
-            <button class="btn" onclick="toast('Profile saved!','success')">Save Changes</button>
+            <div class="prof-av" style="background:var(--g2)" id="empProfAv">MT</div>
+            <div class="field"><label class="label">Full Name</label><input class="input" id="empProfName" placeholder="Your name"></div>
+            <div class="field"><label class="label">Role</label><input class="input" id="empProfRole" readonly></div>
+            <div class="field"><label class="label">Phone</label><input class="input" id="empProfPhone" placeholder="Your phone"></div>
+            <button class="btn" onclick="saveEmpProfile()">Save Changes</button>
           </div>
         </div>
       </div>
@@ -2176,25 +2176,52 @@ function showOwnerSub(id) {
 
 // ════ EMPLOYEE DASHBOARD ════
 async function refreshEmpDash() {
-  const empName=currentUser?currentUser.firstName+' '+currentUser.lastName:'Usman Sheikh';
-  const { data: assigned } = await _supabase.from('bookings').select('*').eq('barber',empName).order('created_at',{ascending:false});
-  const bks=assigned||[];
-  const today=new Date().toISOString().split('T')[0];
-  const todayAssigned=bks.filter(b=>b.date===today);
-  const earnings=bks.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0)*0.6,0);
-  document.getElementById('empOrdersBadge').textContent=todayAssigned.length;
-  document.getElementById('empTotalCust').textContent=bks.length;
-  document.getElementById('empMonthEarn').textContent='Rs. '+Math.round(earnings).toLocaleString();
-  ['empEarnToday','empEarnMonth','empEarnTotal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Rs. '+Math.round(earnings).toLocaleString(); });
-  document.getElementById('empDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  if (currentUser) {
-    document.getElementById('empAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-    document.getElementById('empName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
-  }
-  empIsAvail=STORE.get('available')??true; updateAvailToggle();
-  renderEmpSchedule(todayAssigned,'empTodaySchedule');
-  renderEmpSchedule(bks,'empFullSchedule');
+  if (!currentUser) return;
+  const fullName = currentUser.firstName + ' ' + (currentUser.lastName || '');
+  const initials = (currentUser.firstName[0] + (currentUser.lastName?.[0] || '')).toUpperCase();
+  // Fetch employee record for job role and salon name
+  const { data: emp } = await _supabase.from('employees').select('*, saloons(name)').eq('user_id', currentUser.id).single();
+  const jobRole   = emp?.role || 'Barber';
+  const salonName = emp?.saloons?.name || currentSaloon?.name || 'TrimTime';
+  // Sidebar
+  document.getElementById('empAv').textContent   = initials;
+  document.getElementById('empName').textContent = fullName;
+  // Hero section
+  const heroAv = document.getElementById('empHeroAv'); if (heroAv) heroAv.textContent = initials;
+  const heroNm = document.getElementById('empHeroName'); if (heroNm) heroNm.textContent = fullName;
+  const heroRl = document.getElementById('empHeroRole'); if (heroRl) heroRl.textContent = jobRole + ' · ' + salonName;
+  // Profile section
+  const profAv = document.getElementById('empProfAv');   if (profAv) profAv.textContent = initials;
+  const profNm = document.getElementById('empProfName'); if (profNm) profNm.value = fullName;
+  const profRl = document.getElementById('empProfRole'); if (profRl) profRl.value = jobRole;
+  const profPh = document.getElementById('empProfPhone'); if (profPh) profPh.value = currentUser.phone || '';
+  // Stats
+  const { data: assigned } = await _supabase.from('bookings').select('*').eq('barber', fullName).order('created_at', {ascending:false});
+  const bks = assigned || [];
+  const today = new Date().toISOString().split('T')[0];
+  const todayAssigned = bks.filter(b => b.date === today);
+  const earnings = bks.filter(b => b.status === 'completed').reduce((a, b) => a + (b.price || 0) * 0.6, 0);
+  document.getElementById('empOrdersBadge').textContent = todayAssigned.length;
+  document.getElementById('empTotalCust').textContent   = bks.length;
+  document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earnings).toLocaleString();
+  ['empEarnToday','empEarnMonth','empEarnTotal'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Rs. ' + Math.round(earnings).toLocaleString(); });
+  document.getElementById('empDashDate').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  empIsAvail = STORE.get('available') ?? true; updateAvailToggle();
+  renderEmpSchedule(todayAssigned, 'empTodaySchedule');
+  renderEmpSchedule(bks, 'empFullSchedule');
   renderEmpOrders(bks);
+}
+async function saveEmpProfile() {
+  if (!currentUser) return;
+  const name  = document.getElementById('empProfName')?.value.trim();
+  const phone = document.getElementById('empProfPhone')?.value.trim();
+  if (!name) { toast('Name cannot be empty', 'error'); return; }
+  const parts = name.split(' ');
+  const { error } = await _supabase.from('profiles').update({ first_name: parts[0], last_name: parts.slice(1).join(' '), phone }).eq('id', currentUser.id);
+  if (error) { toast('Save failed: ' + error.message, 'error'); return; }
+  currentUser.firstName = parts[0]; currentUser.lastName = parts.slice(1).join(' '); currentUser.phone = phone;
+  toast('Profile saved!', 'success');
+  refreshEmpDash();
 }
 function renderEmpSchedule(bookings,elId) {
   const el=document.getElementById(elId); if(!el) return;
