@@ -2028,11 +2028,13 @@ async function refreshOwnerDash() {
     document.getElementById('ownerAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
     document.getElementById('ownerName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
   }
+  const { count: empCount } = await _supabase.from('employees').select('*',{count:'exact',head:true}).eq('saloon_id',currentSaloon.id);
+  document.getElementById('ownerSeats').textContent = empCount || 0;
   renderOwnerOrdersTable(bks.slice(0,5));
   renderOwnerOrders(); renderServicesList(); renderOwnerSeatGrid();
   renderEmployeeList(); renderOwnerEarnings(bks); renderPopularServices(bks);
   shopIsOpen=currentSaloon.is_open??true; updateShopToggle();
-  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invite_code||'TT-XXXX-0000';
+  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invoke_code||currentSaloon.invite_code||'TT-XXXX-0000';
 }
 function renderPopularServices(bookings) {
   const el=document.getElementById('popularServices'); if(!el) return;
@@ -2111,7 +2113,6 @@ async function renderOwnerSeatGrid() {
       ${s.status==='available'?'🪑':s.status==='occupied'?'🚫':'🔒'}
       <span>Seat ${s.seat_number}</span>
     </div>`).join('');
-  const ownerSeats=document.getElementById('ownerSeats'); if(ownerSeats) ownerSeats.textContent=(seats||[]).length;
 }
 async function ownerToggleSeat(id, currentStatus) {
   const cycle={available:'occupied',occupied:'reserved',reserved:'available'};
