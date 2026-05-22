@@ -1,0 +1,114 @@
+<div id="pgEmpDash" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="empSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico"><i class="fas fa-scissors"></i></div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Employee Portal</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua green" id="empAv">US</div>
+        <div class="sidebar-user-info"><div class="name" id="empName">Usman Sheikh</div><div class="role">Senior Barber</div></div>
+      </div>
+      <div class="nav-section">My Work</div>
+      <a class="nav-link active" onclick="showEmpSub('eOverview')"><span class="icon"><i class="fas fa-gauge-high"></i></span>Overview</a>
+      <a class="nav-link" onclick="showEmpSub('eSubSchedule')"><span class="icon"><i class="fas fa-calendar-days"></i></span>My Schedule</a>
+      <a class="nav-link" onclick="showEmpSub('eSubOrders')"><span class="icon"><i class="fas fa-clipboard-list"></i></span>Assigned Orders<span class="nav-badge" id="empOrdersBadge">0</span></a>
+      <a class="nav-link" onclick="showEmpSub('eSubEarnings')"><span class="icon"><i class="fas fa-coins"></i></span>My Earnings</a>
+      <a class="nav-link" onclick="showEmpSub('eSubReviews')"><span class="icon"><i class="fas fa-star"></i></span>Reviews</a>
+      <a class="nav-link" onclick="showEmpSub('eSubProfile')"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('empSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('empSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">Employee Dashboard</div><div class="topbar-sub" id="empDashDate"></div></div>
+        <div class="topbar-right">
+          <button class="toggle-btn" id="availToggle" onclick="toggleAvailability()"><span class="t-dot on" id="availDot"></span><span id="availTxt">Available</span></button>
+          <span class="badge employee">Employee</span>
+          <div class="icon-btn"><span><i class="fas fa-bell"></i></span></div>
+        </div>
+      </header>
+      <div class="content">
+        <div id="eOverview" class="sub-page active">
+          <div class="emp-hero fade-up">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div class="emp-hero-av" id="empHeroAv">MT</div>
+              <div class="emp-hero-info">
+                <h2 id="empHeroName">Loading...</h2>
+                <p id="empHeroRole">Barber</p>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                  <span id="empHeroStars" style="color:rgba(255,255,255,.9);font-size:16px;letter-spacing:2px">—</span>
+                  <span id="empHeroRating" style="font-family:'Poppins',sans-serif;font-weight:700;color:#fff">—</span>
+                  <span id="empHeroReviewCount" style="font-size:13px;color:rgba(255,255,255,.7)">(0 reviews)</span>
+                </div>
+                <div class="kpi-row" style="background:rgba(255,255,255,.1);border-radius:10px;margin-top:12px;gap:0">
+                  <div class="kpi"><div class="kpi-n" style="color:#fff" id="empKpiReviews">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Reviews</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empTotalCust">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Customers</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empKpiOnTime">—</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">On Time</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empKpiMissed">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Cancelled</div></div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="earn-lbl">This Month</div>
+              <div class="earn-big" id="empMonthEarn">Rs. 0</div>
+            </div>
+          </div>
+          <div class="g2 fade-up">
+            <div class="card">
+              <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">📅 Today's Schedule</div>
+              <div class="schedule-list" id="empTodaySchedule"></div>
+            </div>
+            <div class="card">
+              <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">⭐ Rate a Customer</div>
+              <div class="field"><label class="label">Customer Name</label><input class="input" id="rateCustomer" placeholder="e.g. Ali Khan"></div>
+              <div class="field"><label class="label">Service Provided</label><input class="input" id="rateSvc" placeholder="e.g. Hair Cutting"></div>
+              <div class="field"><label class="label">Rating</label>
+                <div class="star-widget" id="starWidget">
+                  <span class="star on" onclick="setRating(1)">★</span>
+                  <span class="star on" onclick="setRating(2)">★</span>
+                  <span class="star on" onclick="setRating(3)">★</span>
+                  <span class="star on" onclick="setRating(4)">★</span>
+                  <span class="star on" onclick="setRating(5)">★</span>
+                </div>
+              </div>
+              <div class="field"><label class="label">Notes</label><textarea class="input" id="rateNotes" rows="2" placeholder="Any notes..."></textarea></div>
+              <button class="btn btn-sm" onclick="submitRating()">Submit Rating</button>
+            </div>
+          </div>
+        </div>
+        <div id="eSubSchedule" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Schedule</h2></div>
+          <div class="card"><div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">Full Schedule</div><div class="schedule-list" id="empFullSchedule"></div></div>
+        </div>
+        <div id="eSubOrders" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Assigned Orders</h2></div>
+          <div class="booking-list" id="empOrdersList"></div>
+        </div>
+        <div id="eSubEarnings" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Earnings</h2></div>
+          <div class="g3" style="margin-bottom:20px">
+            <div class="stat-card"><div class="stat-num" id="empEarnToday">Rs. 0</div><div class="stat-label">Today</div></div>
+            <div class="stat-card"><div class="stat-num" id="empEarnMonth">Rs. 0</div><div class="stat-label">This Month</div></div>
+            <div class="stat-card"><div class="stat-num" id="empEarnTotal">Rs. 0</div><div class="stat-label">All Time</div></div>
+          </div>
+        </div>
+        <div id="eSubReviews" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Reviews</h2></div>
+          <div id="empReviewsList"><div class="card"><p style="color:var(--text3)">Loading reviews...</p></div></div>
+        </div>
+        <div id="eSubProfile" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Profile</h2></div>
+          <div class="card" style="max-width:500px">
+            <div class="prof-av" style="background:var(--g2)" id="empProfAv">MT</div>
+            <div class="field"><label class="label">Full Name</label><input class="input" id="empProfName" placeholder="Your name"></div>
+            <div class="field"><label class="label">Role</label><input class="input" id="empProfRole" readonly></div>
+            <div class="field"><label class="label">Phone</label><input class="input" id="empProfPhone" placeholder="Your phone"></div>
+            <button class="btn" onclick="saveEmpProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

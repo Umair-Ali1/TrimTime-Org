@@ -1,0 +1,84 @@
+<div id="pgHome" class="page">
+  <nav class="home-nav">
+    <div class="hn-logo" onclick="showPage('pgLanding')">
+      <div class="hn-logo-ico"><i class="fas fa-scissors"></i></div>
+      <div class="hn-logo-text">TrimTime</div>
+    </div>
+    <div class="hn-links">
+      <span class="hn-link" onclick="showPage('pgHome')">Discover</span>
+      <span class="hn-link" onclick="showPage('pgBooking')">Book Now</span>
+      <span class="hn-link" onclick="showPage('pgUserDash')">Dashboard</span>
+    </div>
+    <div class="hn-right" style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div class="icon-btn" id="homeNotifBtn" style="display:none"><span><i class="fas fa-bell"></i></span><span class="dot"></span></div>
+      <button class="btn btn-sm btn-outline" id="homeLoginBtn" style="display:none" onclick="showPage('pgLogin')"><i class="fas fa-right-to-bracket"></i> Login</button>
+      <div class="nav-av" id="homeAv" onclick="showPage('pgUserDash')" style="display:none">AK</div>
+    </div>
+  </nav>
+  <div class="home-hero">
+    <h1>Find &amp; Book <span>Top Salons</span></h1>
+    <p>Discover the best salons near you and book in seconds</p>
+    <div class="searchbar">
+      <input class="sb-input" id="searchInput" placeholder="Search salons, services..." oninput="renderSaloons()">
+      <div class="sb-sep"></div>
+      <div class="sb-loc"><i class="fas fa-location-dot"></i> Lahore, PK</div>
+      <button class="sb-btn" onclick="renderSaloons()">Search</button>
+    </div>
+  </div>
+  <div class="chip-bar">
+    <span class="chip-lbl">Filter:</span>
+    <span class="chip on" onclick="setChip('all',this)">All</span>
+    <span class="chip" onclick="setChip('open',this)">Open Now</span>
+    <span class="chip" onclick="setChip('top',this)">Top Rated</span>
+    <span class="chip" onclick="setChip('hair',this)">Hair Cutting</span>
+    <span class="chip" onclick="setChip('beard',this)">Beard &amp; Shave</span>
+    <span class="chip" onclick="setChip('facial',this)">Facial</span>
+    <span class="chip" onclick="setChip('massage',this)">Massage</span>
+    <span class="chip" onclick="setChip('kids',this)">Kids Cut</span>
+  </div>
+  <div class="stats-row">
+    <div class="st-item"><div class="st-ico"><i class="fas fa-store"></i></div><div><div class="st-n" id="statSalons">—</div><div class="st-l">Total Salons</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-users"></i></div><div><div class="st-n" id="statUsers">—</div><div class="st-l">Total Users</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-chair"></i></div><div><div class="st-n" id="statSeats">—</div><div class="st-l">Open Seats Today</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-star"></i></div><div><div class="st-n" id="statRating">—</div><div class="st-l">Avg Rating</div></div></div>
+    <div class="st-item"><div class="st-ico"><i class="fas fa-bolt"></i></div><div><div class="st-n" id="statBookings">—</div><div class="st-l">Total Bookings</div></div></div>
+  </div>
+  <div class="home-main">
+    <aside class="filter-sidebar">
+      <div class="filt-card">
+        <div class="filt-title">Distance &amp; Price</div>
+        <div class="range-row"><div class="range-hd"><span>Distance</span><span class="range-val" id="distVal">5 km</span></div><input type="range" min="1" max="20" value="5" oninput="document.getElementById('distVal').textContent=this.value+' km'"></div>
+        <div class="range-row"><div class="range-hd"><span>Max Price</span><span class="range-val" id="priceVal">Rs. 2000</span></div><input type="range" min="200" max="5000" step="100" value="2000" oninput="document.getElementById('priceVal').textContent='Rs. '+this.value"></div>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Services</div>
+        <label class="check-item"><input type="checkbox" checked> Hair Cutting</label>
+        <label class="check-item"><input type="checkbox" checked> Beard &amp; Shave</label>
+        <label class="check-item"><input type="checkbox"> Facial &amp; Skin</label>
+        <label class="check-item"><input type="checkbox"> Massage</label>
+        <label class="check-item"><input type="checkbox"> Hair Color</label>
+        <label class="check-item"><input type="checkbox"> Kids Cut</label>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Rating</div>
+        <label class="check-item"><input type="checkbox" checked> 4.5+ ★</label>
+        <label class="check-item"><input type="checkbox"> 4.0+ ★</label>
+        <label class="check-item"><input type="checkbox"> Any Rating</label>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Availability</div>
+        <label class="check-item"><input type="checkbox" checked> Open Now</label>
+        <label class="check-item"><input type="checkbox"> Today</label>
+        <label class="check-item"><input type="checkbox"> This Week</label>
+      </div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:8px" onclick="renderSaloons()">Apply Filters</button>
+    </aside>
+    <div class="saloon-grid">
+      <div class="grid-head">
+        <h2>Top Rated Salons near <span style="color:var(--p)">Lahore, PK</span></h2>
+        <select class="sort-sel"><option>Best Match</option><option>Top Rated</option><option>Nearest First</option><option>Price: Low-High</option></select>
+      </div>
+      <div class="saloon-cards" id="saloonCards"></div>
+    </div>
+  </div>
+</div>

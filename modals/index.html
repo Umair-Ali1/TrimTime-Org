@@ -1,0 +1,27 @@
+<div class="modal-bg" id="ratingModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title"><i class="fas fa-star"></i> Rate Your Experience</div><span class="modal-close" onclick="closeModal('ratingModal')">✕</span></div>
+    <div style="margin-bottom:4px;font-weight:600;font-size:15px" id="ratingModalSalon">Royal Cuts Studio</div>
+    <div style="margin-bottom:14px;font-size:13px;color:var(--text3)" id="ratingModalBarber"></div>
+    <div class="star-widget" id="ratingStars" style="justify-content:center;margin-bottom:16px">
+      <span class="star" onclick="setModalRating(1)">★</span>
+      <span class="star" onclick="setModalRating(2)">★</span>
+      <span class="star" onclick="setModalRating(3)">★</span>
+      <span class="star" onclick="setModalRating(4)">★</span>
+      <span class="star" onclick="setModalRating(5)">★</span>
+    </div>
+    <div class="field"><label class="label">Your Comment (optional)</label><textarea class="input" id="ratingReview" rows="3" placeholder="Tell us about your experience..."></textarea></div>
+    <button class="btn" id="reviewSubmitBtn" style="width:100%;justify-content:center" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="addServiceModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">✂️ Add New Service</div><span class="modal-close" onclick="closeModal('addServiceModal')">✕</span></div>
+    <div class="field"><label class="label">Service Name</label><input class="input" id="svcName" placeholder="e.g. Hair Coloring"></div>
+    <div class="field"><label class="label">Icon (emoji)</label><input class="input" id="svcIcon" placeholder="e.g. 🎨" value="✂️"></div>
+    <div class="field"><label class="label">Price (Rs.)</label><input class="input" id="svcPrice" type="number" placeholder="300"></div>
+    <div class="field"><label class="label">Duration</label><input class="input" id="svcDuration" placeholder="e.g. 30–45 min"></div>
+    <button class="btn" style="width:100%;justify-content:center" onclick="addService()">Add Service</button>
+  </div>
+</div>

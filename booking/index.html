@@ -1,0 +1,98 @@
+<div id="pgBooking" class="page">
+  <nav class="book-nav">
+    <button class="book-back" onclick="showPage('pgHome')">← Back to Discover</button>
+    <div style="display:flex;align-items:center;gap:8px"><div class="hn-logo-ico"><i class="fas fa-scissors"></i></div><span style="font-family:'Poppins',sans-serif;font-weight:800;color:var(--p);font-size:16px">TrimTime</span></div>
+    <div class="book-step-ct" id="bookStepCount">Step 1 of 4</div>
+  </nav>
+  <div class="book-header">
+    <div class="book-salon-row">
+      <div class="book-salon-logo">✂️</div>
+      <div>
+        <div class="book-salon-name">Royal Cuts Studio</div>
+        <div class="book-salon-meta">
+          <span>📍 Gulberg III, Lahore</span>
+          <span>⏰ Open 9AM–9PM</span>
+          <span>⭐ 4.9 (342 reviews)</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-row" id="progressRow">
+      <div class="prog-step active" id="ps1"><div class="prog-circle">1</div><span class="prog-name">Service</span></div>
+      <div class="prog-line" id="pl1"></div>
+      <div class="prog-step" id="ps2"><div class="prog-circle">2</div><span class="prog-name">Seat &amp; Time</span></div>
+      <div class="prog-line" id="pl2"></div>
+      <div class="prog-step" id="ps3"><div class="prog-circle">3</div><span class="prog-name">Barber</span></div>
+      <div class="prog-line" id="pl3"></div>
+      <div class="prog-step" id="ps4"><div class="prog-circle">4</div><span class="prog-name">Payment</span></div>
+    </div>
+  </div>
+  <div class="book-body">
+    <div class="book-main">
+      <div class="step-section active" id="step1">
+        <div class="book-sec">
+          <div class="book-sec-title">1. Choose a Service</div>
+          <div class="book-sec-sub">Select the service you want. Sub-options will appear after selection.</div>
+          <div class="svc-grid" id="svcGrid"></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn" onclick="goStep(2)">Continue → Seat &amp; Time</button>
+        </div>
+      </div>
+      <div class="step-section" id="step2">
+        <div class="book-sec">
+          <div class="book-sec-title">2. Pick a Seat &amp; Time</div>
+          <div class="book-sec-sub">Select your preferred seat and time slot.</div>
+          <div style="margin-bottom:16px"><div class="label">Select Date</div><input type="date" class="input" id="bookDate" style="max-width:220px"></div>
+          <div style="margin-bottom:16px"><div class="label" style="margin-bottom:10px">Available Seats</div><div class="seat-grid-disp" id="seatGrid"></div></div>
+          <div><div class="label" style="margin-bottom:10px">Time Slots</div><div class="slot-grid" id="slotGrid"></div></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+          <button class="btn" onclick="goStep(3)">Continue → Choose Barber</button>
+        </div>
+      </div>
+      <div class="step-section" id="step3">
+        <div class="book-sec">
+          <div class="book-sec-title">3. Choose Your Barber</div>
+          <div class="book-sec-sub">Pick your preferred barber or let us assign one.</div>
+          <div class="barber-grid" id="barberGrid"></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+          <button class="btn" onclick="goStep(4)">Continue → Payment</button>
+        </div>
+      </div>
+      <div class="step-section" id="step4">
+        <div class="book-sec">
+          <div class="book-sec-title">4. Payment Method</div>
+          <div class="book-sec-sub">Choose how you'd like to pay.</div>
+          <div class="pm-grid" id="pmGrid">
+            <div class="pm picked" onclick="pickPM(this)" data-pm="cash"><div class="pm-icon">💵</div><div><div class="pm-name">Cash on Visit</div><div class="pm-desc">Pay at the saloon</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="card"><div class="pm-icon">💳</div><div><div class="pm-name">Credit / Debit Card</div><div class="pm-desc">Secure online payment</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="easypaisa"><div class="pm-icon">📱</div><div><div class="pm-name">Easypaisa</div><div class="pm-desc">Mobile wallet</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="jazzcash"><div class="pm-icon">🎵</div><div><div class="pm-name">JazzCash</div><div class="pm-desc">Mobile wallet</div></div></div>
+          </div>
+          <div id="cardFields" style="display:none;margin-top:16px">
+            <div class="field"><label class="label">Card Number</label><input class="input" placeholder="1234 5678 9012 3456"></div>
+            <div class="g2"><div class="field"><label class="label">Expiry</label><input class="input" placeholder="MM/YY"></div><div class="field"><label class="label">CVV</label><input class="input" placeholder="123" type="password"></div></div>
+          </div>
+        </div>
+        <div class="book-sec" id="finalSummary">
+          <div class="sum-title">📋 Booking Summary</div>
+          <div id="summaryRows"></div>
+          <div class="sum-row" style="border:none;margin-top:8px"><div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:16px">Total</div><div class="sum-total" id="sumTotal">Rs. 300</div></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+          <button class="confirm-btn" onclick="confirmBooking()">✓ Confirm Booking</button>
+        </div>
+      </div>
+    </div>
+    <div class="book-sidebar">
+      <div class="book-summary">
+        <div class="sum-title"><i class="fas fa-clipboard-list"></i> Your Selection</div>
+        <div id="liveSummary" style="color:var(--text3);font-size:14px">No selections yet.</div>
+      </div>
+    </div>
+  </div>
+</div>

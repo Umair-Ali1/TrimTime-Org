@@ -1,0 +1,85 @@
+<div id="pgUserDash" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="userSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico"><i class="fas fa-scissors"></i></div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Book Your Cut</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua purple" id="userAv">AK</div>
+        <div class="sidebar-user-info"><div class="name" id="userName">Ali Khan</div><div class="role">Customer</div></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" onclick="showPage('pgHome')"><span class="icon"><i class="fas fa-compass"></i></span>Discover Salons</a>
+      <a class="nav-link" onclick="showPage('pgBooking')"><span class="icon"><i class="fas fa-calendar-plus"></i></span>Book Appointment</a>
+      <div class="nav-section">My Account</div>
+      <a class="nav-link active" onclick="showUserSub('subOverview')"><span class="icon"><i class="fas fa-gauge-high"></i></span>My Dashboard</a>
+      <a class="nav-link" onclick="showUserSub('subBookings')"><span class="icon"><i class="fas fa-list"></i></span>My Bookings<span class="nav-badge" id="userBookingsBadge">0</span></a>
+      <a class="nav-link" onclick="showUserSub('subFavs')"><span class="icon"><i class="fas fa-heart"></i></span>Favourites</a>
+      <a class="nav-link" onclick="showUserSub('subProfile')"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile Settings</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('userSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('userSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">My Dashboard</div><div class="topbar-sub" id="userDashDate"></div></div>
+        <div class="topbar-right">
+          <span class="badge customer">Customer</span>
+          <button class="btn btn-sm" onclick="showPage('pgBooking')">+ Book Now</button>
+          <div class="icon-btn"><span><i class="fas fa-bell"></i></span><span class="dot"></span></div>
+        </div>
+      </header>
+      <div class="content">
+        <div id="subOverview" class="sub-page active">
+          <div class="banner fade-up">
+            <div><h2 id="userGreeting">Good afternoon!</h2><p id="userNextAppt">No upcoming appointments. <a style="color:rgba(255,255,255,.8);cursor:pointer;text-decoration:underline" onclick="showPage('pgBooking')">Book one now!</a></p></div>
+            <button class="btn btn-white btn-sm" onclick="showPage('pgBooking')">Book Again</button>
+          </div>
+          <div class="g4 fade-up" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p"><i class="fas fa-calendar-check"></i></div><span class="stat-badge" id="statTotalBadge">0 bookings</span></div><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Bookings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico g"><i class="fas fa-star"></i></div><span class="stat-badge">Gold Tier</span></div><div class="stat-num">4.8</div><div class="stat-label">Avg Rating Given</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p"><i class="fas fa-coins"></i></div><span class="stat-badge" id="statSpentBadge">—</span></div><div class="stat-num" id="statSpent">Rs. 0</div><div class="stat-label">Total Spent</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico b"><i class="fas fa-clock"></i></div><span class="stat-badge">Time saved</span></div><div class="stat-num">18.5h</div><div class="stat-label">Wait Time Saved</div></div>
+          </div>
+          <div class="card fade-up">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700">Recent Bookings</div><button class="btn btn-sm btn-outline" onclick="showUserSub('subBookings')">View All</button></div>
+            <div id="recentBookings" class="booking-list"></div>
+          </div>
+        </div>
+        <div id="subBookings" class="sub-page">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div><h2 style="font-size:24px">My Bookings</h2><p style="color:var(--text3);margin-top:4px">All your appointment history</p></div>
+            <button class="btn btn-sm" onclick="showPage('pgBooking')">+ New Booking</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="chip on" onclick="filterUserBks('all',this)">All</button>
+            <button class="chip" onclick="filterUserBks('confirmed',this)">Confirmed</button>
+            <button class="chip" onclick="filterUserBks('completed',this)">Completed</button>
+            <button class="chip" onclick="filterUserBks('cancelled',this)">Cancelled</button>
+          </div>
+          <div id="allBookingsList" class="booking-list"></div>
+        </div>
+        <div id="subFavs" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Favourites</h2><p style="color:var(--text3);margin-top:4px">Your saved salons</p></div>
+          <div class="saloon-cards" id="favCards"></div>
+        </div>
+        <div id="subProfile" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Profile Settings</h2><p style="color:var(--text3);margin-top:4px">Manage your account</p></div>
+          <div class="card" style="max-width:560px">
+            <div class="prof-av" id="profAvatar">AK</div>
+            <div class="g2">
+              <div class="field"><label class="label">Full Name</label><input class="input" id="profName" placeholder="Your name"></div>
+              <div class="field"><label class="label">Email</label><input class="input" id="profEmail" type="email"></div>
+            </div>
+            <div class="g2">
+              <div class="field"><label class="label">Phone</label><input class="input" id="profPhone"></div>
+              <div class="field"><label class="label">City</label><input class="input" id="profCity"></div>
+            </div>
+            <button class="btn" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

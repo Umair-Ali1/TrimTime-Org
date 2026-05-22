@@ -1,0 +1,109 @@
+<div id="pgAdmin" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="adminSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico"><i class="fas fa-shield-halved"></i></div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Admin Panel</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua" style="background:var(--red)">AD</div>
+        <div class="sidebar-user-info"><div class="name">Admin</div><div class="role">System Administrator</div></div>
+      </div>
+      <div class="nav-section">Management</div>
+      <a class="nav-link active" onclick="showAdminSub('adOverview',this)"><span class="icon"><i class="fas fa-gauge-high"></i></span>Overview</a>
+      <a class="nav-link" onclick="showAdminSub('adSaloons',this)"><span class="icon"><i class="fas fa-store"></i></span>All Saloons</a>
+      <a class="nav-link" onclick="showAdminSub('adUsers',this)"><span class="icon"><i class="fas fa-users"></i></span>All Users</a>
+      <a class="nav-link" onclick="showAdminSub('adBookings',this)"><span class="icon"><i class="fas fa-clipboard-list"></i></span>All Bookings</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('adminSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('adminSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">Admin Panel</div><div class="topbar-sub">TrimTime Platform Management</div></div>
+        <div class="topbar-right">
+          <span class="badge" style="background:var(--red10);color:var(--red)">Admin</span>
+          <div class="icon-btn"><span><i class="fas fa-bell"></i></span></div>
+        </div>
+      </header>
+      <div class="content">
+        <!-- OVERVIEW -->
+        <div id="adOverview" class="sub-page active">
+          <div class="fade-up" style="margin-bottom:24px">
+            <h2 style="font-size:24px">Platform Overview</h2>
+            <p style="color:var(--text3);margin-top:4px">Real-time stats from all across TrimTime</p>
+          </div>
+          <div class="g4 fade-up" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p"><i class="fas fa-store"></i></div></div><div class="stat-num" id="adStatSaloons">—</div><div class="stat-label">Total Saloons</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico b"><i class="fas fa-users"></i></div></div><div class="stat-num" id="adStatUsers">—</div><div class="stat-label">Registered Users</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico g"><i class="fas fa-clipboard-list"></i></div></div><div class="stat-num" id="adStatBookings">—</div><div class="stat-label">Total Bookings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico r"><i class="fas fa-coins"></i></div></div><div class="stat-num" id="adStatRevenue">—</div><div class="stat-label">Total Revenue</div></div>
+          </div>
+          <div class="card fade-up">
+            <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px">Recent Bookings</div>
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--border)">
+                <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text3)">Salon</th>
+                <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text3)">Service</th>
+                <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text3)">Date</th>
+                <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text3)">Price</th>
+                <th style="text-align:left;padding:8px 12px;font-size:13px;color:var(--text3)">Status</th>
+              </tr></thead>
+              <tbody id="adRecentBody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <!-- SALOONS -->
+        <div id="adSaloons" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">All Saloons</h2></div>
+          <div class="card">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--border)">
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Name</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Location</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Rating</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Price From</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Status</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Action</th>
+              </tr></thead>
+              <tbody id="adSaloonTable"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <!-- USERS -->
+        <div id="adUsers" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">All Users</h2></div>
+          <div class="card">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--border)">
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Name</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Phone</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Role</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">City</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Joined</th>
+              </tr></thead>
+              <tbody id="adUserTable"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+        <!-- BOOKINGS -->
+        <div id="adBookings" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">All Bookings</h2></div>
+          <div class="card">
+            <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+              <thead><tr style="border-bottom:2px solid var(--border)">
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Salon</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Service</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Barber</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Date &amp; Time</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Price</th>
+                <th style="text-align:left;padding:10px 12px;font-size:13px;color:var(--text3)">Status</th>
+              </tr></thead>
+              <tbody id="adBookingTable"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
