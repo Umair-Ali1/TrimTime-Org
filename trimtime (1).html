@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TrimTime — Book Your Perfect Look</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --p:#6C3BEE; --pl:#8B5CF6; --pd:#4F29D4; --p10:rgba(108,59,238,.10); --p20:rgba(108,59,238,.20);
+  --g2:#10B981; --g210:rgba(16,185,129,.10); --g220:rgba(16,185,129,.20);
+  --red:#EF4444; --red10:rgba(239,68,68,.10); --red20:rgba(239,68,68,.20);
+  --blue:#3B82F6; --blue10:rgba(59,130,246,.10); --blue20:rgba(59,130,246,.20);
+  --amber:#F59E0B; --amber10:rgba(245,158,11,.10);
+  --bg:#F8F7FF; --bg2:#FFFFFF; --bg3:#F3F4F6;
+  --border:#E5E7EB; --border2:#D1D5DB;
+  --text:#111827; --text2:#374151; --text3:#6B7280; --text4:#9CA3AF;
+  --sw:260px; --r:12px; --rl:16px; --rx:24px;
+  --ease:cubic-bezier(.4,0,.2,1); --dur:.22s;
+  --shadow:0 4px 24px rgba(108,59,238,.12);
+  --shadow2:0 1px 8px rgba(0,0,0,.08);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:15px}
+a{text-decoration:none;color:inherit}
+button{font-family:'Inter',sans-serif;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:'Inter',sans-serif;outline:none}
+img,svg{max-width:100%;display:block}
+h1,h2,h3,h4,h5{font-family:'Poppins',sans-serif;line-height:1.2}
+
+/* ═══ BUTTONS ═══ */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--p);color:#fff;border-radius:var(--r);font-weight:600;font-size:15px;transition:all var(--dur);box-shadow:var(--shadow)}
+.btn:hover{background:var(--pd);transform:translateY(-1px);box-shadow:0 8px 28px rgba(108,59,238,.28)}
+.btn:active{transform:translateY(0)}
+.btn-outline{background:transparent;border:2px solid var(--p);color:var(--p);box-shadow:none}
+.btn-outline:hover{background:var(--p10)}
+.btn-white{background:#fff;color:var(--p);box-shadow:var(--shadow2)}
+.btn-white:hover{background:var(--bg3)}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-xs{padding:6px 12px;font-size:12px}
+.btn-danger{background:var(--red);color:#fff;box-shadow:none}
+.btn-danger:hover{background:#dc2626}
+.btn-success{background:var(--g2);color:#fff;box-shadow:none}
+.btn-google{background:#fff;color:var(--text);border:1.5px solid var(--border2);box-shadow:var(--shadow2);justify-content:center}
+.btn-google:hover{background:var(--bg3);transform:none}
+
+/* ═══ CARDS & INPUTS ═══ */
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--shadow2)}
+.input{width:100%;background:#fff;border:1.5px solid var(--border2);border-radius:var(--r);padding:12px 16px;color:var(--text);font-size:15px;transition:border-color var(--dur)}
+.input:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--p10)}
+.input::placeholder{color:var(--text4)}
+select.input{cursor:pointer}
+.label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.field{margin-bottom:16px}
+.input-icon{position:relative}.input-icon .input{padding-left:44px}.input-icon .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+/* ═══ BADGES ═══ */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
+.badge.confirmed,.badge.active{background:var(--g210);color:var(--g2)}
+.badge.pending{background:var(--blue10);color:var(--blue)}
+.badge.completed{background:var(--bg3);color:var(--text3)}
+.badge.cancelled{background:var(--red10);color:var(--red)}
+.badge.owner{background:var(--p10);color:var(--p)}
+.badge.customer{background:var(--blue10);color:var(--blue)}
+.badge.employee{background:var(--g210);color:var(--g2)}
+
+/* ═══ STAT CARDS ═══ */
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--shadow2)}
+.stat-num{font-family:'Poppins',sans-serif;font-size:32px;font-weight:700;color:var(--text)}
+.stat-label{font-size:13px;color:var(--text3);margin-top:2px;font-weight:500}
+.stat-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.stat-ico.p{background:var(--p10)}
+.stat-ico.g{background:var(--g210)}
+.stat-ico.b{background:var(--blue10)}
+.stat-ico.r{background:var(--red10)}
+.stat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.stat-badge{font-size:11px;padding:3px 8px;border-radius:20px;background:var(--g210);color:var(--g2);font-weight:600}
+.stat-badge.down{background:var(--red10);color:var(--red)}
+
+/* ═══ PAGES ═══ */
+.page{display:none;min-height:100vh;animation:fadeIn .3s var(--ease)}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.fade-up{animation:fadeUp .45s var(--ease) both}
+
+/* ═══ ERRORS ═══ */
+.error-msg{background:var(--red10);border:1.5px solid var(--red20);border-radius:var(--r);padding:12px 16px;font-size:14px;color:var(--red);margin-bottom:14px;display:none}
+.error-msg.show{display:block}
+.success-msg{background:var(--g210);border:1.5px solid var(--g220);border-radius:var(--r);padding:12px 16px;font-size:14px;color:var(--g2);margin-bottom:14px;display:none}
+.success-msg.show{display:block}
+
+/* ═══ TOAST ═══ */
+#toastContainer{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:14px 20px;border-radius:var(--r);font-size:14px;font-weight:500;animation:slideIn .3s var(--ease);box-shadow:0 8px 24px rgba(0,0,0,.15);max-width:320px}
+.toast.gold,.toast.success{background:var(--p);color:#fff}
+.toast.error{background:var(--red);color:#fff}
+.toast.info{background:var(--text2);color:#fff}
+
+/* ═══ MODALS ═══ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:var(--rl);padding:28px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text3)}
+.modal-close:hover{background:var(--border)}
+
+/* ═══ SIDEBAR LAYOUT ═══ */
+.app-layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sw);background:#fff;border-right:1.5px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;transition:transform var(--dur) var(--ease)}
+@media(max-width:900px){.sidebar{transform:translateX(-100%)}}
+.sidebar.show{transform:translateX(0)}
+.sidebar-logo{display:flex;align-items:center;gap:12px;padding:22px 20px;border-bottom:1.5px solid var(--border)}
+.sidebar-logo-ico{width:36px;height:36px;background:var(--p);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.sidebar-logo-text{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:var(--p)}
+.sidebar-logo-sub{font-size:10px;color:var(--text4);letter-spacing:1px;text-transform:uppercase}
+.sidebar-user{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1.5px solid var(--border)}
+.ua{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.ua.purple{background:var(--p);color:#fff}
+.ua.blue{background:var(--blue);color:#fff}
+.ua.green{background:var(--g2);color:#fff}
+.sidebar-user-info .name{font-size:14px;font-weight:600;color:var(--text)}
+.sidebar-user-info .role{font-size:12px;color:var(--text3)}
+.nav-section{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text4);padding:16px 20px 6px}
+.nav-link{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:14px;color:var(--text3);cursor:pointer;transition:all var(--dur);position:relative;font-weight:500}
+.nav-link:hover{background:var(--p10);color:var(--p)}
+.nav-link.active{background:var(--p10);color:var(--p);font-weight:600}
+.nav-link.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--p);border-radius:0 3px 3px 0}
+.nav-link .icon{font-size:17px;width:22px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--p);color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
+.sidebar-foot{margin-top:auto;padding:16px 20px;border-top:1.5px solid var(--border)}
+.logout-link{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text3);transition:color var(--dur);cursor:pointer;font-weight:500}
+.logout-link:hover{color:var(--red)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+.overlay.show{display:block}
+.main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+@media(max-width:900px){.main{margin-left:0}}
+.topbar{background:#fff;border-bottom:1.5px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow2)}
+.ham{width:38px;height:38px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:10px;background:var(--bg3);flex-shrink:0;border:1.5px solid var(--border)}
+@media(max-width:900px){.ham{display:flex}}
+.ham span{width:18px;height:2px;background:var(--text2);border-radius:2px}
+.topbar-left{flex:1}
+.topbar-title{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.content{padding:24px;flex:1}
+.banner{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--rl);padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#fff}
+.banner h2{font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px;color:#fff}
+.banner p{font-size:14px;color:rgba(255,255,255,.8)}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;position:relative}
+.dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid #fff}
+.toggle-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text3);transition:all var(--dur);cursor:pointer}
+.toggle-btn.on{border-color:var(--g220);background:var(--g210);color:var(--g2)}
+.toggle-btn.off-red{border-color:var(--red20);background:var(--red10);color:var(--red)}
+.t-dot{width:8px;height:8px;border-radius:50%;background:var(--text4);transition:background var(--dur)}
+.t-dot.on{background:var(--g2)}.t-dot.off{background:var(--red)}
+
+/* sub pages */
+.sub-page{display:none}
+.sub-page.active{display:block;animation:fadeUp .35s var(--ease)}
+
+/* ═══ LANDING ═══ */
+#pgLanding{background:#fff}
+.land-nav{background:#fff;border-bottom:1.5px solid var(--border);padding:0 40px;display:flex;align-items:center;height:70px;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 var(--border)}
+.land-logo{display:flex;align-items:center;gap:10px;font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--p)}
+.land-logo-ico{width:36px;height:36px;background:var(--p);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.land-nav-links{display:flex;gap:4px;margin:0 auto}
+@media(max-width:768px){.land-nav-links{display:none}}
+.land-nav-link{padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text3);transition:all var(--dur)}
+.land-nav-link:hover{color:var(--p);background:var(--p10)}
+.land-nav-right{display:flex;align-items:center;gap:10px}
+/* hero */
+.hero-sec{display:flex;align-items:center;padding:60px 40px;gap:60px;max-width:1200px;margin:0 auto}
+@media(max-width:900px){.hero-sec{flex-direction:column;padding:40px 20px;text-align:center}}
+.hero-left{flex:1}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--p10);border:1.5px solid var(--p20);color:var(--p);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:20px}
+.hero-title{font-size:clamp(38px,5vw,64px);font-weight:900;line-height:1.05;margin-bottom:16px;color:var(--text)}
+.hero-title span{color:var(--p)}
+.hero-sub{font-size:18px;color:var(--text3);max-width:480px;margin-bottom:32px;line-height:1.7}
+@media(max-width:900px){.hero-sub{margin:0 auto 32px}}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+@media(max-width:900px){.hero-btns{justify-content:center}}
+.hero-right{flex:1;display:flex;justify-content:center}
+.hero-img-wrap{width:420px;height:400px;background:linear-gradient(135deg,var(--p10),var(--p20));border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:120px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+@media(max-width:900px){.hero-img-wrap{width:300px;height:280px;font-size:80px}}
+.hero-float{position:absolute;background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.hero-float-1{top:20px;right:-20px;animation:float1 3s ease-in-out infinite}
+.hero-float-2{bottom:30px;left:-20px;animation:float1 3s ease-in-out .5s infinite}
+@keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+/* how it works */
+.hiw-sec{background:var(--bg);padding:60px 40px}
+@media(max-width:768px){.hiw-sec{padding:40px 20px}}
+.sec-head{text-align:center;margin-bottom:40px}
+.sec-tag{display:inline-block;background:var(--p10);color:var(--p);border:1.5px solid var(--p20);padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:12px}
+.sec-title{font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:12px}
+.sec-sub{font-size:16px;color:var(--text3);max-width:520px;margin:0 auto}
+.hiw-steps{display:flex;gap:0;max-width:800px;margin:0 auto;position:relative}
+@media(max-width:600px){.hiw-steps{flex-direction:column;gap:20px}}
+.hiw-step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;position:relative}
+.hiw-step:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:28px;font-size:20px;color:var(--p);font-weight:700}
+@media(max-width:600px){.hiw-step:not(:last-child)::after{display:none}}
+.hiw-num{width:56px;height:56px;background:var(--p);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px;box-shadow:var(--shadow)}
+.hiw-step h4{font-size:16px;font-weight:700;margin-bottom:6px}
+.hiw-step p{font-size:14px;color:var(--text3)}
+/* why */
+.why-sec{padding:60px 40px;max-width:1200px;margin:0 auto}
+@media(max-width:768px){.why-sec{padding:40px 20px}}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
+.why-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:24px;box-shadow:var(--shadow2);transition:all var(--dur)}
+.why-card:hover{border-color:var(--p);box-shadow:var(--shadow);transform:translateY(-3px)}
+.why-ico{font-size:32px;margin-bottom:14px}
+.why-card h4{font-size:17px;font-weight:700;margin-bottom:8px}
+.why-card p{font-size:14px;color:var(--text3);line-height:1.7}
+/* for everyone */
+.fore-sec{background:var(--bg);padding:60px 40px}
+@media(max-width:768px){.fore-sec{padding:40px 20px}}
+.fore-cards{display:flex;gap:20px;max-width:900px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.fore-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:28px;flex:1;min-width:240px;max-width:280px;box-shadow:var(--shadow2);transition:all var(--dur);cursor:pointer}
+.fore-card:hover{border-color:var(--p);box-shadow:var(--shadow);transform:translateY(-3px)}
+.fore-card-ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+.fore-card.cust .fore-card-ico{background:var(--blue10)}
+.fore-card.owner .fore-card-ico{background:var(--p10)}
+.fore-card.emp .fore-card-ico{background:var(--g210)}
+.fore-card h4{font-size:18px;font-weight:700;margin-bottom:6px}
+.fore-card h4 span{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.fore-card.cust h4 span{color:var(--blue)}
+.fore-card.owner h4 span{color:var(--p)}
+.fore-card.emp h4 span{color:var(--g2)}
+.fore-card p{font-size:14px;color:var(--text3);line-height:1.7;margin-bottom:14px}
+.fore-link{font-size:14px;font-weight:600;color:var(--p)}
+/* testimonial */
+.test-sec{padding:60px 40px;max-width:800px;margin:0 auto;text-align:center}
+.test-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:32px;box-shadow:var(--shadow2)}
+.test-stars{color:var(--amber);font-size:22px;letter-spacing:3px;margin-bottom:16px}
+.test-quote{font-size:18px;color:var(--text2);line-height:1.7;margin-bottom:20px;font-style:italic}
+.test-auth{display:flex;align-items:center;gap:12px;justify-content:center}
+.test-av{width:44px;height:44px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+/* newsletter */
+.nl-sec{background:linear-gradient(135deg,var(--p),var(--pl));padding:60px 40px;text-align:center;color:#fff}
+.nl-sec h2{font-size:clamp(26px,4vw,38px);font-weight:800;margin-bottom:10px;color:#fff}
+.nl-sec p{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:28px}
+.nl-form{display:flex;gap:10px;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.nl-form input{flex:1;min-width:200px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:var(--r);padding:12px 16px;color:#fff;font-size:14px}
+.nl-form input::placeholder{color:rgba(255,255,255,.6)}
+.nl-form input:focus{border-color:#fff;outline:none}
+/* footer */
+.land-footer{background:var(--text);color:#fff;padding:48px 40px 24px}
+@media(max-width:768px){.land-footer{padding:32px 20px 20px}}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px;margin-bottom:36px}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr;gap:24px}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr}}
+.footer-brand h3{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:8px}
+.footer-brand h3 span{color:var(--pl)}
+.footer-brand p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.7;max-width:240px}
+.footer-col h5{font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.footer-link{display:block;font-size:14px;color:rgba(255,255,255,.6);margin-bottom:8px;transition:color var(--dur);cursor:pointer}
+.footer-link:hover{color:#fff}
+.footer-bot{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);font-size:13px;color:rgba(255,255,255,.5);flex-wrap:wrap;gap:12px}
+
+/* ═══ LOGIN PAGE ═══ */
+.login-wrap{min-height:100vh;display:flex}
+.login-left{flex:1;background:linear-gradient(135deg,var(--p),var(--pd));position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+@media(max-width:768px){.login-left{display:none}}
+.ll-bg{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.ll-content{position:relative;z-index:1;padding:48px;max-width:420px;color:#fff}
+.ll-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.ll-logo-ico{width:48px;height:48px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.ll-logo-text{font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff}
+.ll-brand{font-family:'Poppins',sans-serif;font-size:38px;font-weight:900;line-height:1.1;margin-bottom:14px;color:#fff}
+.ll-sub{font-size:16px;color:rgba(255,255,255,.75);margin-bottom:36px;line-height:1.7}
+.ll-feat{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.15);font-size:15px;color:rgba(255,255,255,.85)}
+.ll-feat:last-child{border:none}
+.feat-ico{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ll-nums{display:flex;gap:0;margin-top:28px;background:rgba(255,255,255,.1);border-radius:var(--rl);overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+.ll-num{flex:1;padding:18px;text-align:center}
+.ll-num-n{font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:#fff}
+.ll-num-l{font-size:12px;color:rgba(255,255,255,.65);margin-top:2px}
+.ll-num-sep{width:1px;background:rgba(255,255,255,.15)}
+.login-right{width:500px;display:flex;align-items:center;justify-content:center;padding:40px 36px;background:#fff}
+@media(max-width:768px){.login-right{width:100%;padding:28px 20px}}
+.form-wrap{width:100%;max-width:420px}
+.form-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.form-logo-ico{width:36px;height:36px;background:var(--p);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.form-logo-text{font-family:'Poppins',sans-serif;font-size:20px;font-weight:800;color:var(--p)}
+.form-tabs{display:flex;background:var(--bg3);border-radius:var(--r);padding:4px;margin-bottom:24px;gap:4px}
+.ftab{flex:1;padding:10px;border-radius:8px;font-size:14px;font-weight:600;color:var(--text3);transition:all var(--dur);text-align:center}
+.ftab.on{background:#fff;color:var(--p);box-shadow:var(--shadow2)}
+.form-head{font-family:'Poppins',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px;color:var(--text)}
+.form-sub{font-size:14px;color:var(--text3);margin-bottom:22px;line-height:1.6}
+.divider{text-align:center;color:var(--text4);font-size:13px;margin:18px 0;position:relative;display:flex;align-items:center;gap:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1.5px;background:var(--border)}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 16px}
+.role-card{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:16px 8px;text-align:center;cursor:pointer;transition:all var(--dur)}
+.role-card:hover{border-color:var(--p);background:var(--p10)}
+.role-card.selected{border-color:var(--p);background:var(--p10)}
+.rc-icon{font-size:26px;margin-bottom:8px}
+.rc-name{font-size:13px;font-weight:700;color:var(--text)}
+.rc-desc{font-size:11px;color:var(--text3);margin-top:3px}
+.invite-note{display:none;background:var(--blue10);border:1.5px solid var(--blue20);border-radius:var(--r);padding:12px;font-size:13px;color:var(--blue);gap:8px;align-items:flex-start;margin-bottom:12px}
+.invite-note.show{display:flex}
+.demo-btns{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.demo-btn{flex:1;padding:8px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--text2);transition:all var(--dur)}
+.demo-btn:hover{border-color:var(--p);color:var(--p);background:var(--p10)}
+
+/* ═══ HOME / DISCOVER ═══ */
+.home-nav{background:#fff;border-bottom:1.5px solid var(--border);padding:0 24px;display:flex;align-items:center;height:64px;position:sticky;top:0;z-index:50;gap:16px;box-shadow:var(--shadow2)}
+.hn-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.hn-logo-ico{width:32px;height:32px;background:var(--p);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.hn-logo-text{font-family:'Poppins',sans-serif;font-size:18px;font-weight:800;color:var(--p)}
+.hn-links{display:flex;gap:4px;margin-left:auto}
+@media(max-width:700px){.hn-links{display:none}}
+.hn-link{padding:8px 14px;border-radius:8px;font-size:14px;color:var(--text3);font-weight:500;transition:all var(--dur)}
+.hn-link:hover{color:var(--p);background:var(--p10)}
+.hn-right{display:flex;align-items:center;gap:10px}
+.nav-av{width:36px;height:36px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer}
+/* hero banner */
+.home-hero{background:linear-gradient(135deg,var(--p),var(--pl));padding:48px 24px;text-align:center;color:#fff}
+.home-hero h1{font-size:clamp(30px,5vw,52px);font-weight:900;margin-bottom:10px;color:#fff}
+.home-hero h1 span{color:rgba(255,255,255,.8)}
+.home-hero p{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:28px}
+.searchbar{display:flex;align-items:center;background:#fff;border-radius:var(--rx);padding:6px;max-width:580px;margin:0 auto;gap:0;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.sb-input{flex:1;background:none;border:none;padding:10px 14px;color:var(--text);font-size:15px}
+.sb-sep{width:1.5px;height:32px;background:var(--border)}
+.sb-loc{padding:10px 14px;font-size:14px;color:var(--text3);flex-shrink:0}
+.sb-btn{background:var(--p);color:#fff;border-radius:18px;padding:10px 22px;font-weight:700;font-size:14px;flex-shrink:0}
+.sb-btn:hover{background:var(--pd)}
+/* chips */
+.chip-bar{display:flex;gap:8px;padding:16px 24px;overflow-x:auto;border-bottom:1.5px solid var(--border);align-items:center;background:#fff;scrollbar-width:none}
+.chip-bar::-webkit-scrollbar{display:none}
+.chip-lbl{font-size:13px;color:var(--text4);flex-shrink:0;font-weight:600}
+.chip{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);color:var(--text3);white-space:nowrap;transition:all var(--dur);cursor:pointer;background:#fff}
+.chip:hover{border-color:var(--p);color:var(--p)}
+.chip.on{background:var(--p);border-color:var(--p);color:#fff}
+/* stats */
+.stats-row{display:flex;gap:0;background:#fff;border-bottom:1.5px solid var(--border)}
+.st-item{flex:1;display:flex;align-items:center;gap:14px;padding:18px 24px;border-right:1.5px solid var(--border)}
+.st-item:last-child{border:none}
+@media(max-width:600px){.st-item{padding:14px 16px;gap:10px}}
+.st-ico{font-size:22px}
+.st-n{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--p)}
+.st-l{font-size:12px;color:var(--text3);margin-top:1px;font-weight:500}
+/* layout */
+.home-main{display:flex;gap:0;max-width:1400px;margin:0 auto;padding:0 24px 40px}
+.filter-sidebar{width:240px;flex-shrink:0;padding-top:20px}
+@media(max-width:900px){.filter-sidebar{display:none}}
+.saloon-grid{flex:1;padding-top:20px}
+.grid-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.grid-head h2{font-family:'Poppins',sans-serif;font-size:17px;font-weight:700}
+.sort-sel{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:var(--r);padding:8px 12px;font-size:13px;font-weight:500}
+.saloon-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.salon-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:all var(--dur);box-shadow:var(--shadow2)}
+.salon-card:hover{transform:translateY(-4px);border-color:var(--p);box-shadow:var(--shadow)}
+.salon-img{height:150px;background:linear-gradient(135deg,var(--p10),var(--p20));display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.salon-status{position:absolute;top:10px;right:10px;background:var(--g2);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px}
+.salon-status.closed{background:var(--red)}
+.salon-body{padding:16px}
+.salon-name{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.salon-loc{font-size:13px;color:var(--text3);margin-bottom:10px}
+.salon-meta{display:flex;gap:10px;font-size:13px;color:var(--text3)}
+.salon-rating{color:var(--amber);font-weight:700}
+.salon-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1.5px solid var(--border)}
+.salon-price{font-size:13px;color:var(--text3)}
+.salon-price strong{color:var(--text);font-size:14px;font-weight:700}
+.filt-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow2)}
+.filt-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:12px}
+.range-row{margin-bottom:12px}
+.range-hd{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;font-weight:500}
+.range-val{color:var(--p);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--p)}
+.check-item{display:flex;align-items:center;gap:8px;font-size:14px;padding:5px 0;cursor:pointer;color:var(--text2)}
+.check-item input{accent-color:var(--p);width:15px;height:15px}
+
+/* ═══ BOOKING ═══ */
+.book-nav{background:#fff;border-bottom:1.5px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow2)}
+.book-back{font-size:14px;color:var(--p);font-weight:600;display:flex;align-items:center;gap:4px}
+.book-back:hover{text-decoration:underline}
+.book-step-ct{font-size:13px;color:var(--text3);font-weight:600;background:var(--bg3);padding:6px 14px;border-radius:20px}
+.book-header{background:linear-gradient(135deg,var(--p),var(--pl));padding:28px 24px;color:#fff}
+.book-salon-row{display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.book-salon-logo{width:56px;height:56px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.book-salon-name{font-family:'Poppins',sans-serif;font-size:24px;font-weight:800;color:#fff}
+.book-salon-meta{display:flex;gap:16px;font-size:13px;color:rgba(255,255,255,.8);flex-wrap:wrap;margin-top:4px}
+.progress-row{display:flex;align-items:center;gap:0;background:rgba(255,255,255,.1);border-radius:var(--rl);padding:12px 16px;flex-wrap:wrap;gap:8px}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1;min-width:80px}
+.prog-circle{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.7);flex-shrink:0}
+.prog-step.active .prog-circle{background:#fff;color:var(--p);border-color:#fff}
+.prog-step.done .prog-circle{background:var(--g2);border-color:var(--g2);color:#fff}
+.prog-name{font-size:12px;font-weight:600;color:rgba(255,255,255,.7)}
+.prog-step.active .prog-name,.prog-step.done .prog-name{color:#fff}
+.prog-line{flex:1;height:2px;background:rgba(255,255,255,.3);min-width:20px}
+.prog-line.done{background:var(--g2)}
+.book-body{display:flex;gap:24px;padding:24px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
+.book-main{flex:1;min-width:0}
+.book-sidebar{width:280px;flex-shrink:0}
+@media(max-width:900px){.book-sidebar{width:100%}}
+.step-section{display:none}
+.step-section.active{display:block;animation:fadeUp .35s var(--ease)}
+.book-sec{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:24px;margin-bottom:16px;box-shadow:var(--shadow2)}
+.book-sec-title{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.book-sec-sub{font-size:14px;color:var(--text3);margin-bottom:20px}
+.step-btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.svc-card{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all var(--dur);text-align:center}
+.svc-card:hover{border-color:var(--p);background:var(--p10)}
+.svc-card.picked{border-color:var(--p);background:var(--p10)}
+.svc-icon{font-size:36px;margin-bottom:10px}
+.svc-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.svc-price{font-size:13px;color:var(--p);font-weight:600}
+.svc-dur{font-size:12px;color:var(--text3)}
+.sub-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.sub-opt{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all var(--dur);background:#fff}
+.sub-opt.picked{background:var(--p);border-color:var(--p);color:#fff}
+.seat-grid-disp{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:4px}
+.seat-item{border-radius:8px;background:#fff;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;padding:12px 4px;transition:all var(--dur);font-weight:700;font-size:13px}
+.seat-item.available{border-color:var(--g2);color:var(--g2);background:var(--g210)}
+.seat-item.occupied{border-color:var(--red);color:var(--red);background:var(--red10);cursor:not-allowed}
+.seat-item.reserved{border-color:var(--amber);color:var(--amber);background:var(--amber10)}
+.seat-item.picked{border-color:var(--p);background:var(--p);color:#fff}
+.slot-grid{display:flex;flex-wrap:wrap;gap:8px}
+.slot{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all var(--dur);background:#fff}
+.slot:hover{border-color:var(--p);color:var(--p)}
+.slot.picked{background:var(--p);border-color:var(--p);color:#fff}
+.barber-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.barber-card{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:all var(--dur);text-align:center}
+.barber-card:hover{border-color:var(--p)}
+.barber-card.picked{border-color:var(--p);background:var(--p10)}
+.barber-av{width:56px;height:56px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;margin:0 auto 12px}
+.barber-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.barber-role{font-size:13px;color:var(--text3)}
+.barber-rating{font-size:13px;color:var(--amber);font-weight:700;margin-top:4px}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pm{background:#fff;border:2px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all var(--dur);display:flex;align-items:center;gap:12px}
+.pm:hover{border-color:var(--p)}
+.pm.picked{border-color:var(--p);background:var(--p10)}
+.pm-icon{font-size:24px}
+.pm-name{font-size:14px;font-weight:700}
+.pm-desc{font-size:12px;color:var(--text3)}
+.book-summary{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:20px;box-shadow:var(--shadow2);position:sticky;top:80px}
+.sum-title{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid var(--border)}
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.sum-row .label{margin:0;font-size:13px;color:var(--text3)}
+.sum-total{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--p)}
+.confirm-btn{background:linear-gradient(135deg,var(--p),var(--pl));color:#fff;border-radius:var(--r);padding:14px 28px;font-weight:700;font-size:16px;box-shadow:var(--shadow);transition:all var(--dur)}
+.confirm-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(108,59,238,.35)}
+
+/* ═══ BOOKINGS / TABLE ═══ */
+.booking-list{display:flex;flex-direction:column;gap:10px}
+.booking-item{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;transition:all var(--dur);box-shadow:var(--shadow2)}
+.booking-item:hover{border-color:var(--p)}
+.bi-icon{width:40px;height:40px;border-radius:10px;background:var(--p10);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.bi-info{flex:1;min-width:0}
+.bi-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.bi-meta{font-size:13px;color:var(--text3)}
+.bi-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.bi-price{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--p)}
+.data-table{width:100%;border-collapse:collapse;font-size:14px}
+.data-table th{text-align:left;padding:12px 14px;background:var(--bg3);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);border-bottom:1.5px solid var(--border)}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border:none}
+.data-table tr:hover td{background:var(--bg)}
+.table-wrap{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow2)}
+
+/* ═══ SERVICE LIST ═══ */
+.svc-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.svc-row:last-child{border:none}
+.svc-row-icon{font-size:22px;width:36px;text-align:center}
+.svc-row-info{flex:1}
+.svc-row-name{font-size:14px;font-weight:700}
+.svc-row-price{font-size:13px;color:var(--text3)}
+.svc-toggle{background:var(--g210);color:var(--g2);border:none;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:all var(--dur)}
+.svc-toggle.off{background:var(--red10);color:var(--red)}
+
+/* ═══ SCHEDULE ═══ */
+.schedule-list{display:flex;flex-direction:column;gap:8px}
+.sch-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);background:var(--p10);border-left:3px solid var(--p)}
+.sch-item.done{background:var(--bg3);border-color:var(--border);opacity:.7}
+.sch-item.upcoming{background:var(--p10);border-color:var(--p)}
+.sch-time{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;width:70px;flex-shrink:0;color:var(--p)}
+.sch-item.done .sch-time{color:var(--text3)}
+.sch-name{font-size:14px;font-weight:700}
+.sch-svc{font-size:12px;color:var(--text3)}
+
+/* ═══ STARS ═══ */
+.star-widget{display:flex;gap:4px}
+.star{font-size:28px;cursor:pointer;transition:all .15s;color:var(--border);line-height:1}
+.star.on{color:var(--amber)}
+
+/* ═══ KPI ═══ */
+.kpi-row{display:flex;gap:0;margin-top:16px}
+.kpi{flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--border)}
+.kpi:last-child{border:none}
+.kpi-n{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--p)}
+.kpi-l{font-size:11px;color:var(--text3);margin-top:2px;font-weight:500}
+
+/* ═══ EMPLOYEE HERO ═══ */
+.emp-hero{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--rl);padding:24px;margin-bottom:20px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.emp-hero-av{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff;flex-shrink:0}
+.emp-hero-info h2{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.emp-hero-info p{font-size:14px;color:rgba(255,255,255,.75)}
+.earn-big{font-family:'Poppins',sans-serif;font-size:28px;font-weight:900;color:#fff}
+.earn-lbl{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:4px;font-weight:600;text-transform:uppercase}
+.earn-up{font-size:13px;color:rgba(255,255,255,.75);margin-top:4px}
+
+/* ═══ AI SECTION ═══ */
+.ai-box{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:24px;box-shadow:var(--shadow2)}
+.ai-btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.ai-btn{padding:10px 18px;background:var(--p10);border:1.5px solid var(--p20);color:var(--p);border-radius:var(--r);font-size:14px;font-weight:600;transition:all var(--dur);cursor:pointer}
+.ai-btn:hover{background:var(--p);color:#fff}
+.ai-resp{background:var(--bg3);border-radius:var(--r);padding:16px;font-size:14px;line-height:1.7;min-height:80px;white-space:pre-line;color:var(--text2)}
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--text3)}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--p);animation:pulse 1.2s ease-in-out infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.ai-chat-row{display:flex;gap:10px;margin-top:12px}
+.ai-chat-row input{flex:1}
+
+/* profile */
+.prof-av{width:80px;height:80px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin-bottom:16px}
+
+/* seat grid owner */
+.owner-seat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.owner-seat-item{border-radius:10px;background:#fff;border:1.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;cursor:pointer;padding:14px 4px;transition:all var(--dur)}
+.owner-seat-item.available{border-color:var(--g2);background:var(--g210)}
+.owner-seat-item.occupied{border-color:var(--red);background:var(--red10);cursor:default}
+.owner-seat-item.reserved{border-color:var(--amber);background:var(--amber10)}
+.owner-seat-item span{font-size:11px;margin-top:4px;font-weight:600;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- ════ LANDING PAGE ════ -->
+<div id="pgLanding" class="page active">
+  <nav class="land-nav">
+    <div class="land-logo">
+      <div class="land-logo-ico">✂️</div>
+      TrimTime
+    </div>
+    <div class="land-nav-links">
+      <a class="land-nav-link" onclick="showPage('pgLanding');scrollTo(0,0)">Home</a>
+      <a class="land-nav-link" href="#why">About Us</a>
+      <a class="land-nav-link" href="#features">Features</a>
+      <a class="land-nav-link" href="#pricing">Pricing</a>
+      <a class="land-nav-link" href="#contact">Contact</a>
+    </div>
+    <div class="land-nav-right">
+      <button class="btn btn-outline btn-sm" onclick="showPage('pgLogin')">Login</button>
+      <button class="btn btn-sm" onclick="showPage('pgLogin')">Sign Up</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-sec">
+    <div class="hero-left fade-up">
+      <div class="hero-tag">✨ The Smarter Way to Book Your Cut</div>
+      <h1 class="hero-title">Book Your<br><span>Perfect Look,</span><br>Anytime</h1>
+      <p class="hero-sub">TrimTime makes it easy to find the best salons near you and book appointments in just a few clicks.</p>
+      <div class="hero-btns">
+        <button class="btn" onclick="quickLogin('customer')">📅 Book Now</button>
+        <button class="btn btn-outline" onclick="showPage('pgLogin')">Register Your Salon</button>
+      </div>
+    </div>
+    <div class="hero-right fade-up">
+      <div class="hero-img-wrap">
+        💈
+        <div class="hero-float hero-float-1">✂️ Just Booked! <strong>10:30 AM</strong></div>
+        <div class="hero-float hero-float-2">⭐ <strong>4.9</strong> Rating</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="hiw-sec" id="features">
+    <div class="sec-head">
+      <div class="sec-tag">How It Works</div>
+      <h2 class="sec-title">Book in 3 Simple Steps</h2>
+      <p class="sec-sub">Get your perfect look without the wait — simple, fast, and hassle-free.</p>
+    </div>
+    <div class="hiw-steps">
+      <div class="hiw-step">
+        <div class="hiw-num">1</div>
+        <h4>Choose Salon</h4>
+        <p>Find the best salons near you</p>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">2</div>
+        <h4>Select Service</h4>
+        <p>Choose the service you need</p>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">3</div>
+        <h4>Book &amp; Relax</h4>
+        <p>Pick a time and book your slot</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why -->
+  <section class="why-sec" id="why">
+    <div class="sec-head">
+      <div class="sec-tag">Why TrimTime?</div>
+      <h2 class="sec-title">Everything You Need</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-ico">📡</div>
+        <h4>Real-time Booking</h4>
+        <p>Find the best salons with available seats in real-time. No phone calls needed.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-ico">💇</div>
+        <h4>Staff Selection</h4>
+        <p>Choose your favorite stylist and get consistent results every single visit.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-ico">🔔</div>
+        <h4>Instant Notifications</h4>
+        <p>Get booking reminders and updates so you never miss an appointment.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-ico">💳</div>
+        <h4>Secure Payments</h4>
+        <p>Pay online securely via card, Easypaisa, JazzCash or cash at the salon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- For Everyone -->
+  <section class="fore-sec" id="pricing">
+    <div class="sec-head">
+      <div class="sec-tag">For Everyone</div>
+      <h2 class="sec-title">Built for Every Role</h2>
+    </div>
+    <div class="fore-cards">
+      <div class="fore-card cust" onclick="quickLogin('customer')">
+        <div class="fore-card-ico">👤</div>
+        <h4><span>Customer</span>Book Your Favorite Services</h4>
+        <p>Book appointments at your favorite salons anytime, anywhere from your phone.</p>
+        <div class="fore-link">Learn More →</div>
+      </div>
+      <div class="fore-card owner" onclick="quickLogin('owner')">
+        <div class="fore-card-ico">🏪</div>
+        <h4><span>Salon Owner</span>Manage Your Business</h4>
+        <p>Manage your salon, employees, and bookings easily from one powerful dashboard.</p>
+        <div class="fore-link">Learn More →</div>
+      </div>
+      <div class="fore-card emp" onclick="quickLogin('employee')">
+        <div class="fore-card-ico">✂️</div>
+        <h4><span>Employee</span>Track Your Schedule</h4>
+        <p>Manage your schedule and provide the best services to your clients efficiently.</p>
+        <div class="fore-link">Learn More →</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="test-sec">
+    <div class="sec-head">
+      <div class="sec-tag">Customer Reviews</div>
+      <h2 class="sec-title">What Our Customers Say</h2>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-quote">"TrimTime made booking appointments so easy! I love the convenience and amazing service. I can't imagine going back to calling salons."</p>
+      <div class="test-auth">
+        <div class="test-av">SK</div>
+        <div>
+          <div style="font-weight:700;font-size:15px">Sarah Khan</div>
+          <div style="font-size:13px;color:var(--text3)">Regular Customer · Lahore</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="nl-sec" id="contact">
+    <h2>Join Our Newsletter</h2>
+    <p>Get the latest updates and offers from TrimTime.</p>
+    <div class="nl-form">
+      <input type="email" placeholder="Enter your email address">
+      <button class="btn btn-white">Subscribe</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="land-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>Trim<span>Time</span></h3>
+        <p>The smarter way to book salon appointments. Find the best salons near you in seconds.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Quick Links</h5>
+        <a class="footer-link" onclick="showPage('pgLanding')">Home</a>
+        <a class="footer-link" href="#why">About Us</a>
+        <a class="footer-link" href="#features">Features</a>
+        <a class="footer-link" href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>For Customers</h5>
+        <a class="footer-link" onclick="quickLogin('customer')">Find Salons</a>
+        <a class="footer-link" onclick="quickLogin('customer')">My Bookings</a>
+        <a class="footer-link">Help Center</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact Us</h5>
+        <a class="footer-link">+1 234 567 890</a>
+        <a class="footer-link">info@trimtime.com</a>
+        <a class="footer-link">123 Barber Street, Lahore</a>
+      </div>
+    </div>
+    <div class="footer-bot">
+      <div>© 2026 TrimTime. All rights reserved.</div>
+      <div style="display:flex;gap:16px">
+        <a class="footer-link" style="margin:0">Privacy</a>
+        <a class="footer-link" style="margin:0">Terms</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ════ LOGIN PAGE ════ -->
+<div id="pgLogin" class="page">
+  <div class="login-wrap">
+    <!-- Left Panel -->
+    <div class="login-left">
+      <div class="ll-bg"></div>
+      <div class="ll-content">
+        <div class="ll-logo">
+          <div class="ll-logo-ico">✂️</div>
+          <div class="ll-logo-text">TrimTime</div>
+        </div>
+        <h2 class="ll-brand">Your Perfect Look<br>Starts Here</h2>
+        <p class="ll-sub">Join thousands of customers who book their favorite salon services with ease using TrimTime.</p>
+        <div class="ll-feat"><div class="feat-ico">📡</div>Real-time slot availability</div>
+        <div class="ll-feat"><div class="feat-ico">✂️</div>Choose your preferred barber</div>
+        <div class="ll-feat"><div class="feat-ico">🔔</div>Instant booking reminders</div>
+        <div class="ll-feat"><div class="feat-ico">💳</div>Multiple payment options</div>
+        <div class="ll-nums">
+          <div class="ll-num"><div class="ll-num-n">120</div><div class="ll-num-l">Total Salons</div></div>
+          <div class="ll-num-sep"></div>
+          <div class="ll-num"><div class="ll-num-n">1.2K</div><div class="ll-num-l">Bookings</div></div>
+          <div class="ll-num-sep"></div>
+          <div class="ll-num"><div class="ll-num-n">4.8★</div><div class="ll-num-l">Avg Rating</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Right Panel -->
+    <div class="login-right">
+      <div class="form-wrap">
+        <div class="form-logo">
+          <div class="form-logo-ico">✂️</div>
+          <div class="form-logo-text">TrimTime</div>
+        </div>
+        <div class="form-tabs">
+          <button class="ftab on" onclick="switchLoginTab('login',this)">Login</button>
+          <button class="ftab" onclick="switchLoginTab('register',this)">Sign Up</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="loginSection">
+          <h2 class="form-head">Welcome Back!</h2>
+          <p class="form-sub">Login to continue to your account</p>
+          <div class="error-msg" id="loginError"></div>
+          <div class="field">
+            <label class="label">Email or Phone</label>
+            <div class="input-icon"><span class="ico">📧</span><input class="input" id="loginEmail" type="email" placeholder="your@email.com"></div>
+          </div>
+          <div class="field">
+            <label class="label">Password</label>
+            <div class="input-icon"><span class="ico">🔒</span><input class="input" id="loginPass" type="password" placeholder="••••••••"></div>
+          </div>
+          <div class="field">
+            <label class="label">Login as</label>
+            <select class="input" id="loginRole">
+              <option value="customer">Customer</option>
+              <option value="owner">Salon Owner</option>
+              <option value="employee">Employee</option>
+            </select>
+          </div>
+          <button class="btn" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doLogin()">Login</button>
+          <div class="divider">or</div>
+          <button class="btn btn-google" onclick="toast('Google login coming soon!','info')">
+            <img src="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z' fill='%234285F4'/%3E%3Cpath d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' fill='%2334A853'/%3E%3Cpath d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z' fill='%23FBBC05'/%3E%3Cpath d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z' fill='%23EA4335'/%3E%3C/svg%3E" style="width:18px;height:18px">
+            Continue with Google
+          </button>
+          <div style="margin-top:16px;text-align:center;font-size:14px;color:var(--text3)">Don't have an account? <a style="color:var(--p);font-weight:600;cursor:pointer" onclick="document.querySelectorAll('.ftab')[1].click()">Sign Up</a></div>
+          <div class="demo-btns">
+            <div style="width:100%;font-size:12px;color:var(--text4);font-weight:600;margin-bottom:4px">QUICK DEMO LOGIN:</div>
+            <button class="demo-btn" onclick="quickLogin('customer')">👤 Customer</button>
+            <button class="demo-btn" onclick="quickLogin('owner')">🏪 Owner</button>
+            <button class="demo-btn" onclick="quickLogin('employee')">✂️ Employee</button>
+          </div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="registerSection" style="display:none">
+          <h2 class="form-head">Create Your Account</h2>
+          <p class="form-sub">Join TrimTime and book your favorite services</p>
+          <div class="error-msg" id="regError"></div>
+          <div class="success-msg" id="regSuccess"></div>
+          <div class="label" style="margin-bottom:8px">I am a:</div>
+          <div class="role-grid">
+            <div class="role-card selected" onclick="selectRegRole(this,'customer')"><div class="rc-icon">👤</div><div class="rc-name">Customer</div><div class="rc-desc">Book services</div></div>
+            <div class="role-card" onclick="selectRegRole(this,'owner')"><div class="rc-icon">🏪</div><div class="rc-name">Salon Owner</div><div class="rc-desc">Manage salon</div></div>
+            <div class="role-card" onclick="selectRegRole(this,'employee')"><div class="rc-icon">✂️</div><div class="rc-name">Employee</div><div class="rc-desc">Work at salon</div></div>
+          </div>
+          <div class="invite-note" id="inviteNote">ℹ️ You need an invite code from a Salon Owner to register as an Employee.</div>
+          <div class="field"><label class="label">Full Name</label><div class="input-icon"><span class="ico">👤</span><input class="input" id="regFirst" placeholder="Your Full Name"></div></div>
+          <div class="field"><label class="label">Email or Phone</label><div class="input-icon"><span class="ico">📧</span><input class="input" id="regEmail" type="email" placeholder="your@email.com"></div></div>
+          <div class="field"><label class="label">Phone Number</label><div class="input-icon"><span class="ico">📱</span><input class="input" id="regPhone" placeholder="+92 300 1234567"></div></div>
+          <div class="field"><label class="label">Password</label><div class="input-icon"><span class="ico">🔒</span><input class="input" id="regPass" type="password" placeholder="Choose a password"></div></div>
+          <div class="field"><label class="label">Confirm Password</label><div class="input-icon"><span class="ico">🔒</span><input class="input" id="regPass2" type="password" placeholder="Repeat password"></div></div>
+          <div class="field" id="saloonNameField" style="display:none"><label class="label">Salon Name</label><input class="input" id="regSalon" placeholder="Your salon name"></div>
+          <div class="field" id="inviteCodeField" style="display:none"><label class="label">Invite Code</label><input class="input" id="regInvite" placeholder="TT-XXXX-0000"></div>
+          <button class="btn" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doRegister()">Sign Up</button>
+          <div class="divider">or</div>
+          <button class="btn btn-google" onclick="toast('Google signup coming soon!','info')">
+            <img src="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z' fill='%234285F4'/%3E%3Cpath d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z' fill='%2334A853'/%3E%3Cpath d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z' fill='%23FBBC05'/%3E%3Cpath d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z' fill='%23EA4335'/%3E%3C/svg%3E" style="width:18px;height:18px">
+            Continue with Google
+          </button>
+          <div style="margin-top:14px;text-align:center;font-size:14px;color:var(--text3)">Already have an account? <a style="color:var(--p);font-weight:600;cursor:pointer" onclick="document.querySelectorAll('.ftab')[0].click()">Login</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HOME / DISCOVER ════ -->
+<div id="pgHome" class="page">
+  <nav class="home-nav">
+    <div class="hn-logo" onclick="showPage('pgLanding')">
+      <div class="hn-logo-ico">✂️</div>
+      <div class="hn-logo-text">TrimTime</div>
+    </div>
+    <div class="hn-links">
+      <span class="hn-link" onclick="showPage('pgHome')">Discover</span>
+      <span class="hn-link" onclick="showPage('pgBooking')">Book Now</span>
+      <span class="hn-link" onclick="showPage('pgUserDash')">Dashboard</span>
+    </div>
+    <div class="hn-right" style="margin-left:auto">
+      <div class="icon-btn"><span>🔔</span><span class="dot"></span></div>
+      <div class="icon-btn"><span>❤️</span></div>
+      <div class="nav-av" id="homeAv" onclick="showPage('pgUserDash')">AK</div>
+    </div>
+  </nav>
+  <div class="home-hero">
+    <h1>Find &amp; Book <span>Top Salons</span></h1>
+    <p>Discover the best salons near you and book in seconds</p>
+    <div class="searchbar">
+      <input class="sb-input" id="searchInput" placeholder="Search salons, services..." oninput="renderSaloons()">
+      <div class="sb-sep"></div>
+      <div class="sb-loc">📍 Lahore, PK</div>
+      <button class="sb-btn" onclick="renderSaloons()">Search</button>
+    </div>
+  </div>
+  <div class="chip-bar">
+    <span class="chip-lbl">Filter:</span>
+    <span class="chip on" onclick="setChip('all',this)">All</span>
+    <span class="chip" onclick="setChip('open',this)">Open Now</span>
+    <span class="chip" onclick="setChip('top',this)">Top Rated</span>
+    <span class="chip" onclick="setChip('hair',this)">Hair Cutting</span>
+    <span class="chip" onclick="setChip('beard',this)">Beard &amp; Shave</span>
+    <span class="chip" onclick="setChip('facial',this)">Facial</span>
+    <span class="chip" onclick="setChip('massage',this)">Massage</span>
+    <span class="chip" onclick="setChip('kids',this)">Kids Cut</span>
+  </div>
+  <div class="stats-row">
+    <div class="st-item"><div class="st-ico">🏪</div><div><div class="st-n">120</div><div class="st-l">Total Salons</div></div></div>
+    <div class="st-item"><div class="st-ico">👥</div><div><div class="st-n">540</div><div class="st-l">Total Users</div></div></div>
+    <div class="st-item"><div class="st-ico">🪑</div><div><div class="st-n">1,840</div><div class="st-l">Open Seats Today</div></div></div>
+    <div class="st-item"><div class="st-ico">⭐</div><div><div class="st-n">4.8</div><div class="st-l">Avg Rating</div></div></div>
+    <div class="st-item"><div class="st-ico">⚡</div><div><div class="st-n">~3 min</div><div class="st-l">Avg Booking Time</div></div></div>
+  </div>
+  <div class="home-main">
+    <aside class="filter-sidebar">
+      <div class="filt-card">
+        <div class="filt-title">Distance &amp; Price</div>
+        <div class="range-row"><div class="range-hd"><span>Distance</span><span class="range-val" id="distVal">5 km</span></div><input type="range" min="1" max="20" value="5" oninput="document.getElementById('distVal').textContent=this.value+' km'"></div>
+        <div class="range-row"><div class="range-hd"><span>Max Price</span><span class="range-val" id="priceVal">Rs. 2000</span></div><input type="range" min="200" max="5000" step="100" value="2000" oninput="document.getElementById('priceVal').textContent='Rs. '+this.value"></div>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Services</div>
+        <label class="check-item"><input type="checkbox" checked> Hair Cutting</label>
+        <label class="check-item"><input type="checkbox" checked> Beard &amp; Shave</label>
+        <label class="check-item"><input type="checkbox"> Facial &amp; Skin</label>
+        <label class="check-item"><input type="checkbox"> Massage</label>
+        <label class="check-item"><input type="checkbox"> Hair Color</label>
+        <label class="check-item"><input type="checkbox"> Kids Cut</label>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Rating</div>
+        <label class="check-item"><input type="checkbox" checked> 4.5+ ★</label>
+        <label class="check-item"><input type="checkbox"> 4.0+ ★</label>
+        <label class="check-item"><input type="checkbox"> Any Rating</label>
+      </div>
+      <div class="filt-card">
+        <div class="filt-title">Availability</div>
+        <label class="check-item"><input type="checkbox" checked> Open Now</label>
+        <label class="check-item"><input type="checkbox"> Today</label>
+        <label class="check-item"><input type="checkbox"> This Week</label>
+      </div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:8px" onclick="renderSaloons()">Apply Filters</button>
+    </aside>
+    <div class="saloon-grid">
+      <div class="grid-head">
+        <h2>Top Rated Salons near <span style="color:var(--p)">Lahore, PK</span></h2>
+        <select class="sort-sel"><option>Best Match</option><option>Top Rated</option><option>Nearest First</option><option>Price: Low-High</option></select>
+      </div>
+      <div class="saloon-cards" id="saloonCards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BOOKING PAGE ════ -->
+<div id="pgBooking" class="page">
+  <nav class="book-nav">
+    <button class="book-back" onclick="showPage('pgHome')">← Back to Discover</button>
+    <div style="display:flex;align-items:center;gap:8px"><div class="hn-logo-ico">✂️</div><span style="font-family:'Poppins',sans-serif;font-weight:800;color:var(--p);font-size:16px">TrimTime</span></div>
+    <div class="book-step-ct" id="bookStepCount">Step 1 of 4</div>
+  </nav>
+  <div class="book-header">
+    <div class="book-salon-row">
+      <div class="book-salon-logo">✂️</div>
+      <div>
+        <div class="book-salon-name">Royal Cuts Studio</div>
+        <div class="book-salon-meta">
+          <span>📍 Gulberg III, Lahore</span>
+          <span>⏰ Open 9AM–9PM</span>
+          <span>⭐ 4.9 (342 reviews)</span>
+        </div>
+      </div>
+    </div>
+    <div class="progress-row" id="progressRow">
+      <div class="prog-step active" id="ps1"><div class="prog-circle">1</div><span class="prog-name">Service</span></div>
+      <div class="prog-line" id="pl1"></div>
+      <div class="prog-step" id="ps2"><div class="prog-circle">2</div><span class="prog-name">Seat &amp; Time</span></div>
+      <div class="prog-line" id="pl2"></div>
+      <div class="prog-step" id="ps3"><div class="prog-circle">3</div><span class="prog-name">Barber</span></div>
+      <div class="prog-line" id="pl3"></div>
+      <div class="prog-step" id="ps4"><div class="prog-circle">4</div><span class="prog-name">Payment</span></div>
+    </div>
+  </div>
+  <div class="book-body">
+    <div class="book-main">
+      <div class="step-section active" id="step1">
+        <div class="book-sec">
+          <div class="book-sec-title">1. Choose a Service</div>
+          <div class="book-sec-sub">Select the service you want. Sub-options will appear after selection.</div>
+          <div class="svc-grid" id="svcGrid"></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn" onclick="goStep(2)">Continue → Seat &amp; Time</button>
+        </div>
+      </div>
+      <div class="step-section" id="step2">
+        <div class="book-sec">
+          <div class="book-sec-title">2. Pick a Seat &amp; Time</div>
+          <div class="book-sec-sub">Select your preferred seat and time slot.</div>
+          <div style="margin-bottom:16px"><div class="label">Select Date</div><input type="date" class="input" id="bookDate" style="max-width:220px"></div>
+          <div style="margin-bottom:16px"><div class="label" style="margin-bottom:10px">Available Seats</div><div class="seat-grid-disp" id="seatGrid"></div></div>
+          <div><div class="label" style="margin-bottom:10px">Time Slots</div><div class="slot-grid" id="slotGrid"></div></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+          <button class="btn" onclick="goStep(3)">Continue → Choose Barber</button>
+        </div>
+      </div>
+      <div class="step-section" id="step3">
+        <div class="book-sec">
+          <div class="book-sec-title">3. Choose Your Barber</div>
+          <div class="book-sec-sub">Pick your preferred barber or let us assign one.</div>
+          <div class="barber-grid" id="barberGrid"></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+          <button class="btn" onclick="goStep(4)">Continue → Payment</button>
+        </div>
+      </div>
+      <div class="step-section" id="step4">
+        <div class="book-sec">
+          <div class="book-sec-title">4. Payment Method</div>
+          <div class="book-sec-sub">Choose how you'd like to pay.</div>
+          <div class="pm-grid" id="pmGrid">
+            <div class="pm picked" onclick="pickPM(this)" data-pm="cash"><div class="pm-icon">💵</div><div><div class="pm-name">Cash on Visit</div><div class="pm-desc">Pay at the saloon</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="card"><div class="pm-icon">💳</div><div><div class="pm-name">Credit / Debit Card</div><div class="pm-desc">Secure online payment</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="easypaisa"><div class="pm-icon">📱</div><div><div class="pm-name">Easypaisa</div><div class="pm-desc">Mobile wallet</div></div></div>
+            <div class="pm" onclick="pickPM(this)" data-pm="jazzcash"><div class="pm-icon">🎵</div><div><div class="pm-name">JazzCash</div><div class="pm-desc">Mobile wallet</div></div></div>
+          </div>
+          <div id="cardFields" style="display:none;margin-top:16px">
+            <div class="field"><label class="label">Card Number</label><input class="input" placeholder="1234 5678 9012 3456"></div>
+            <div class="g2"><div class="field"><label class="label">Expiry</label><input class="input" placeholder="MM/YY"></div><div class="field"><label class="label">CVV</label><input class="input" placeholder="123" type="password"></div></div>
+          </div>
+        </div>
+        <div class="book-sec" id="finalSummary">
+          <div class="sum-title">📋 Booking Summary</div>
+          <div id="summaryRows"></div>
+          <div class="sum-row" style="border:none;margin-top:8px"><div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:16px">Total</div><div class="sum-total" id="sumTotal">Rs. 300</div></div>
+        </div>
+        <div class="step-btn-row">
+          <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+          <button class="confirm-btn" onclick="confirmBooking()">✓ Confirm Booking</button>
+        </div>
+      </div>
+    </div>
+    <div class="book-sidebar">
+      <div class="book-summary">
+        <div class="sum-title">📋 Your Selection</div>
+        <div id="liveSummary" style="color:var(--text3);font-size:14px">No selections yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ CUSTOMER DASHBOARD ════ -->
+<div id="pgUserDash" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="userSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico">✂️</div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Book Your Cut</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua purple" id="userAv">AK</div>
+        <div class="sidebar-user-info"><div class="name" id="userName">Ali Khan</div><div class="role">Customer</div></div>
+      </div>
+      <div class="nav-section">Discover</div>
+      <a class="nav-link" onclick="showPage('pgHome')"><span class="icon">🔍</span>Discover Salons</a>
+      <a class="nav-link" onclick="showPage('pgBooking')"><span class="icon">📅</span>Book Appointment</a>
+      <div class="nav-section">My Account</div>
+      <a class="nav-link active" onclick="showUserSub('subOverview')"><span class="icon">🏠</span>My Dashboard</a>
+      <a class="nav-link" onclick="showUserSub('subBookings')"><span class="icon">📋</span>My Bookings<span class="nav-badge" id="userBookingsBadge">0</span></a>
+      <a class="nav-link" onclick="showUserSub('subFavs')"><span class="icon">❤️</span>Favourites</a>
+      <a class="nav-link" onclick="showUserSub('subProfile')"><span class="icon">👤</span>Profile Settings</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span>🚪</span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('userSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('userSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">My Dashboard</div><div class="topbar-sub" id="userDashDate"></div></div>
+        <div class="topbar-right">
+          <span class="badge customer">Customer</span>
+          <button class="btn btn-sm" onclick="showPage('pgBooking')">+ Book Now</button>
+          <div class="icon-btn"><span>🔔</span><span class="dot"></span></div>
+        </div>
+      </header>
+      <div class="content">
+        <div id="subOverview" class="sub-page active">
+          <div class="banner fade-up">
+            <div><h2 id="userGreeting">Good afternoon! 👋</h2><p id="userNextAppt">No upcoming appointments. <a style="color:rgba(255,255,255,.8);cursor:pointer;text-decoration:underline" onclick="showPage('pgBooking')">Book one now!</a></p></div>
+            <button class="btn btn-white btn-sm" onclick="showPage('pgBooking')">Book Again</button>
+          </div>
+          <div class="g4 fade-up" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p">📅</div><span class="stat-badge" id="statTotalBadge">0 bookings</span></div><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Bookings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico g">⭐</div><span class="stat-badge">Gold Tier</span></div><div class="stat-num">4.8</div><div class="stat-label">Avg Rating Given</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p">💰</div><span class="stat-badge" id="statSpentBadge">—</span></div><div class="stat-num" id="statSpent">Rs. 0</div><div class="stat-label">Total Spent</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico b">🕐</div><span class="stat-badge">Time saved</span></div><div class="stat-num">18.5h</div><div class="stat-label">Wait Time Saved</div></div>
+          </div>
+          <div class="card fade-up">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700">Recent Bookings</div><button class="btn btn-sm btn-outline" onclick="showUserSub('subBookings')">View All</button></div>
+            <div id="recentBookings" class="booking-list"></div>
+          </div>
+        </div>
+        <div id="subBookings" class="sub-page">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div><h2 style="font-size:24px">My Bookings</h2><p style="color:var(--text3);margin-top:4px">All your appointment history</p></div>
+            <button class="btn btn-sm" onclick="showPage('pgBooking')">+ New Booking</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="chip on" onclick="filterUserBks('all',this)">All</button>
+            <button class="chip" onclick="filterUserBks('confirmed',this)">Confirmed</button>
+            <button class="chip" onclick="filterUserBks('completed',this)">Completed</button>
+            <button class="chip" onclick="filterUserBks('cancelled',this)">Cancelled</button>
+          </div>
+          <div id="allBookingsList" class="booking-list"></div>
+        </div>
+        <div id="subFavs" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Favourites</h2><p style="color:var(--text3);margin-top:4px">Your saved salons</p></div>
+          <div class="saloon-cards" id="favCards"></div>
+        </div>
+        <div id="subProfile" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Profile Settings</h2><p style="color:var(--text3);margin-top:4px">Manage your account</p></div>
+          <div class="card" style="max-width:560px">
+            <div class="prof-av" id="profAvatar">AK</div>
+            <div class="g2">
+              <div class="field"><label class="label">Full Name</label><input class="input" id="profName" placeholder="Your name"></div>
+              <div class="field"><label class="label">Email</label><input class="input" id="profEmail" type="email"></div>
+            </div>
+            <div class="g2">
+              <div class="field"><label class="label">Phone</label><input class="input" id="profPhone"></div>
+              <div class="field"><label class="label">City</label><input class="input" id="profCity"></div>
+            </div>
+            <button class="btn" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ OWNER DASHBOARD ════ -->
+<div id="pgOwnerDash" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="ownerSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico">✂️</div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Owner Panel</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua purple" id="ownerAv">MK</div>
+        <div class="sidebar-user-info"><div class="name" id="ownerName">Muhammad Khan</div><div class="role">Salon Owner</div></div>
+      </div>
+      <div class="nav-section">Management</div>
+      <a class="nav-link active" onclick="showOwnerSub('oDash')"><span class="icon">📊</span>Dashboard</a>
+      <a class="nav-link" onclick="showOwnerSub('oBookings')"><span class="icon">📋</span>Bookings<span class="nav-badge" id="ownerOrdersBadge">0</span></a>
+      <a class="nav-link" onclick="showOwnerSub('oServices')"><span class="icon">✂️</span>Services</a>
+      <a class="nav-link" onclick="showOwnerSub('oEmployees')"><span class="icon">👥</span>Employees</a>
+      <a class="nav-link" onclick="showOwnerSub('oSeats')"><span class="icon">🪑</span>Seat Management</a>
+      <div class="nav-section">Finance</div>
+      <a class="nav-link" onclick="showOwnerSub('oEarnings')"><span class="icon">💰</span>Earnings</a>
+      <div class="nav-section">Settings</div>
+      <a class="nav-link" onclick="showOwnerSub('oSettings')"><span class="icon">⚙️</span>Settings</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span>🚪</span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('ownerSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('ownerSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">Owner Dashboard</div><div class="topbar-sub" id="ownerDashDate"></div></div>
+        <div class="topbar-right">
+          <button class="toggle-btn" id="shopToggle" onclick="toggleShop()"><span class="t-dot on" id="shopDot"></span><span id="shopTxt">Shop Open</span></button>
+          <span class="badge owner">Owner</span>
+          <div class="icon-btn"><span>🔔</span><span class="dot"></span></div>
+        </div>
+      </header>
+      <div class="content">
+        <!-- Dashboard Overview -->
+        <div id="oDash" class="sub-page active">
+          <div class="banner fade-up">
+            <div><h2>Royal Cuts Studio 🏪</h2><p id="ownerBannerMsg">Loading today's data...</p></div>
+            <button class="btn btn-white btn-sm" onclick="showOwnerSub('oBookings')">View Bookings</button>
+          </div>
+          <div class="g4 fade-up" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p">📅</div><span class="stat-badge">Today</span></div><div class="stat-num" id="ownerToday">0</div><div class="stat-label">Today's Bookings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico g">💰</div><span class="stat-badge">Revenue</span></div><div class="stat-num" id="ownerRevenue">Rs. 0</div><div class="stat-label">Today's Earnings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico b">👥</div><span class="stat-badge">Active</span></div><div class="stat-num" id="ownerSeats">3</div><div class="stat-label">Active Employees</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p">⭐</div><span class="stat-badge">Rating</span></div><div class="stat-num">4.9</div><div class="stat-label">Average Rating</div></div>
+          </div>
+          <div class="g2 fade-up">
+            <div class="card">
+              <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px">Upcoming Bookings</div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Customer</th><th>Service</th><th>Date &amp; Time</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody id="ownerOrdersTable"></tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:16px">
+                <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">Popular Services</div>
+                <div id="popularServices"></div>
+              </div>
+              <div class="card">
+                <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">Quick Actions</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <button class="btn btn-sm" onclick="showOwnerSub('oServices')">+ Add Service</button>
+                  <button class="btn btn-sm btn-outline" onclick="showOwnerSub('oSettings')">⚙️ Settings</button>
+                  <button class="btn btn-sm btn-outline" onclick="showOwnerSub('oEmployees')">👥 Manage Team</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Bookings -->
+        <div id="oBookings" class="sub-page">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div><h2 style="font-size:24px">All Bookings</h2><p style="color:var(--text3);margin-top:4px">Manage customer appointments</p></div>
+            <select class="sort-sel" id="orderFilter" onchange="renderOwnerOrders()">
+              <option value="all">All Status</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Customer</th><th>Service</th><th>Barber</th><th>Date &amp; Time</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="allOrdersTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Services -->
+        <div id="oServices" class="sub-page">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+            <div><h2 style="font-size:24px">Services</h2><p style="color:var(--text3);margin-top:4px">Manage your service offerings</p></div>
+            <button class="btn btn-sm" onclick="openAddServiceModal()">+ Add Service</button>
+          </div>
+          <div class="card"><div id="servicesList"></div></div>
+        </div>
+        <!-- Employees -->
+        <div id="oEmployees" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Team Members</h2><p style="color:var(--text3);margin-top:4px">Manage your barbershop team</p></div>
+          <div class="card"><div id="employeeList"></div></div>
+          <div class="card" style="margin-top:16px">
+            <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">🔑 Employee Invite Code</div>
+            <p style="font-size:14px;color:var(--text3);margin-bottom:14px">Share this code with new employees to register.</p>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <code style="font-size:18px;font-weight:700;background:var(--p10);padding:12px 20px;border-radius:10px;color:var(--p);border:1.5px solid var(--p20);letter-spacing:2px" id="inviteCode">TT-XXXX-0000</code>
+              <button class="btn btn-sm btn-outline" onclick="copyCode()">📋 Copy</button>
+              <button class="btn btn-sm" onclick="genCode()">🔄 Regenerate</button>
+            </div>
+          </div>
+        </div>
+        <!-- Seats -->
+        <div id="oSeats" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Seat Management</h2><p style="color:var(--text3);margin-top:4px">Click seats to toggle: Available → Occupied → Reserved</p></div>
+          <div class="card">
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+              <span style="font-size:13px">🟢 Available</span>
+              <span style="font-size:13px">🔴 Occupied</span>
+              <span style="font-size:13px">🟡 Reserved</span>
+            </div>
+            <div class="owner-seat-grid" id="ownerSeatGrid"></div>
+          </div>
+        </div>
+        <!-- Earnings -->
+        <div id="oEarnings" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Earnings</h2><p style="color:var(--text3);margin-top:4px">Revenue overview &amp; breakdown</p></div>
+          <div class="g3" style="margin-bottom:24px">
+            <div class="stat-card"><div class="stat-ico p" style="margin-bottom:12px">💰</div><div class="stat-num" id="earnToday">Rs. 0</div><div class="stat-label">Today</div></div>
+            <div class="stat-card"><div class="stat-ico g" style="margin-bottom:12px">📈</div><div class="stat-num" id="earnMonth">Rs. 0</div><div class="stat-label">This Month</div></div>
+            <div class="stat-card"><div class="stat-ico b" style="margin-bottom:12px">🏆</div><div class="stat-num" id="earnTotal">Rs. 0</div><div class="stat-label">All Time</div></div>
+          </div>
+          <div class="card"><div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">Earnings by Service</div><div id="earningsBreakdown"></div></div>
+          <div class="ai-box" style="margin-top:16px">
+            <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">🤖 AI Business Analysis</div>
+            <div class="ai-btns">
+              <button class="ai-btn" onclick="runAIAnalysis('overview')">📊 Business Overview</button>
+              <button class="ai-btn" onclick="runAIAnalysis('tips')">💡 Growth Tips</button>
+              <button class="ai-btn" onclick="runAIAnalysis('peak')">⏰ Peak Hours</button>
+            </div>
+            <div class="ai-resp" id="aiResponse">Click a button above to get AI-powered insights for your salon.</div>
+            <div class="ai-chat-row" style="margin-top:16px">
+              <input class="input" id="aiQuestion" placeholder="Ask anything about your business..." onkeydown="if(event.key==='Enter')sendAIQuestion()">
+              <button class="btn" onclick="sendAIQuestion()">Ask AI</button>
+            </div>
+            <div class="ai-resp" id="aiChatResponse" style="margin-top:12px;display:none"></div>
+          </div>
+        </div>
+        <!-- Settings -->
+        <div id="oSettings" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Salon Settings</h2></div>
+          <div class="card" style="max-width:560px">
+            <div class="field"><label class="label">Salon Name</label><input class="input" value="Royal Cuts Studio"></div>
+            <div class="field"><label class="label">City</label><input class="input" value="Lahore"></div>
+            <div class="field"><label class="label">Address</label><input class="input" value="Gulberg III, Lahore"></div>
+            <div class="g2">
+              <div class="field"><label class="label">Opening Time</label><input class="input" type="time" value="09:00"></div>
+              <div class="field"><label class="label">Closing Time</label><input class="input" type="time" value="21:00"></div>
+            </div>
+            <div class="field"><label class="label">Working Days</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+                <span class="chip on">Mon</span><span class="chip on">Tue</span><span class="chip on">Wed</span><span class="chip on">Thu</span><span class="chip on">Fri</span><span class="chip">Sat</span><span class="chip">Sun</span>
+              </div>
+            </div>
+            <button class="btn" onclick="toast('Settings saved!','success')">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ EMPLOYEE DASHBOARD ════ -->
+<div id="pgEmpDash" class="page">
+  <div class="app-layout">
+    <aside class="sidebar" id="empSidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-ico">✂️</div>
+        <div><div class="sidebar-logo-text">TrimTime</div><div class="sidebar-logo-sub">Employee Portal</div></div>
+      </div>
+      <div class="sidebar-user">
+        <div class="ua green" id="empAv">US</div>
+        <div class="sidebar-user-info"><div class="name" id="empName">Usman Sheikh</div><div class="role">Senior Barber</div></div>
+      </div>
+      <div class="nav-section">My Work</div>
+      <a class="nav-link active" onclick="showEmpSub('eOverview')"><span class="icon">🏠</span>Overview</a>
+      <a class="nav-link" onclick="showEmpSub('eSubSchedule')"><span class="icon">📅</span>My Schedule</a>
+      <a class="nav-link" onclick="showEmpSub('eSubOrders')"><span class="icon">📋</span>Assigned Orders<span class="nav-badge" id="empOrdersBadge">0</span></a>
+      <a class="nav-link" onclick="showEmpSub('eSubEarnings')"><span class="icon">💰</span>My Earnings</a>
+      <a class="nav-link" onclick="showEmpSub('eSubReviews')"><span class="icon">⭐</span>Reviews</a>
+      <a class="nav-link" onclick="showEmpSub('eSubProfile')"><span class="icon">👤</span>Profile</a>
+      <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span>🚪</span>Sign Out</a></div>
+    </aside>
+    <div class="overlay" onclick="closeSidebar('empSidebar')"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="ham" onclick="openSidebar('empSidebar')"><span></span><span></span><span></span></button>
+        <div class="topbar-left"><div class="topbar-title">Employee Dashboard</div><div class="topbar-sub" id="empDashDate"></div></div>
+        <div class="topbar-right">
+          <button class="toggle-btn" id="availToggle" onclick="toggleAvailability()"><span class="t-dot on" id="availDot"></span><span id="availTxt">Available</span></button>
+          <span class="badge employee">Employee</span>
+          <div class="icon-btn"><span>🔔</span></div>
+        </div>
+      </header>
+      <div class="content">
+        <div id="eOverview" class="sub-page active">
+          <div class="emp-hero fade-up">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div class="emp-hero-av">US</div>
+              <div class="emp-hero-info">
+                <h2>Usman Sheikh</h2>
+                <p>Senior Barber · Royal Cuts Studio</p>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+                  <span style="color:rgba(255,255,255,.9);font-size:16px;letter-spacing:2px">★★★★★</span>
+                  <span style="font-family:'Poppins',sans-serif;font-weight:700;color:#fff">4.9</span>
+                  <span style="font-size:13px;color:rgba(255,255,255,.7)">(127 reviews)</span>
+                </div>
+                <div class="kpi-row" style="background:rgba(255,255,255,.1);border-radius:10px;margin-top:12px;gap:0">
+                  <div class="kpi"><div class="kpi-n" style="color:#fff">127</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Reviews</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff" id="empTotalCust">0</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Customers</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff">98%</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">On Time</div></div>
+                  <div class="kpi" style="border-color:rgba(255,255,255,.2)"><div class="kpi-n" style="color:#fff">2</div><div class="kpi-l" style="color:rgba(255,255,255,.7)">Missed</div></div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="earn-lbl">This Month</div>
+              <div class="earn-big" id="empMonthEarn">Rs. 0</div>
+              <div class="earn-up">↑ 18% vs last month</div>
+            </div>
+          </div>
+          <div class="g2 fade-up">
+            <div class="card">
+              <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">📅 Today's Schedule</div>
+              <div class="schedule-list" id="empTodaySchedule"></div>
+            </div>
+            <div class="card">
+              <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">⭐ Rate a Customer</div>
+              <div class="field"><label class="label">Customer Name</label><input class="input" id="rateCustomer" placeholder="e.g. Ali Khan"></div>
+              <div class="field"><label class="label">Service Provided</label><input class="input" id="rateSvc" placeholder="e.g. Hair Cutting"></div>
+              <div class="field"><label class="label">Rating</label>
+                <div class="star-widget" id="starWidget">
+                  <span class="star on" onclick="setRating(1)">★</span>
+                  <span class="star on" onclick="setRating(2)">★</span>
+                  <span class="star on" onclick="setRating(3)">★</span>
+                  <span class="star on" onclick="setRating(4)">★</span>
+                  <span class="star on" onclick="setRating(5)">★</span>
+                </div>
+              </div>
+              <div class="field"><label class="label">Notes</label><textarea class="input" id="rateNotes" rows="2" placeholder="Any notes..."></textarea></div>
+              <button class="btn btn-sm" onclick="submitRating()">Submit Rating</button>
+            </div>
+          </div>
+        </div>
+        <div id="eSubSchedule" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Schedule</h2></div>
+          <div class="card"><div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:14px">Full Schedule</div><div class="schedule-list" id="empFullSchedule"></div></div>
+        </div>
+        <div id="eSubOrders" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Assigned Orders</h2></div>
+          <div class="booking-list" id="empOrdersList"></div>
+        </div>
+        <div id="eSubEarnings" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Earnings</h2></div>
+          <div class="g3" style="margin-bottom:20px">
+            <div class="stat-card"><div class="stat-num" id="empEarnToday">Rs. 0</div><div class="stat-label">Today</div></div>
+            <div class="stat-card"><div class="stat-num" id="empEarnMonth">Rs. 0</div><div class="stat-label">This Month</div></div>
+            <div class="stat-card"><div class="stat-num" id="empEarnTotal">Rs. 0</div><div class="stat-label">All Time</div></div>
+          </div>
+        </div>
+        <div id="eSubReviews" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Reviews</h2></div>
+          <div class="card"><p style="color:var(--text3)">No reviews yet. Keep providing great service!</p></div>
+        </div>
+        <div id="eSubProfile" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">My Profile</h2></div>
+          <div class="card" style="max-width:500px">
+            <div class="prof-av" style="background:var(--g2)">US</div>
+            <div class="field"><label class="label">Full Name</label><input class="input" value="Usman Sheikh"></div>
+            <div class="field"><label class="label">Role</label><input class="input" value="Senior Barber" readonly></div>
+            <div class="field"><label class="label">Phone</label><input class="input" value="+92 333 5678901"></div>
+            <button class="btn" onclick="toast('Profile saved!','success')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODALS ════ -->
+<div class="modal-bg" id="ratingModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">⭐ Rate Your Experience</div><span class="modal-close" onclick="closeModal('ratingModal')">✕</span></div>
+    <div style="margin-bottom:14px;font-size:14px;color:var(--text3)" id="ratingModalSalon">Royal Cuts Studio</div>
+    <div class="star-widget" id="ratingStars" style="justify-content:center;margin-bottom:16px">
+      <span class="star" onclick="setModalRating(1)">★</span>
+      <span class="star" onclick="setModalRating(2)">★</span>
+      <span class="star" onclick="setModalRating(3)">★</span>
+      <span class="star" onclick="setModalRating(4)">★</span>
+      <span class="star" onclick="setModalRating(5)">★</span>
+    </div>
+    <div class="field"><label class="label">Your Review</label><textarea class="input" id="ratingReview" rows="3" placeholder="Tell us about your experience..."></textarea></div>
+    <button class="btn" style="width:100%;justify-content:center" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="addServiceModal">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">✂️ Add New Service</div><span class="modal-close" onclick="closeModal('addServiceModal')">✕</span></div>
+    <div class="field"><label class="label">Service Name</label><input class="input" id="svcName" placeholder="e.g. Hair Coloring"></div>
+    <div class="field"><label class="label">Icon (emoji)</label><input class="input" id="svcIcon" placeholder="e.g. 🎨" value="✂️"></div>
+    <div class="field"><label class="label">Price (Rs.)</label><input class="input" id="svcPrice" type="number" placeholder="300"></div>
+    <div class="field"><label class="label">Duration</label><input class="input" id="svcDuration" placeholder="e.g. 30–45 min"></div>
+    <button class="btn" style="width:100%;justify-content:center" onclick="addService()">Add Service</button>
+  </div>
+</div>
+
+<script>
+// ════ DATA STORE ════
+const STORE = {
+  get: k => { try { return JSON.parse(localStorage.getItem('tt2_'+k)) } catch { return null } },
+  set: (k,v) => localStorage.setItem('tt2_'+k, JSON.stringify(v)),
+  del: k => localStorage.removeItem('tt2_'+k)
+};
+
+function initData() {
+  if (!STORE.get('inited')) {
+    STORE.set('users', [
+      { id:1, email:'ali@example.com', pass:'password123', role:'customer', firstName:'Ali', lastName:'Khan', phone:'+92 300 1234567', city:'Lahore' },
+      { id:2, email:'khan@example.com', pass:'password123', role:'owner', firstName:'Muhammad', lastName:'Khan', phone:'+92 321 9876543', city:'Lahore' },
+      { id:3, email:'usman@example.com', pass:'password123', role:'employee', firstName:'Usman', lastName:'Sheikh', phone:'+92 333 5678901', city:'Lahore' }
+    ]);
+    STORE.set('bookings', [
+      { id:1001, userId:1, saloon:'Royal Cuts Studio', service:'Hair Cutting', subService:'Classic Cut', barber:'Usman Sheikh', date:'2026-03-10', time:'10:30 AM', price:350, status:'completed', paymentMethod:'cash' },
+      { id:1002, userId:1, saloon:'Prestige Barbers', service:'Beard & Shave', subService:'Full Beard', barber:'Ahmad Raza', date:'2026-03-15', time:'2:00 PM', price:250, status:'completed', paymentMethod:'easypaisa' },
+      { id:1003, userId:1, saloon:'Royal Cuts Studio', service:'Hair Cutting', subService:'Fade Cut', barber:'Usman Sheikh', date:'2026-04-21', time:'3:30 PM', price:400, status:'confirmed', paymentMethod:'cash' }
+    ]);
+    STORE.set('services', [
+      { id:1, icon:'✂️', name:'Hair Cutting', price:300, duration:'30–45 min', active:true },
+      { id:2, icon:'🪒', name:'Beard & Shave', price:200, duration:'20–30 min', active:true },
+      { id:3, icon:'💆', name:'Facial & Skin', price:500, duration:'45–60 min', active:true },
+      { id:4, icon:'🧴', name:'Head Massage', price:400, duration:'30 min', active:true },
+      { id:5, icon:'🎨', name:'Hair Coloring', price:1200, duration:'60–90 min', active:false },
+      { id:6, icon:'✨', name:'Full Grooming', price:1500, duration:'90 min', active:true }
+    ]);
+    STORE.set('seats', ['available','available','occupied','reserved','available','available']);
+    STORE.set('employees', [
+      { id:1, name:'Usman Sheikh', role:'Senior Barber', rating:4.9, customers:342, status:'available', avatar:'US' },
+      { id:2, name:'Ahmad Raza', role:'Barber', rating:4.7, customers:219, status:'available', avatar:'AR' },
+      { id:3, name:'Bilal Khan', role:'Junior Barber', rating:4.5, customers:98, status:'busy', avatar:'BK' }
+    ]);
+    STORE.set('saloons', [
+      { id:1, name:'Royal Cuts Studio', area:'Gulberg III', city:'Lahore', rating:4.9, reviews:342, priceFrom:300, seats:6, icon:'✂️', open:true, tags:['hair','beard'] },
+      { id:2, name:'Prestige Barbers', area:'DHA Phase 5', city:'Lahore', rating:4.8, reviews:218, priceFrom:400, seats:4, icon:'💈', open:true, tags:['hair','facial'] },
+      { id:3, name:'Modern Cuts', area:'Johar Town', city:'Lahore', rating:4.6, reviews:156, priceFrom:200, seats:5, icon:'🪒', open:false, tags:['hair','beard','kids'] },
+      { id:4, name:"The Gentleman's Club", area:'Model Town', city:'Lahore', rating:4.9, reviews:412, priceFrom:600, seats:8, icon:'🎩', open:true, tags:['hair','beard','facial','massage'] },
+      { id:5, name:'Style Zone', area:'Bahria Town', city:'Lahore', rating:4.5, reviews:89, priceFrom:150, seats:3, icon:'⭐', open:true, tags:['hair','kids'] },
+      { id:6, name:'Elite Grooming', area:'Cantt', city:'Lahore', rating:4.7, reviews:203, priceFrom:500, seats:6, icon:'👑', open:true, tags:['facial','massage','hair'] }
+    ]);
+    STORE.set('shopOpen', true);
+    STORE.set('available', true);
+    STORE.set('inviteCode', 'TT-ABCD-1234');
+    STORE.set('inited', true);
+  }
+}
+
+// ════ STATE ════
+let currentUser = null;
+let currentStep = 1;
+let booking = { service:null, subService:null, seat:null, slot:null, barber:null, payment:'cash', date:'' };
+let activeChipFilter = 'all';
+let modalRating = 0;
+let empRatingVal = 5;
+let shopIsOpen = true;
+let empIsAvail = true;
+
+// ════ PAGES ════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 'pgHome') renderSaloons();
+  if (id === 'pgBooking') initBooking();
+  if (id === 'pgUserDash') refreshUserDash();
+  if (id === 'pgOwnerDash') refreshOwnerDash();
+  if (id === 'pgEmpDash') refreshEmpDash();
+}
+
+// ════ AUTH ════
+function switchLoginTab(tab, el) {
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('loginSection').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('registerSection').style.display = tab==='register' ? 'block' : 'none';
+}
+function selectRegRole(el, role) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('inviteNote').classList.toggle('show', role==='employee');
+  document.getElementById('inviteCodeField').style.display = role==='employee' ? 'block' : 'none';
+  document.getElementById('saloonNameField').style.display = role==='owner' ? 'block' : 'none';
+}
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const role = document.getElementById('loginRole').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  const users = STORE.get('users') || [];
+  const user = users.find(u => u.email === email && u.pass === pass && u.role === role);
+  if (!user) { errEl.textContent = 'Invalid credentials. Use the Demo buttons below!'; errEl.classList.add('show'); return; }
+  setCurrentUser(user); routeByRole(user.role);
+  toast('Welcome back, ' + user.firstName + '! 👋', 'gold');
+}
+function quickLogin(role) {
+  const users = STORE.get('users') || [];
+  const user = users.find(u => u.role === role);
+  if (user) { setCurrentUser(user); routeByRole(role); toast('Logged in as ' + user.firstName + ' (' + role + ')', 'gold'); }
+}
+function doRegister() {
+  const first = document.getElementById('regFirst').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const roleCard = document.querySelector('.role-card.selected');
+  const roleName = roleCard?.querySelector('.rc-name')?.textContent?.toLowerCase() || 'customer';
+  const role = roleName.includes('owner') ? 'owner' : roleName.includes('employee') ? 'employee' : 'customer';
+  const errEl = document.getElementById('regError');
+  const sucEl = document.getElementById('regSuccess');
+  errEl.classList.remove('show'); sucEl.classList.remove('show');
+  if (!first || !email || !pass) { errEl.textContent = 'Please fill in all required fields.'; errEl.classList.add('show'); return; }
+  const users = STORE.get('users') || [];
+  if (users.find(u => u.email === email)) { errEl.textContent = 'An account with this email already exists.'; errEl.classList.add('show'); return; }
+  if (role === 'employee') {
+    const code = document.getElementById('regInvite').value.trim();
+    if (code !== STORE.get('inviteCode')) { errEl.textContent = 'Invalid invite code.'; errEl.classList.add('show'); return; }
+  }
+  const nameParts = first.split(' ');
+  const newUser = { id: Date.now(), email, pass, role, firstName:nameParts[0], lastName:nameParts.slice(1).join(' '), phone, city:'Lahore' };
+  users.push(newUser); STORE.set('users', users);
+  sucEl.textContent = 'Account created! You can now sign in.'; sucEl.classList.add('show');
+  setTimeout(() => { document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value = email; }, 1500);
+}
+function setCurrentUser(user) { currentUser = user; STORE.set('session', user.id); }
+function routeByRole(role) {
+  if (role === 'owner') showPage('pgOwnerDash');
+  else if (role === 'employee') showPage('pgEmpDash');
+  else showPage('pgHome');
+}
+function doLogout() { currentUser = null; STORE.del('session'); showPage('pgLogin'); toast('Signed out.', 'info'); }
+
+// ════ HOME ════
+function setChip(f, el) {
+  activeChipFilter = f;
+  document.querySelectorAll('.chip-bar .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderSaloons();
+}
+function renderSaloons() {
+  const saloons = STORE.get('saloons') || [];
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  let list = saloons.filter(s => {
+    if (q && !s.name.toLowerCase().includes(q) && !s.area.toLowerCase().includes(q)) return false;
+    if (activeChipFilter === 'open' && !s.open) return false;
+    if (activeChipFilter === 'top' && s.rating < 4.8) return false;
+    if (['hair','beard','facial','massage','kids'].includes(activeChipFilter) && !s.tags.includes(activeChipFilter)) return false;
+    return true;
+  });
+  const container = document.getElementById('saloonCards');
+  if (!container) return;
+  container.innerHTML = list.map(s => `
+    <div class="salon-card" onclick="bookSaloon(${s.id})">
+      <div class="salon-img">${s.icon}<div class="salon-status${s.open?'':' closed'}">${s.open?'Open':'Closed'}</div></div>
+      <div class="salon-body">
+        <div class="salon-name">${s.name}</div>
+        <div class="salon-loc">📍 ${s.area}, ${s.city}</div>
+        <div class="salon-meta"><span class="salon-rating">★ ${s.rating}</span><span>(${s.reviews} reviews)</span><span>🪑 ${s.seats} seats</span></div>
+        <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.priceFrom}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book Now</button></div>
+      </div>
+    </div>`).join('');
+  // update home av
+  if (currentUser) {
+    const av = document.getElementById('homeAv');
+    if (av) av.textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+  }
+}
+function bookSaloon(id) { showPage('pgBooking'); }
+function filterSaloons() { renderSaloons(); toast('Filters applied', 'info'); }
+
+// ════ BOOKING ════
+const SUB_SERVICES = {
+  'Hair Cutting': ['Classic Cut','Fade Cut','Crew Cut','Skin Fade','Taper Cut'],
+  'Beard & Shave': ['Full Beard Trim','Clean Shave','Beard Shaping','Line Up'],
+  'Facial & Skin': ['Deep Cleansing','Brightening Facial','Anti-Aging'],
+  'Head Massage': ['Relaxing Massage','Oil Massage','Hot Towel'],
+  'Hair Coloring': ['Full Color','Highlights','Balayage'],
+  'Full Grooming': ['Premium Package','Deluxe Package']
+};
+function initBooking() {
+  currentStep = 1;
+  booking = { service:null, subService:null, seat:null, slot:null, barber:null, payment:'cash', date:'' };
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step1').classList.add('active');
+  updateStepUI();
+  // date default
+  const d = new Date(); d.setDate(d.getDate()+1);
+  const bd = document.getElementById('bookDate');
+  if (bd) bd.value = d.toISOString().split('T')[0];
+  booking.date = bd?.value || '';
+  renderServiceGrid();
+  renderSeatGrid();
+  renderSlotGrid();
+  renderBarberGrid();
+  updateLiveSummary();
+}
+function renderServiceGrid() {
+  const services = (STORE.get('services') || []).filter(s => s.active);
+  document.getElementById('svcGrid').innerHTML = services.map(s => `
+    <div class="svc-card" onclick="pickService(this,'${s.name}',${s.price},'${s.icon}',${s.id})" data-sid="${s.id}">
+      <div class="svc-icon">${s.icon}</div>
+      <div class="svc-name">${s.name}</div>
+      <div class="svc-price">Rs. ${s.price}</div>
+      <div class="svc-dur">${s.duration}</div>
+    </div>`).join('');
+}
+function pickService(el, name, price, icon, id) {
+  document.querySelectorAll('.svc-card').forEach(c => c.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.service = name; booking.servicePrice = price; booking.serviceIcon = icon;
+  booking.subService = null;
+  // show sub-options
+  const subs = SUB_SERVICES[name] || [];
+  const existing = document.getElementById('subOptRow');
+  if (existing) existing.remove();
+  if (subs.length) {
+    const row = document.createElement('div');
+    row.id = 'subOptRow';
+    row.innerHTML = '<div class="label" style="margin-top:16px;margin-bottom:8px">Select style:</div><div class="sub-opts">' + subs.map(sub=>`<span class="sub-opt" onclick="pickSubService(this,'${sub}')">${sub}</span>`).join('') + '</div>';
+    el.closest('.book-sec').appendChild(row);
+  }
+  updateLiveSummary();
+}
+function pickSubService(el, name) {
+  document.querySelectorAll('.sub-opt').forEach(s => s.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.subService = name;
+  updateLiveSummary();
+}
+function renderSeatGrid() {
+  const seats = STORE.get('seats') || [];
+  document.getElementById('seatGrid').innerHTML = seats.map((s,i) => `
+    <div class="seat-item ${s}" onclick="pickSeat(this,${i+1},'${s}')" title="Seat ${i+1}">
+      ${s==='available'?'🟢':s==='occupied'?'🔴':'🟡'} ${i+1}
+    </div>`).join('');
+}
+function pickSeat(el, num, status) {
+  if (status === 'occupied') { toast('This seat is occupied','error'); return; }
+  document.querySelectorAll('.seat-item').forEach(s => s.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.seat = num;
+  updateLiveSummary();
+}
+function renderSlotGrid() {
+  const times = ['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','12:00 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM','5:00 PM','5:30 PM','6:00 PM','6:30 PM','7:00 PM'];
+  document.getElementById('slotGrid').innerHTML = times.map(t => `<span class="slot" onclick="pickSlot(this,'${t}')">${t}</span>`).join('');
+}
+function pickSlot(el, time) {
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.slot = time;
+  updateLiveSummary();
+}
+function renderBarberGrid() {
+  const emps = STORE.get('employees') || [];
+  document.getElementById('barberGrid').innerHTML = `
+    <div class="barber-card picked" onclick="bookPickBarber(this,'Any Available')">
+      <div class="barber-av">🎲</div>
+      <div class="barber-name">Any Available</div>
+      <div class="barber-role">Auto-assign</div>
+    </div>` + emps.map(e => `
+    <div class="barber-card" onclick="bookPickBarber(this,'${e.name}')">
+      <div class="barber-av">${e.avatar}</div>
+      <div class="barber-name">${e.name}</div>
+      <div class="barber-role">${e.role}</div>
+      <div class="barber-rating">★ ${e.rating} · ${e.customers} clients</div>
+      ${e.status==='busy'?'<div style="font-size:12px;color:var(--red);margin-top:4px">Currently Busy</div>':'<div style="font-size:12px;color:var(--g2);margin-top:4px">Available</div>'}
+    </div>`).join('');
+  booking.barber = 'Any Available';
+}
+function bookPickBarber(el, name) {
+  document.querySelectorAll('.barber-card').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.barber = name;
+  updateLiveSummary();
+}
+function pickPM(el) {
+  document.querySelectorAll('.pm').forEach(p => p.classList.remove('picked'));
+  el.classList.add('picked');
+  booking.payment = el.dataset.pm;
+  document.getElementById('cardFields').style.display = booking.payment==='card' ? 'block' : 'none';
+}
+function goStep(n) {
+  if (n > 1 && !booking.service) { toast('Please select a service first','error'); return; }
+  if (n > 2 && !booking.slot) { toast('Please pick a time slot','error'); return; }
+  if (n > 3 && !booking.barber) { toast('Please select a barber','error'); return; }
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  currentStep = n;
+  document.getElementById('bookStepCount').textContent = 'Step '+n+' of 4';
+  booking.date = document.getElementById('bookDate')?.value || booking.date;
+  updateStepUI();
+  if (n === 4) renderFinalSummary();
+  window.scrollTo(0,0);
+}
+function updateStepUI() {
+  for (let i=1;i<=4;i++) {
+    const ps=document.getElementById('ps'+i), pl=document.getElementById('pl'+i);
+    if(!ps) continue;
+    ps.classList.remove('active','done');
+    if(i<currentStep) ps.classList.add('done');
+    if(i===currentStep) ps.classList.add('active');
+    if(pl && i<currentStep) pl.classList.add('done'); else if(pl) pl.classList.remove('done');
+  }
+}
+function updateLiveSummary() {
+  const el = document.getElementById('liveSummary'); if(!el) return;
+  const parts = [];
+  if (booking.service) parts.push(`<div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)"><strong>${booking.serviceIcon} ${booking.service}</strong>${booking.subService?'<br><span style="color:var(--text3);font-size:13px">'+booking.subService+'</span>':''}<br><span style="color:var(--p);font-weight:700">Rs. ${booking.servicePrice||'—'}</span></div>`);
+  if (booking.date) parts.push(`<div style="font-size:13px;margin-bottom:4px">📅 ${booking.date}</div>`);
+  if (booking.slot) parts.push(`<div style="font-size:13px;margin-bottom:4px">⏰ ${booking.slot}</div>`);
+  if (booking.seat) parts.push(`<div style="font-size:13px;margin-bottom:4px">🪑 Seat #${booking.seat}</div>`);
+  if (booking.barber) parts.push(`<div style="font-size:13px;margin-bottom:4px">✂️ ${booking.barber}</div>`);
+  el.innerHTML = parts.length ? parts.join('') : '<span style="color:var(--text4)">No selections yet.</span>';
+}
+function renderFinalSummary() {
+  const rows = document.getElementById('summaryRows'); if(!rows) return;
+  rows.innerHTML = [
+    ['Saloon','Royal Cuts Studio'],['Service',(booking.serviceIcon||'')+(booking.service||'—')],
+    ['Style',booking.subService||'—'],['Barber',booking.barber||'—'],
+    ['Date & Time',(booking.date||'—')+' at '+(booking.slot||'—')],
+    ['Seat',booking.seat?'#'+booking.seat:'—'],['Payment',booking.payment||'—']
+  ].map(([k,v])=>`<div class="sum-row"><div style="font-size:13px;color:var(--text3)">${k}</div><div style="font-weight:600">${v}</div></div>`).join('');
+  document.getElementById('sumTotal').textContent = 'Rs. '+(booking.servicePrice||0);
+}
+function confirmBooking() {
+  if (!booking.service || !booking.slot) { toast('Please complete all booking steps','error'); return; }
+  const bookings = STORE.get('bookings') || [];
+  bookings.push({ id:Date.now(), userId:currentUser?.id||1, saloon:'Royal Cuts Studio', service:booking.service, subService:booking.subService, barber:booking.barber, date:booking.date, time:booking.slot, price:booking.servicePrice||300, status:'confirmed', paymentMethod:booking.payment });
+  STORE.set('bookings', bookings);
+  toast('🎉 Booking confirmed! See you at Royal Cuts Studio.', 'gold');
+  setTimeout(() => showPage('pgUserDash'), 800);
+}
+
+// ════ USER DASHBOARD ════
+function refreshUserDash() {
+  if (!currentUser) return;
+  const bookings = STORE.get('bookings') || [];
+  const mine = bookings.filter(b => b.userId === currentUser.id);
+  const totalSpent = mine.reduce((a,b)=>a+(b.price||0),0);
+  const hour = new Date().getHours();
+  const greet = hour<12?'Morning':hour<17?'Afternoon':'Evening';
+  document.getElementById('userGreeting').textContent = `Good ${greet}, ${currentUser.firstName}! 👋`;
+  const upcoming = mine.filter(b=>b.status==='confirmed'||b.status==='pending');
+  if (upcoming.length) {
+    const next = upcoming[upcoming.length-1];
+    document.getElementById('userNextAppt').innerHTML = `Next appointment: <strong>${next.saloon}</strong> on ${next.date} at ${next.time}.`;
+  }
+  document.getElementById('statTotal').textContent = mine.length;
+  document.getElementById('statTotalBadge').textContent = mine.length+' total';
+  document.getElementById('statSpent').textContent = 'Rs. '+totalSpent.toLocaleString();
+  document.getElementById('statSpentBadge').textContent = 'Rs. '+totalSpent.toLocaleString();
+  document.getElementById('userBookingsBadge').textContent = mine.length;
+  document.getElementById('userAv').textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+  document.getElementById('userName').textContent = currentUser.firstName+' '+(currentUser.lastName||'');
+  document.getElementById('userDashDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('profName').value = currentUser.firstName+' '+(currentUser.lastName||'');
+  document.getElementById('profEmail').value = currentUser.email;
+  document.getElementById('profPhone').value = currentUser.phone||'';
+  document.getElementById('profCity').value = currentUser.city||'';
+  document.getElementById('profAvatar').textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+  renderRecentBookings(mine); renderAllBookings(mine); renderFavCards();
+}
+function renderBookingItem(b, showActions=false) {
+  return `<div class="booking-item">
+    <div class="bi-icon">✂️</div>
+    <div class="bi-info">
+      <div class="bi-name">${b.saloon}</div>
+      <div class="bi-meta">${b.service}${b.subService?' · '+b.subService:''} · ${b.barber||'—'}</div>
+      <div class="bi-meta" style="margin-top:2px">📅 ${b.date} ⏰ ${b.time}</div>
+    </div>
+    <div class="bi-right">
+      <div class="bi-price">Rs. ${b.price}</div>
+      <span class="badge ${b.status}">● ${b.status}</span>
+      ${b.status==='completed'&&showActions?`<button class="btn btn-xs btn-outline" onclick="openRatingModal('${b.saloon}',${b.id})">Rate</button>`:''}
+      ${(b.status==='confirmed'||b.status==='pending')&&showActions?`<button class="btn btn-xs btn-danger" onclick="cancelBooking(${b.id})">Cancel</button>`:''}
+    </div>
+  </div>`;
+}
+function renderRecentBookings(mine) {
+  const el = document.getElementById('recentBookings');
+  const recent = mine.slice(-3).reverse();
+  el.innerHTML = recent.length ? recent.map(b=>renderBookingItem(b,true)).join('') : '<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No bookings yet. <a style="color:var(--p);cursor:pointer;font-weight:600" onclick="showPage(\'pgBooking\')">Book your first!</a></div>';
+}
+let userBkFilter = 'all';
+function filterUserBks(f, el) {
+  userBkFilter = f;
+  document.querySelectorAll('#subBookings .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const bookings = STORE.get('bookings')||[];
+  const mine = bookings.filter(b=>b.userId===currentUser?.id);
+  renderAllBookings(mine);
+}
+function renderAllBookings(mine) {
+  const el = document.getElementById('allBookingsList');
+  const filtered = userBkFilter==='all' ? mine : mine.filter(b=>b.status===userBkFilter);
+  el.innerHTML = filtered.length ? filtered.reverse().map(b=>renderBookingItem(b,true)).join('') : '<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No bookings in this category.</div>';
+}
+function renderFavCards() {
+  const saloons = STORE.get('saloons')||[];
+  document.getElementById('favCards').innerHTML = saloons.slice(0,3).map(s=>`
+    <div class="salon-card" onclick="showPage('pgBooking')">
+      <div class="salon-img">${s.icon}<div class="salon-status${s.open?'':' closed'}">${s.open?'Open':'Closed'}</div></div>
+      <div class="salon-body">
+        <div class="salon-name">${s.name}</div>
+        <div class="salon-loc">📍 ${s.area}</div>
+        <div class="salon-meta"><span class="salon-rating">★ ${s.rating}</span><span>(${s.reviews})</span></div>
+        <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.priceFrom}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book</button></div>
+      </div>
+    </div>`).join('');
+}
+function cancelBooking(id) {
+  if (!confirm('Cancel this booking?')) return;
+  const bookings = STORE.get('bookings')||[];
+  const idx = bookings.findIndex(b=>b.id===id);
+  if (idx>-1) { bookings[idx].status='cancelled'; STORE.set('bookings',bookings); }
+  refreshUserDash(); toast('Booking cancelled.','info');
+}
+function saveProfile() {
+  const name = document.getElementById('profName').value.trim().split(' ');
+  const users = STORE.get('users')||[];
+  const idx = users.findIndex(u=>u.id===currentUser.id);
+  if (idx>-1) {
+    users[idx].firstName=name[0]; users[idx].lastName=name.slice(1).join(' ');
+    users[idx].email=document.getElementById('profEmail').value;
+    users[idx].phone=document.getElementById('profPhone').value;
+    users[idx].city=document.getElementById('profCity').value;
+    STORE.set('users',users); currentUser=users[idx];
+  }
+  toast('Profile updated!','success'); refreshUserDash();
+}
+function showUserSub(id) {
+  document.querySelectorAll('#pgUserDash .sub-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#userSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+}
+
+// ════ OWNER DASHBOARD ════
+function refreshOwnerDash() {
+  const bookings = STORE.get('bookings')||[];
+  const today = new Date().toISOString().split('T')[0];
+  const todayBks = bookings.filter(b=>b.date===today);
+  const revenue = bookings.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0);
+  document.getElementById('ownerToday').textContent = todayBks.length;
+  document.getElementById('ownerRevenue').textContent = 'Rs. '+revenue.toLocaleString();
+  document.getElementById('ownerBannerMsg').innerHTML = `<strong>${todayBks.length} bookings</strong> today · Revenue: Rs. ${revenue.toLocaleString()}`;
+  document.getElementById('ownerOrdersBadge').textContent = bookings.filter(b=>b.status==='confirmed'||b.status==='pending').length;
+  document.getElementById('ownerDashDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  ['earnToday','earnMonth','earnTotal'].forEach((id,i)=>{ const el=document.getElementById(id); if(el) el.textContent='Rs. '+revenue.toLocaleString(); });
+  // owner name
+  if (currentUser) {
+    document.getElementById('ownerAv').textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+    document.getElementById('ownerName').textContent = currentUser.firstName+' '+(currentUser.lastName||'');
+  }
+  renderOwnerOrdersTable(bookings.slice(-5));
+  renderOwnerOrders(); renderServicesList(); renderOwnerSeatGrid();
+  renderEmployeeList(); renderOwnerEarnings(bookings); renderPopularServices(bookings);
+  shopIsOpen = STORE.get('shopOpen') ?? true; updateShopToggle();
+  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=STORE.get('inviteCode')||'TT-XXXX-0000';
+}
+function renderPopularServices(bookings) {
+  const el = document.getElementById('popularServices'); if(!el) return;
+  const svcCount = {};
+  bookings.forEach(b => { svcCount[b.service]=(svcCount[b.service]||0)+1; });
+  const sorted = Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  el.innerHTML = sorted.map(([name,count])=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:20px">✂️</span>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${name}</div><div style="font-size:12px;color:var(--text3)">${count} bookings</div></div>
+      <div style="font-weight:700;color:var(--p)">#${sorted.indexOf(sorted.find(s=>s[0]===name))+1}</div>
+    </div>`).join('') || '<p style="color:var(--text3);font-size:14px">No data yet.</p>';
+}
+function renderOwnerOrdersTable(orders) {
+  const el=document.getElementById('ownerOrdersTable'); if(!el) return;
+  const users=STORE.get('users')||[];
+  el.innerHTML = orders.reverse().map(b=>{
+    const u=users.find(u=>u.id===b.userId);
+    return `<tr><td>${u?u.firstName+' '+u.lastName:'Customer'}</td><td>${b.service}</td><td style="white-space:nowrap">${b.date} ${b.time}</td><td style="color:var(--p);font-weight:700">Rs. ${b.price}</td><td><span class="badge ${b.status}">● ${b.status}</span></td></tr>`;
+  }).join('');
+}
+function renderOwnerOrders() {
+  const el=document.getElementById('allOrdersTable'); if(!el) return;
+  const filter=document.getElementById('orderFilter')?.value||'all';
+  const bookings=STORE.get('bookings')||[];
+  const users=STORE.get('users')||[];
+  const filtered=filter==='all'?bookings:bookings.filter(b=>b.status===filter);
+  el.innerHTML = filtered.slice().reverse().map(b=>{
+    const u=users.find(u=>u.id===b.userId);
+    return `<tr><td>${u?u.firstName+' '+u.lastName:'Customer'}</td><td>${b.service}</td><td>${b.barber||'—'}</td><td style="white-space:nowrap">${b.date} ${b.time}</td><td style="color:var(--p);font-weight:700">Rs. ${b.price}</td><td><span class="badge ${b.status}">● ${b.status}</span></td>
+    <td>${b.status==='confirmed'?`<button class="btn btn-xs" onclick="updateBookingStatus(${b.id},'completed')">Done</button>`:b.status==='pending'?`<button class="btn btn-xs btn-outline" onclick="updateBookingStatus(${b.id},'confirmed')">Confirm</button>`:''}</td></tr>`;
+  }).join('');
+}
+function updateBookingStatus(id, status) {
+  const bookings=STORE.get('bookings')||[];
+  const idx=bookings.findIndex(b=>b.id===id);
+  if(idx>-1){ bookings[idx].status=status; STORE.set('bookings',bookings); }
+  renderOwnerOrders(); refreshOwnerDash(); toast('Booking marked as '+status,'success');
+}
+function renderServicesList() {
+  const services=STORE.get('services')||[];
+  const el=document.getElementById('servicesList'); if(!el) return;
+  el.innerHTML = services.map(s=>`
+    <div class="svc-row">
+      <div class="svc-row-icon">${s.icon}</div>
+      <div class="svc-row-info"><div class="svc-row-name">${s.name}</div><div class="svc-row-price">Rs. ${s.price} · ${s.duration}</div></div>
+      <button class="svc-toggle${s.active?'':' off'}" onclick="toggleService(${s.id})">${s.active?'Active':'Inactive'}</button>
+      <button class="btn btn-xs btn-danger" style="margin-left:8px" onclick="deleteService(${s.id})">✕</button>
+    </div>`).join('');
+}
+function toggleService(id) {
+  const services=STORE.get('services')||[];
+  const idx=services.findIndex(s=>s.id===id);
+  if(idx>-1){ services[idx].active=!services[idx].active; STORE.set('services',services); }
+  renderServicesList();
+}
+function deleteService(id) {
+  if(!confirm('Delete this service?')) return;
+  STORE.set('services',(STORE.get('services')||[]).filter(s=>s.id!==id));
+  renderServicesList(); toast('Service removed.','info');
+}
+function openAddServiceModal() { document.getElementById('addServiceModal').classList.add('show'); }
+function addService() {
+  const name=document.getElementById('svcName').value.trim();
+  const icon=document.getElementById('svcIcon').value.trim()||'✂️';
+  const price=parseInt(document.getElementById('svcPrice').value)||0;
+  const duration=document.getElementById('svcDuration').value.trim()||'30 min';
+  if(!name){ toast('Enter a service name','error'); return; }
+  const services=STORE.get('services')||[];
+  services.push({id:Date.now(),icon,name,price,duration,active:true});
+  STORE.set('services',services); closeModal('addServiceModal'); renderServicesList();
+  toast('Service added!','success');
+  ['svcName','svcPrice','svcDuration'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('svcIcon').value='✂️';
+}
+function renderOwnerSeatGrid() {
+  const seats=STORE.get('seats')||[];
+  const el=document.getElementById('ownerSeatGrid'); if(!el) return;
+  el.innerHTML = seats.map((s,i)=>`
+    <div class="owner-seat-item ${s}" onclick="ownerToggleSeat(${i})">
+      ${s==='available'?'🪑':s==='occupied'?'🚫':'🔒'}
+      <span>Seat ${i+1}</span>
+    </div>`).join('');
+  const ownerSeats=document.getElementById('ownerSeats'); if(ownerSeats) ownerSeats.textContent=seats.length;
+}
+function ownerToggleSeat(i) {
+  const seats=STORE.get('seats')||[];
+  const cycle={available:'occupied',occupied:'reserved',reserved:'available'};
+  seats[i]=cycle[seats[i]]||'available'; STORE.set('seats',seats); renderOwnerSeatGrid();
+}
+function renderEmployeeList() {
+  const emps=STORE.get('employees')||[];
+  const el=document.getElementById('employeeList'); if(!el) return;
+  el.innerHTML = emps.map(e=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--border)">
+      <div class="ua green" style="width:40px;height:40px;font-size:13px;flex-shrink:0">${e.avatar}</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:700">${e.name}</div><div style="font-size:13px;color:var(--text3)">${e.role} · ★ ${e.rating}</div></div>
+      <span class="badge ${e.status==='available'?'confirmed':'pending'}">● ${e.status}</span>
+    </div>`).join('');
+}
+function renderOwnerEarnings(bookings) {
+  const el=document.getElementById('earningsBreakdown'); if(!el) return;
+  const services={};
+  bookings.filter(b=>b.status==='completed').forEach(b=>{ services[b.service]=(services[b.service]||0)+(b.price||0); });
+  el.innerHTML=Object.entries(services).map(([k,v])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:500">✂️ ${k}</div>
+      <div style="font-weight:700;color:var(--p)">Rs. ${v.toLocaleString()}</div>
+    </div>`).join('')||'<div style="color:var(--text3);font-size:14px;padding:16px 0">No completed bookings yet.</div>';
+}
+function genCode() {
+  const c='ABCDEFGHJKLMNPQRSTUVWXYZ',n='0123456789';
+  let code='TT-';
+  for(let i=0;i<4;i++) code+=c[Math.floor(Math.random()*c.length)];
+  code+='-';
+  for(let i=0;i<4;i++) code+=n[Math.floor(Math.random()*n.length)];
+  STORE.set('inviteCode',code);
+  const el=document.getElementById('inviteCode'); if(el) el.textContent=code;
+  toast('New code generated!','success');
+}
+function copyCode() {
+  const el=document.getElementById('inviteCode');
+  if(el) navigator.clipboard.writeText(el.textContent).then(()=>toast('Invite code copied!','success'));
+}
+function toggleShop() {
+  shopIsOpen=!shopIsOpen; STORE.set('shopOpen',shopIsOpen); updateShopToggle();
+  toast(shopIsOpen?'Shop is now Open 🟢':'Shop is now Closed 🔴',shopIsOpen?'success':'error');
+}
+function updateShopToggle() {
+  const btn=document.getElementById('shopToggle'),dot=document.getElementById('shopDot'),txt=document.getElementById('shopTxt');
+  if(!btn) return;
+  btn.classList.toggle('on',shopIsOpen); btn.classList.toggle('off-red',!shopIsOpen);
+  dot.classList.toggle('on',shopIsOpen); dot.classList.toggle('off',!shopIsOpen);
+  txt.textContent=shopIsOpen?'Shop Open':'Shop Closed';
+}
+function showOwnerSub(id) {
+  document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#ownerSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=STORE.get('inviteCode')||'TT-XXXX-0000';
+}
+
+// ════ EMPLOYEE DASHBOARD ════
+function refreshEmpDash() {
+  const bookings=STORE.get('bookings')||[];
+  const assigned=bookings.filter(b=>b.barber==='Usman Sheikh');
+  const today=new Date().toISOString().split('T')[0];
+  const todayAssigned=assigned.filter(b=>b.date===today);
+  const earnings=assigned.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0)*0.6,0);
+  document.getElementById('empOrdersBadge').textContent=todayAssigned.length;
+  document.getElementById('empTotalCust').textContent=assigned.length;
+  document.getElementById('empMonthEarn').textContent='Rs. '+Math.round(earnings).toLocaleString();
+  ['empEarnToday','empEarnMonth','empEarnTotal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Rs. '+Math.round(earnings).toLocaleString(); });
+  document.getElementById('empDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if (currentUser) {
+    document.getElementById('empAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+    document.getElementById('empName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
+  }
+  empIsAvail=STORE.get('available')??true; updateAvailToggle();
+  renderEmpSchedule(todayAssigned,'empTodaySchedule');
+  renderEmpSchedule(assigned,'empFullSchedule');
+  renderEmpOrders(assigned);
+}
+function renderEmpSchedule(bookings,elId) {
+  const el=document.getElementById(elId); if(!el) return;
+  const now=new Date();
+  el.innerHTML=bookings.length?bookings.slice(0,8).map(b=>{
+    const isPast=new Date(b.date+' '+b.time)<now;
+    return `<div class="sch-item ${isPast?'done':'upcoming'}">
+      <div class="sch-time">${b.time}</div>
+      <div><div class="sch-name">Customer</div><div class="sch-svc">${b.service}${b.subService?' · '+b.subService:''} · ${b.date}</div></div>
+      <span class="badge ${b.status}">● ${b.status}</span>
+    </div>`;
+  }).join(''):'<div style="color:var(--text3);font-size:14px;padding:16px 0;text-align:center">No appointments scheduled.</div>';
+}
+function renderEmpOrders(bookings) {
+  const el=document.getElementById('empOrdersList'); if(!el) return;
+  el.innerHTML=bookings.length?bookings.slice().reverse().map(b=>`
+    <div class="booking-item">
+      <div class="bi-icon">✂️</div>
+      <div class="bi-info"><div class="bi-name">${b.service}${b.subService?' · '+b.subService:''}</div><div class="bi-meta">📅 ${b.date} ⏰ ${b.time}</div></div>
+      <div class="bi-right"><div class="bi-price">Rs. ${Math.round((b.price||0)*0.6)}</div><span class="badge ${b.status}">● ${b.status}</span></div>
+    </div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No assigned orders.</div>';
+}
+function toggleAvailability() {
+  empIsAvail=!empIsAvail; STORE.set('available',empIsAvail); updateAvailToggle();
+  toast(empIsAvail?'You are now Available ✅':'You are now Unavailable ❌',empIsAvail?'success':'info');
+}
+function updateAvailToggle() {
+  const btn=document.getElementById('availToggle'),dot=document.getElementById('availDot'),txt=document.getElementById('availTxt');
+  if(!btn) return;
+  btn.classList.toggle('on',empIsAvail); btn.classList.toggle('off-red',!empIsAvail);
+  dot.classList.toggle('on',empIsAvail); dot.classList.toggle('off',!empIsAvail);
+  txt.textContent=empIsAvail?'Available':'Unavailable';
+}
+function showEmpSub(id) {
+  document.querySelectorAll('#pgEmpDash .sub-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#empSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+}
+function setRating(n) {
+  empRatingVal=n;
+  document.querySelectorAll('#starWidget .star').forEach((s,i)=>{ s.classList.toggle('on',i<n); });
+}
+function submitRating() {
+  const cust=document.getElementById('rateCustomer').value.trim();
+  const svc=document.getElementById('rateSvc').value.trim();
+  if(!cust){ toast('Enter a customer name','error'); return; }
+  toast(`Rated ${cust} — ${empRatingVal}⭐ for ${svc||'service'}`, 'success');
+  document.getElementById('rateCustomer').value=''; document.getElementById('rateSvc').value=''; document.getElementById('rateNotes').value='';
+}
+
+// ════ MODALS & REVIEWS ════
+function openRatingModal(salon, bookingId) {
+  document.getElementById('ratingModalSalon').textContent=salon;
+  document.getElementById('ratingModal').classList.add('show');
+  modalRating=0; setModalRating(0);
+}
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function setModalRating(n) {
+  modalRating=n;
+  document.querySelectorAll('#ratingStars .star').forEach((s,i)=>{ s.classList.toggle('on',i<n); });
+}
+function submitReview() {
+  if(!modalRating){ toast('Please select a rating','error'); return; }
+  closeModal('ratingModal'); toast(`Review submitted! ⭐ ${modalRating}/5 — Thank you!`, 'success');
+}
+
+// ════ SIDEBAR ════
+function openSidebar(id) {
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('.overlay').forEach(o=>o.classList.add('show'));
+}
+function closeSidebar(id) {
+  document.getElementById(id).classList.remove('show');
+  document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('show'));
+}
+
+// ════ TOAST ════
+function toast(msg, type='info') {
+  const el=document.createElement('div');
+  el.className='toast '+type; el.textContent=msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// ════ AI ANALYSIS ════
+async function runAIAnalysis(type) {
+  const el=document.getElementById('aiResponse');
+  el.innerHTML='<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Analyzing your business data...</div>';
+  const bookings=STORE.get('bookings')||[];
+  const services=STORE.get('services')||[];
+  const stats={ totalBookings:bookings.length, completedBookings:bookings.filter(b=>b.status==='completed').length, totalRevenue:bookings.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0), services:services.map(s=>s.name), topService:Object.entries(bookings.reduce((acc,b)=>{acc[b.service]=(acc[b.service]||0)+1;return acc},{})).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A' };
+  const prompts={overview:`You are a business analyst for TrimTime, a saloon management platform. Analyze this saloon data and give actionable insights in 3-4 short paragraphs:\n\nData: ${JSON.stringify(stats)}\n\nFocus on: revenue performance, booking trends, and key opportunities. Be specific and practical for a Pakistani saloon owner in Lahore.`,tips:`You are a business growth expert for TrimTime. Given this saloon data: ${JSON.stringify(stats)}\n\nProvide 5 specific, actionable growth tips for increasing bookings and revenue. Format as numbered list. Keep it practical for a Lahore-based saloon.`,peak:`You are a scheduling expert for TrimTime saloon platform. Given this data: ${JSON.stringify(stats)}\n\nAnalyze and recommend:\n1. Likely peak hours for a Lahore saloon\n2. How to optimize staffing\n3. How to handle slow periods\n\nBe specific and practical.`};
+  try {
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompts[type]}]})});
+    const data=await response.json();
+    el.textContent=data.content?.map(c=>c.text||'').join('')||'Unable to generate analysis.';
+  } catch(err) {
+    el.textContent='AI analysis unavailable. Sample insight: Your saloon has '+stats.totalBookings+' total bookings. Top service: '+stats.topService+'.';
+  }
+}
+async function sendAIQuestion() {
+  const q=document.getElementById('aiQuestion').value.trim(); if(!q) return;
+  const el=document.getElementById('aiChatResponse');
+  el.style.display='block';
+  el.innerHTML='<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Thinking...</div>';
+  document.getElementById('aiQuestion').value='';
+  const bookings=STORE.get('bookings')||[];
+  const stats={totalBookings:bookings.length,revenue:bookings.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0)};
+  try {
+    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`You are a business advisor for a saloon in Lahore, Pakistan called "Royal Cuts Studio" using TrimTime platform. Business stats: ${JSON.stringify(stats)}. Answer this question concisely and practically: ${q}`}]})});
+    const data=await response.json();
+    el.textContent=data.content?.map(c=>c.text||'').join('')||'No response.';
+  } catch(err) { el.textContent='AI unavailable. Please try again later.'; }
+}
+
+// ════ INIT ════
+document.addEventListener('DOMContentLoaded', () => {
+  initData();
+  const sid=STORE.get('session');
+  if(sid) {
+    const users=STORE.get('users')||[];
+    const user=users.find(u=>u.id===sid);
+    if(user){ currentUser=user; routeByRole(user.role); return; }
+  }
+  // start on landing page
+});
+</script>
+</body>
+</html>
