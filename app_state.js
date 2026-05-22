@@ -73,6 +73,7 @@ async function doLogin() {
       if (!existing) await _supabase.from('profiles').upsert({ id: data.user.id, role: 'admin', first_name: 'Admin', last_name: 'TrimTime' });
     }
     await loadUserAndRoute(data.user);
+    _clearAuthForms();
     resetBtn();
   } catch (e) {
     showErr('Unexpected error: ' + e.message);
@@ -135,6 +136,7 @@ async function doRegister() {
     if (data.session) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
       await loadUserAndRoute(data.user);
+      _clearAuthForms();
       resetBtn();
     } else {
       resetBtn();
@@ -174,7 +176,19 @@ async function loadUserAndRoute(authUser) {
   else if (profile.role === 'employee') showPage('pgEmpDash');
   else showPage('pgHome');
 }
-async function doLogout() { await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; showPage('pgLogin'); toast('Signed out.','info'); }
+function _clearAuthForms() {
+  ['loginEmail','loginPass','regFirst','regEmail','regPhone','regPass','regPass2','regSalon','regInvite'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.role-card[data-role="customer"]').forEach(c => c.classList.add('selected'));
+  ['loginError','regError','regSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+async function doLogout() { await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; _clearAuthForms(); showPage('pgLogin'); toast('Signed out.','info'); }
 
 // ════ HOME ════
 function setChip(f, el) {
