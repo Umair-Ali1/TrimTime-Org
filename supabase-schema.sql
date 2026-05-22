@@ -83,6 +83,19 @@ CREATE TABLE IF NOT EXISTS employees (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 7. REVIEWS
+CREATE TABLE IF NOT EXISTS reviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id  UUID REFERENCES bookings(id) ON DELETE CASCADE,
+  reviewer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  employee_id UUID REFERENCES employees(id) ON DELETE CASCADE,
+  saloon_id   UUID REFERENCES saloons(id) ON DELETE CASCADE,
+  rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment     TEXT DEFAULT '',
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (booking_id)  -- one review per booking
+);
+
 -- ════ DISABLE ROW LEVEL SECURITY (for development) ════
 -- These tables are readable/writable with the anon key.
 -- Enable RLS with proper policies before going to production.
@@ -92,6 +105,7 @@ ALTER TABLE services  DISABLE ROW LEVEL SECURITY;
 ALTER TABLE seats     DISABLE ROW LEVEL SECURITY;
 ALTER TABLE bookings  DISABLE ROW LEVEL SECURITY;
 ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
+ALTER TABLE reviews   DISABLE ROW LEVEL SECURITY;
 
 -- ════ SEED: Demo saloons (run after the schema is created) ════
 -- The demo owner account is auto-created the first time you click

@@ -1366,7 +1366,7 @@ input[type=range]{width:100%;accent-color:var(--p)}
         </div>
         <div id="eSubReviews" class="sub-page">
           <div style="margin-bottom:24px"><h2 style="font-size:24px">My Reviews</h2></div>
-          <div class="card"><p style="color:var(--text3)">No reviews yet. Keep providing great service!</p></div>
+          <div id="empReviewsList"><div class="card"><p style="color:var(--text3)">Loading reviews...</p></div></div>
         </div>
         <div id="eSubProfile" class="sub-page">
           <div style="margin-bottom:24px"><h2 style="font-size:24px">My Profile</h2></div>
@@ -1497,8 +1497,9 @@ input[type=range]{width:100%;accent-color:var(--p)}
 <!-- ════ MODALS ════ -->
 <div class="modal-bg" id="ratingModal">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">⭐ Rate Your Experience</div><span class="modal-close" onclick="closeModal('ratingModal')">✕</span></div>
-    <div style="margin-bottom:14px;font-size:14px;color:var(--text3)" id="ratingModalSalon">Royal Cuts Studio</div>
+    <div class="modal-head"><div class="modal-title"><i class="fas fa-star"></i> Rate Your Experience</div><span class="modal-close" onclick="closeModal('ratingModal')">✕</span></div>
+    <div style="margin-bottom:4px;font-weight:600;font-size:15px" id="ratingModalSalon">Royal Cuts Studio</div>
+    <div style="margin-bottom:14px;font-size:13px;color:var(--text3)" id="ratingModalBarber"></div>
     <div class="star-widget" id="ratingStars" style="justify-content:center;margin-bottom:16px">
       <span class="star" onclick="setModalRating(1)">★</span>
       <span class="star" onclick="setModalRating(2)">★</span>
@@ -1506,8 +1507,8 @@ input[type=range]{width:100%;accent-color:var(--p)}
       <span class="star" onclick="setModalRating(4)">★</span>
       <span class="star" onclick="setModalRating(5)">★</span>
     </div>
-    <div class="field"><label class="label">Your Review</label><textarea class="input" id="ratingReview" rows="3" placeholder="Tell us about your experience..."></textarea></div>
-    <button class="btn" style="width:100%;justify-content:center" onclick="submitReview()">Submit Review</button>
+    <div class="field"><label class="label">Your Comment (optional)</label><textarea class="input" id="ratingReview" rows="3" placeholder="Tell us about your experience..."></textarea></div>
+    <button class="btn" id="reviewSubmitBtn" style="width:100%;justify-content:center" onclick="submitReview()">Submit Review</button>
   </div>
 </div>
 
@@ -1551,6 +1552,8 @@ let empRatingVal = 5;
 let shopIsOpen = true;
 let empIsAvail = true;
 let _cachedOwnerBookings = [];
+let _reviewedBookingIds  = new Set();   // booking IDs the current user already reviewed
+let _reviewModalBookingId = null;       // booking being rated right now
 
 // ════ PAGES ════
 function showPage(id) {
@@ -1915,7 +1918,11 @@ async function confirmBooking() {
 // ════ USER DASHBOARD ════
 async function refreshUserDash() {
   if (!currentUser) return;
-  const { data: bookings } = await _supabase.from('bookings').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false});
+  const [{ data: bookings }, { data: myReviews }] = await Promise.all([
+    _supabase.from('bookings').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
+    _supabase.from('reviews').select('booking_id').eq('reviewer_id', currentUser.id)
+  ]);
+  _reviewedBookingIds = new Set((myReviews||[]).map(r => r.booking_id));
   const mine=bookings||[];
   const totalSpent=mine.reduce((a,b)=>a+(b.price||0),0);
   const hour=new Date().getHours();
@@ -1942,19 +1949,21 @@ async function refreshUserDash() {
   renderRecentBookings(mine); renderAllBookings(mine); renderFavCards();
 }
 function renderBookingItem(b, showActions=false) {
-  const sName=b.saloon_name||b.saloon||'—';
+  const sName = b.saloon_name || b.saloon || '—';
+  const alreadyReviewed = _reviewedBookingIds.has(b.id);
   return `<div class="booking-item">
-    <div class="bi-icon">✂️</div>
+    <div class="bi-icon"><i class="fas fa-scissors"></i></div>
     <div class="bi-info">
       <div class="bi-name">${sName}</div>
       <div class="bi-meta">${b.service||'—'}${b.sub_service?' · '+b.sub_service:''} · ${b.barber||'—'}</div>
-      <div class="bi-meta" style="margin-top:2px">📅 ${b.date||'—'} ⏰ ${b.time||'—'}</div>
+      <div class="bi-meta" style="margin-top:2px"><i class="fas fa-calendar" style="font-size:11px"></i> ${b.date||'—'} &nbsp;<i class="fas fa-clock" style="font-size:11px"></i> ${b.time||'—'}</div>
     </div>
     <div class="bi-right">
       <div class="bi-price">Rs. ${b.price||0}</div>
       <span class="badge ${b.status}">● ${b.status}</span>
-      ${b.status==='completed'&&showActions?`<button class="btn btn-xs btn-outline" onclick="openRatingModal('${sName}','${b.id}')">Rate</button>`:''}
-      ${(b.status==='confirmed'||b.status==='pending')&&showActions?`<button class="btn btn-xs btn-danger" onclick="cancelBooking('${b.id}')">Cancel</button>`:''}
+      ${b.status==='completed' && showActions && !alreadyReviewed ? `<button class="btn btn-xs btn-outline" onclick="openRatingModal('${sName.replace(/'/g,"\\'")}','${b.id}','${(b.barber||'').replace(/'/g,"\\'")}')"><i class="fas fa-star"></i> Rate</button>` : ''}
+      ${b.status==='completed' && showActions && alreadyReviewed ? `<span style="font-size:12px;color:var(--g2);font-weight:600"><i class="fas fa-check"></i> Reviewed</span>` : ''}
+      ${(b.status==='confirmed'||b.status==='pending') && showActions ? `<button class="btn btn-xs btn-danger" onclick="cancelBooking('${b.id}')">Cancel</button>` : ''}
     </div>
   </div>`;
 }
@@ -2194,11 +2203,6 @@ async function refreshEmpDash() {
   const profNm = document.getElementById('empProfName'); if (profNm) profNm.value = fullName;
   const profRl = document.getElementById('empProfRole'); if (profRl) profRl.value = jobRole;
   const profPh = document.getElementById('empProfPhone'); if (profPh) profPh.value = currentUser.phone || '';
-  // Rating from employee record
-  const rating = emp?.rating || null;
-  const ratingStars = rating ? '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating)) : '—';
-  const heroStars = document.getElementById('empHeroStars'); if (heroStars) heroStars.textContent = ratingStars;
-  const heroRating = document.getElementById('empHeroRating'); if (heroRating) heroRating.textContent = rating ? rating.toFixed(1) : '—';
   // Stats from bookings
   const { data: assigned } = await _supabase.from('bookings').select('*').eq('barber', fullName).order('created_at', {ascending:false});
   const bks       = assigned || [];
@@ -2208,10 +2212,17 @@ async function refreshEmpDash() {
   const today     = new Date().toISOString().split('T')[0];
   const todayAssigned = bks.filter(b => b.date === today);
   const earnings  = completed.reduce((a, b) => a + (b.price || 0) * 0.6, 0);
-  // Reviews — 0 until a reviews table is added
-  const reviewCount = 0;
-  const rc = document.getElementById('empHeroReviewCount'); if (rc) rc.textContent = `(${reviewCount} reviews)`;
+  // Real reviews from DB
+  const { data: empReviews } = emp ? await _supabase.from('reviews').select('rating, comment, created_at').eq('employee_id', emp.id).order('created_at', {ascending:false}) : {data:[]};
+  const reviewCount = (empReviews||[]).length;
+  const avgRating   = reviewCount > 0 ? empReviews.reduce((s,r) => s + r.rating, 0) / reviewCount : null;
+  if (avgRating !== null) {
+    const heroStars2 = document.getElementById('empHeroStars'); if (heroStars2) heroStars2.textContent = '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5 - Math.round(avgRating));
+    const heroRating2 = document.getElementById('empHeroRating'); if (heroRating2) heroRating2.textContent = avgRating.toFixed(1);
+  }
+  const rc = document.getElementById('empHeroReviewCount'); if (rc) rc.textContent = `(${reviewCount} review${reviewCount !== 1 ? 's' : ''})`;
   const kr = document.getElementById('empKpiReviews');      if (kr) kr.textContent = reviewCount;
+  renderEmpReviews(empReviews||[]);
   document.getElementById('empTotalCust').textContent   = bks.length;
   document.getElementById('empOrdersBadge').textContent = todayAssigned.length;
   document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earnings).toLocaleString();
@@ -2235,6 +2246,21 @@ async function saveEmpProfile() {
   currentUser.firstName = parts[0]; currentUser.lastName = parts.slice(1).join(' '); currentUser.phone = phone;
   toast('Profile saved!', 'success');
   refreshEmpDash();
+}
+function renderEmpReviews(reviews) {
+  const el = document.getElementById('empReviewsList'); if (!el) return;
+  if (!reviews.length) {
+    el.innerHTML = '<div class="card"><p style="color:var(--text3);text-align:center">No reviews yet. Keep providing great service!</p></div>';
+    return;
+  }
+  el.innerHTML = reviews.map(r => `
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="color:var(--amber);font-size:18px;letter-spacing:2px">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+        <span style="font-size:12px;color:var(--text3)">${new Date(r.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}</span>
+      </div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.5">${r.comment || '<em style="color:var(--text4)">No comment left.</em>'}</p>
+    </div>`).join('');
 }
 function renderEmpSchedule(bookings,elId) {
   const el=document.getElementById(elId); if(!el) return;
@@ -2286,19 +2312,55 @@ function submitRating() {
 }
 
 // ════ MODALS & REVIEWS ════
-function openRatingModal(salon, bookingId) {
-  document.getElementById('ratingModalSalon').textContent=salon;
+function openRatingModal(salon, bookingId, barber) {
+  _reviewModalBookingId = bookingId;
+  document.getElementById('ratingModalSalon').textContent = salon;
+  document.getElementById('ratingModalBarber').textContent = barber ? 'Barber: ' + barber : '';
+  document.getElementById('ratingReview').value = '';
+  modalRating = 0; setModalRating(0);
   document.getElementById('ratingModal').classList.add('show');
-  modalRating=0; setModalRating(0);
 }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function setModalRating(n) {
-  modalRating=n;
-  document.querySelectorAll('#ratingStars .star').forEach((s,i)=>{ s.classList.toggle('on',i<n); });
+  modalRating = n;
+  document.querySelectorAll('#ratingStars .star').forEach((s,i) => s.classList.toggle('on', i < n));
 }
-function submitReview() {
-  if(!modalRating){ toast('Please select a rating','error'); return; }
-  closeModal('ratingModal'); toast(`Review submitted! ⭐ ${modalRating}/5 — Thank you!`, 'success');
+async function submitReview() {
+  if (!modalRating) { toast('Please select a star rating', 'error'); return; }
+  if (!_reviewModalBookingId) { closeModal('ratingModal'); return; }
+  const btn = document.getElementById('reviewSubmitBtn');
+  btn.classList.add('btn-loading');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Submitting...';
+  // Fetch booking to get saloon_id and barber name
+  const { data: booking } = await _supabase.from('bookings').select('saloon_id, barber').eq('id', _reviewModalBookingId).single();
+  // Find employee by name in that saloon
+  let employeeId = null;
+  if (booking?.barber && booking?.saloon_id) {
+    const { data: emp } = await _supabase.from('employees').select('id').eq('saloon_id', booking.saloon_id).eq('name', booking.barber).single();
+    employeeId = emp?.id || null;
+  }
+  const { error } = await _supabase.from('reviews').insert({
+    booking_id:  _reviewModalBookingId,
+    reviewer_id: currentUser.id,
+    employee_id: employeeId,
+    saloon_id:   booking?.saloon_id || null,
+    rating:      modalRating,
+    comment:     document.getElementById('ratingReview').value.trim()
+  });
+  btn.classList.remove('btn-loading'); btn.innerHTML = 'Submit Review';
+  if (error) { toast('Could not save review: ' + error.message, 'error'); return; }
+  // Recalculate and update employee average rating
+  if (employeeId) {
+    const { data: allRatings } = await _supabase.from('reviews').select('rating').eq('employee_id', employeeId);
+    if (allRatings?.length) {
+      const avg = allRatings.reduce((s,r) => s + r.rating, 0) / allRatings.length;
+      await _supabase.from('employees').update({ rating: Math.round(avg * 10) / 10 }).eq('id', employeeId);
+    }
+  }
+  _reviewedBookingIds.add(_reviewModalBookingId);
+  closeModal('ratingModal');
+  toast('Review submitted — thank you!', 'success');
+  refreshUserDash();
 }
 
 // ════ SIDEBAR ════
