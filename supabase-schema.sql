@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   user_id        UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   saloon_id      UUID REFERENCES saloons(id) ON DELETE SET NULL,
   saloon_name    TEXT,
+  customer_name  TEXT,
   service        TEXT,
   sub_service    TEXT,
   barber         TEXT,
@@ -72,6 +73,8 @@ CREATE TABLE IF NOT EXISTS bookings (
   payment_method TEXT DEFAULT 'cash',
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
+-- Add customer_name to existing installs
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_name TEXT;
 
 -- 6. EMPLOYEES
 CREATE TABLE IF NOT EXISTS employees (

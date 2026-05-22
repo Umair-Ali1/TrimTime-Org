@@ -1954,6 +1954,7 @@ async function confirmBooking() {
   const salonName=currentBookingSaloon?.name||'Royal Cuts Studio';
   const { error } = await _supabase.from('bookings').insert({
     user_id:currentUser.id, saloon_id:currentBookingSaloon?.id||null, saloon_name:salonName,
+    customer_name: currentUser.firstName + ' ' + (currentUser.lastName||''),
     service:booking.service, sub_service:booking.subService, barber:booking.barber,
     date:booking.date, time:booking.slot, price:booking.servicePrice||300,
     status:'confirmed', payment_method:booking.payment
@@ -2071,7 +2072,7 @@ function showUserSub(id) {
 // ════ OWNER DASHBOARD ════
 async function refreshOwnerDash() {
   if (!currentSaloon) return;
-  const { data: bookings } = await _supabase.from('bookings').select('*, profiles(first_name,last_name)').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false});
+  const { data: bookings } = await _supabase.from('bookings').select('*').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false});
   const bks=bookings||[];
   _cachedOwnerBookings=bks;
   const today=new Date().toISOString().split('T')[0];
@@ -2110,7 +2111,7 @@ function renderPopularServices(bookings) {
 function renderOwnerOrdersTable(orders) {
   const el=document.getElementById('ownerOrdersTable'); if(!el) return;
   el.innerHTML=orders.map(b=>{
-    const p=b.profiles; const cust=p?p.first_name+' '+p.last_name:'Customer';
+    const cust=b.customer_name||'Customer';
     return `<tr><td>${cust}</td><td>${b.service||'—'}</td><td style="white-space:nowrap">${b.date||'—'} ${b.time||''}</td><td style="color:var(--p);font-weight:700">Rs. ${b.price||0}</td><td><span class="badge ${b.status}">● ${b.status}</span></td></tr>`;
   }).join('');
 }
@@ -2119,7 +2120,7 @@ function renderOwnerOrders() {
   const filter=document.getElementById('orderFilter')?.value||'all';
   const filtered=filter==='all'?_cachedOwnerBookings:_cachedOwnerBookings.filter(b=>b.status===filter);
   el.innerHTML=filtered.map(b=>{
-    const p=b.profiles; const cust=p?p.first_name+' '+p.last_name:'Customer';
+    const cust=b.customer_name||'Customer';
     return `<tr><td>${cust}</td><td>${b.service||'—'}</td><td>${b.barber||'—'}</td><td style="white-space:nowrap">${b.date||'—'} ${b.time||''}</td><td style="color:var(--p);font-weight:700">Rs. ${b.price||0}</td><td><span class="badge ${b.status}">● ${b.status}</span></td>
     <td>${b.status==='confirmed'?`<button class="btn btn-xs" onclick="updateBookingStatus('${b.id}','completed')">Done</button>`:b.status==='pending'?`<button class="btn btn-xs btn-outline" onclick="updateBookingStatus('${b.id}','confirmed')">Confirm</button>`:''}</td></tr>`;
   }).join('');
@@ -2356,12 +2357,27 @@ function renderEmpSchedule(bookings,elId) {
 }
 function renderEmpOrders(bookings) {
   const el=document.getElementById('empOrdersList'); if(!el) return;
-  el.innerHTML=bookings.length?bookings.map(b=>`
-    <div class="booking-item">
-      <div class="bi-icon">✂️</div>
-      <div class="bi-info"><div class="bi-name">${b.service||'—'}${b.sub_service?' · '+b.sub_service:''}</div><div class="bi-meta">📅 ${b.date||'—'} ⏰ ${b.time||'—'}</div></div>
-      <div class="bi-right"><div class="bi-price">Rs. ${Math.round((b.price||0)*0.6)}</div><span class="badge ${b.status}">● ${b.status}</span></div>
-    </div>`).join(''):'<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No assigned orders.</div>';
+  el.innerHTML=bookings.length?bookings.map(b=>{
+    const canComplete = b.status==='confirmed'||b.status==='pending';
+    return `
+    <div class="booking-item" style="flex-wrap:wrap;gap:8px">
+      <div class="bi-icon"><i class="fas fa-scissors" style="font-size:18px;color:var(--p)"></i></div>
+      <div class="bi-info" style="flex:1;min-width:160px">
+        <div class="bi-name">${b.customer_name||'Customer'} · ${b.service||'—'}${b.sub_service?' ('+b.sub_service+')':''}</div>
+        <div class="bi-meta"><i class="fas fa-calendar" style="margin-right:4px"></i>${b.date||'—'} &nbsp;<i class="fas fa-clock" style="margin-right:4px"></i>${b.time||'—'}</div>
+      </div>
+      <div class="bi-right" style="display:flex;align-items:center;gap:8px">
+        <div class="bi-price">Rs. ${Math.round((b.price||0)*0.6)}</div>
+        <span class="badge ${b.status}">● ${b.status}</span>
+        ${canComplete?`<button class="btn btn-xs" style="white-space:nowrap" onclick="markEmpBookingComplete('${b.id}')"><i class="fas fa-check"></i> Mark Done</button>`:''}
+      </div>
+    </div>`;
+  }).join(''):'<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No assigned orders.</div>';
+}
+async function markEmpBookingComplete(id) {
+  await _supabase.from('bookings').update({ status:'completed' }).eq('id', id);
+  toast('Booking marked as completed!', 'success');
+  refreshEmpDash();
 }
 function toggleAvailability() {
   empIsAvail=!empIsAvail; STORE.set('available',empIsAvail); updateAvailToggle();
