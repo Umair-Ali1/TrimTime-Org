@@ -150,7 +150,7 @@ async function doRegister() {
 }
 async function _setupNewOwnerSalon(ownerId, salonName) {
   const code='TT-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Math.floor(1000+Math.random()*9000);
-  const { data: salon } = await _supabase.from('saloons').insert({ owner_id:ownerId, name:salonName, area:'Lahore', city:'Lahore', rating:4.5, reviews:0, price_from:300, icon:'✂️', image_url:'', is_open:true, tags:['hair','beard'], invite_code:code }).select().single();
+  const { data: salon } = await _supabase.from('saloons').insert({ owner_id:ownerId, name:salonName, area:'Lahore', city:'Lahore', rating:4.5, reviews:0, price_from:300, icon:'✂️', image_url:'', is_open:true, tags:['hair','beard'], invite_code:code, approval_status:'draft' }).select().single();
   if (!salon) return;
   await _supabase.from('services').insert([
     { saloon_id:salon.id, icon:'✂️', name:'Hair Cutting', price:300, duration:'30–45 min', active:true },
@@ -237,7 +237,7 @@ async function renderSaloons() {
   if (loginBtn) { loginBtn.style.display  = loggedIn ? 'none' : 'flex'; }
   if (notifBtn) { notifBtn.style.display  = loggedIn ? 'flex' : 'none'; }
   if (loggedIn && av) av.textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-  const { data: saloons } = await _supabase.from('saloons').select('*').eq('is_suspended', false).order('rating', { ascending: false });
+  const { data: saloons } = await _supabase.from('saloons').select('*').eq('is_suspended', false).eq('approval_status', 'approved').order('rating', { ascending: false });
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let list = (saloons || []).filter(s => {
     if (q && !s.name.toLowerCase().includes(q) && !(s.area||'').toLowerCase().includes(q)) return false;
@@ -588,6 +588,16 @@ async function refreshOwnerDash() {
   renderEmployeeList(); renderOwnerEarnings(bks); renderPopularServices(bks);
   shopIsOpen=currentSaloon.is_open??true; updateShopToggle();
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invoke_code||currentSaloon.invite_code||'TT-XXXX-0000';
+  const approvalStatus = currentSaloon.approval_status;
+  if (approvalStatus && approvalStatus !== 'approved') {
+    if (approvalStatus === 'pending') {
+      document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
+      const waitEl = document.getElementById('oApprovalWait');
+      if (waitEl) { waitEl.classList.add('active'); _updateApprovalWaitPage(approvalStatus); }
+    } else {
+      showOwnerSub('oSettings');
+    }
+  }
 }
 function renderPopularServices(bookings) {
   const el=document.getElementById('popularServices'); if(!el) return;
@@ -721,8 +731,17 @@ function updateShopToggle() {
   txt.textContent=shopIsOpen?'Shop Open':'Shop Closed';
 }
 function showOwnerSub(id) {
+  const status = currentSaloon?.approval_status;
+  const isApproved = !status || status === 'approved';
+  if (!isApproved && id !== 'oSettings') {
+    document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
+    const waitEl = document.getElementById('oApprovalWait');
+    if (waitEl) { waitEl.classList.add('active'); _updateApprovalWaitPage(status); }
+    document.querySelectorAll('#ownerSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+    return;
+  }
   document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.getElementById(id)?.classList.add('active');
   document.querySelectorAll('#ownerSidebar .nav-link').forEach(l=>l.classList.remove('active'));
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon?.invite_code||'TT-XXXX-0000';
   if (id === 'oSettings' && currentSaloon) {
@@ -733,6 +752,44 @@ function showOwnerSub(id) {
     set('settAddress',   currentSaloon.address);
     set('settImageUrl',  currentSaloon.image_url);
     previewSettImg(currentSaloon.image_url || '');
+    _updateApprovalSettingsUI(status);
+  }
+}
+function _updateApprovalWaitPage(status) {
+  const ico   = document.getElementById('approvalWaitIco');
+  const title = document.getElementById('approvalWaitTitle');
+  const msg   = document.getElementById('approvalWaitMsg');
+  if (!ico || !title || !msg) return;
+  if (status === 'pending') {
+    ico.innerHTML = '<i class="fas fa-clock"></i>'; ico.style.color = '#f59e0b';
+    title.textContent = 'Awaiting Admin Approval';
+    msg.textContent = 'Your application is under review. You\'ll have full access once the admin approves your salon.';
+  } else if (status === 'declined') {
+    ico.innerHTML = '<i class="fas fa-times-circle"></i>'; ico.style.color = 'var(--red)';
+    title.textContent = 'Application Declined';
+    const reason = currentSaloon?.decline_reason || 'No reason provided.';
+    msg.innerHTML = `Your application was declined.<br><br><strong>Reason:</strong> ${reason}<br><br>Go to Settings to update your details and resubmit.`;
+  }
+}
+function _updateApprovalSettingsUI(status) {
+  const card    = document.getElementById('approvalStatusCard');
+  const actions = document.getElementById('approvalActions');
+  if (!card) return;
+  if (!status || status === 'approved') { card.style.display='none'; if(actions) actions.style.display='none'; return; }
+  card.style.display = 'block';
+  if (status === 'draft') {
+    card.style.cssText += ';background:var(--p10);border:1.5px solid var(--p20);border-radius:10px;padding:16px';
+    card.innerHTML = `<div style="display:flex;align-items:center;gap:12px"><i class="fas fa-info-circle" style="font-size:20px;color:var(--p)"></i><div><div style="font-weight:700;font-size:15px;color:var(--p)">Complete Your Profile</div><div style="font-size:13px;color:var(--text3);margin-top:2px">Fill in your salon details below, then click Apply for Approval.</div></div></div>`;
+    if (actions) { actions.style.display='block'; actions.innerHTML='<button class="btn" style="width:100%;justify-content:center" onclick="submitSalonApproval()"><i class="fas fa-paper-plane"></i>&nbsp; Apply for Approval</button>'; }
+  } else if (status === 'pending') {
+    card.style.cssText += ';background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:16px';
+    card.innerHTML = `<div style="display:flex;align-items:center;gap:12px"><i class="fas fa-clock" style="font-size:20px;color:#f59e0b"></i><div><div style="font-weight:700;font-size:15px;color:#d97706">Pending Admin Approval</div><div style="font-size:13px;color:var(--text3);margin-top:2px">Your application is under review. Please wait for the admin to approve your salon.</div></div></div>`;
+    if (actions) actions.style.display = 'none';
+  } else if (status === 'declined') {
+    const reason = currentSaloon?.decline_reason || 'No reason provided.';
+    card.style.cssText += ';background:var(--red10);border:1.5px solid rgba(239,68,68,.2);border-radius:10px;padding:16px';
+    card.innerHTML = `<div style="display:flex;align-items:flex-start;gap:12px"><i class="fas fa-times-circle" style="font-size:20px;color:var(--red);margin-top:2px"></i><div><div style="font-weight:700;font-size:15px;color:var(--red)">Application Declined</div><div style="font-size:13px;color:var(--text3);margin-top:2px"><strong>Reason:</strong> ${reason}</div><div style="font-size:13px;color:var(--text3);margin-top:4px">Update your details below and resubmit.</div></div></div>`;
+    if (actions) { actions.style.display='block'; actions.innerHTML='<button class="btn" style="width:100%;justify-content:center" onclick="submitSalonApproval()"><i class="fas fa-paper-plane"></i>&nbsp; Resubmit Application</button>'; }
   }
 }
 function previewSettImg(url) {
@@ -754,6 +811,23 @@ async function saveSalonSettings() {
   if (error) return toast('Save failed: ' + error.message, 'error');
   currentSaloon = { ...currentSaloon, name, city, area, address, image_url: imageUrl };
   toast('Settings saved!', 'success');
+}
+async function submitSalonApproval() {
+  const name     = document.getElementById('settSalonName').value.trim();
+  const city     = document.getElementById('settCity').value.trim();
+  const area     = document.getElementById('settArea').value.trim();
+  const address  = document.getElementById('settAddress').value.trim();
+  const imageUrl = document.getElementById('settImageUrl').value.trim();
+  if (!name)       return toast('Please enter your salon name.', 'error');
+  if (!city||!area) return toast('Please fill in city and area.', 'error');
+  if (!currentSaloon?.id) return;
+  const { error } = await _supabase.from('saloons').update({ name, city, area, address, image_url: imageUrl, approval_status: 'pending', decline_reason: null }).eq('id', currentSaloon.id);
+  if (error) return toast('Failed: ' + error.message, 'error');
+  currentSaloon = { ...currentSaloon, name, city, area, address, image_url: imageUrl, approval_status: 'pending', decline_reason: null };
+  toast('Application submitted! Admin will review your salon.', 'success');
+  document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
+  const waitEl = document.getElementById('oApprovalWait');
+  if (waitEl) { waitEl.classList.add('active'); _updateApprovalWaitPage('pending'); }
 }
 
 // ════ EMPLOYEE DASHBOARD ════
@@ -998,6 +1072,7 @@ function showAdminSub(id, el) {
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('#adminSidebar .nav-link').forEach(l => l.classList.remove('active'));
   if (el) el.classList.add('active');
+  if (id === 'adApprovals') renderAdminApprovals();
 }
 async function refreshAdminDash() {
   const [{ count: saloonCount }, { count: userCount }, { count: bookingCount }] = await Promise.all([
@@ -1015,6 +1090,9 @@ async function refreshAdminDash() {
   renderAdminSaloons();
   renderAdminUsers();
   renderAdminBookings();
+  const { count: pendingApprovals } = await _supabase.from('saloons').select('*',{count:'exact',head:true}).eq('approval_status','pending');
+  const apBadge = document.getElementById('adApprovalsBadge');
+  if (apBadge) apBadge.textContent = pendingApprovals || '';
 }
 async function renderAdminRecent() {
   const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(10);
@@ -1094,6 +1172,47 @@ async function adminToggleUserSuspend(id, isSuspended) {
   await _supabase.from('profiles').update({ is_suspended: !isSuspended }).eq('id', id);
   toast(`User ${action}ed`, 'success');
   renderAdminUsers();
+}
+async function renderAdminApprovals() {
+  const { data } = await _supabase.from('saloons').select('*').eq('approval_status','pending').order('created_at',{ascending:true});
+  const el = document.getElementById('approvalsList');
+  if (!el) return;
+  const apBadge = document.getElementById('adApprovalsBadge');
+  if (apBadge) apBadge.textContent = data?.length || '';
+  if (!data?.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:48px"><i class="fas fa-check-circle" style="font-size:48px;color:var(--g2);display:block;margin-bottom:12px"></i><p style="color:var(--text3)">No pending approvals</p></div>';
+    return;
+  }
+  el.innerHTML = data.map(s=>`
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+        ${s.image_url?`<img src="${s.image_url}" style="width:130px;height:96px;object-fit:cover;border-radius:10px;flex-shrink:0" onerror="this.style.display='none'">` : '<div style="width:130px;height:96px;border-radius:10px;background:var(--p10);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-scissors" style="font-size:32px;color:var(--p)"></i></div>'}
+        <div style="flex:1;min-width:180px">
+          <div style="font-family:\'Poppins\',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px">${s.name}</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-location-dot" style="width:14px"></i> ${s.area||'—'}, ${s.city||'—'}</div>
+          ${s.address?`<div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-map-pin" style="width:14px"></i> ${s.address}</div>`:''}
+          <div style="font-size:12px;color:var(--text3);margin-top:4px"><i class="fas fa-calendar" style="width:14px"></i> Applied: ${new Date(s.created_at).toLocaleDateString()}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-sm" style="background:var(--g2)" onclick="adminApproveSalon('${s.id}')"><i class="fas fa-check"></i> Approve</button>
+          <button class="btn btn-sm btn-danger" onclick="adminDeclineSalon('${s.id}')"><i class="fas fa-times"></i> Decline</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+async function adminApproveSalon(id) {
+  await _supabase.from('saloons').update({ approval_status:'approved', decline_reason:null }).eq('id', id);
+  toast('Salon approved — now live on the platform!', 'success');
+  renderAdminApprovals();
+  refreshAdminDash();
+}
+async function adminDeclineSalon(id) {
+  const reason = prompt('Enter reason for declining (the owner will see this):');
+  if (reason === null) return;
+  await _supabase.from('saloons').update({ approval_status:'declined', decline_reason: reason||'Application declined.' }).eq('id', id);
+  toast('Salon application declined.', 'info');
+  renderAdminApprovals();
+  refreshAdminDash();
 }
 
 // ════ INIT ════

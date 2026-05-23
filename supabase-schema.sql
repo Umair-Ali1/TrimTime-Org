@@ -80,6 +80,11 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_name TEXT;
 ALTER TABLE saloons  ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
 
+-- ════ APPROVAL COLUMNS (run these in SQL Editor if upgrading existing install) ════
+-- DEFAULT 'approved' so existing salons are not affected
+ALTER TABLE saloons ADD COLUMN IF NOT EXISTS approval_status TEXT DEFAULT 'approved';
+ALTER TABLE saloons ADD COLUMN IF NOT EXISTS decline_reason TEXT;
+
 -- 6. EMPLOYEES
 CREATE TABLE IF NOT EXISTS employees (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),

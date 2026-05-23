@@ -14,6 +14,7 @@
       <a class="nav-link" onclick="showAdminSub('adSaloons',this)"><span class="icon"><i class="fas fa-store"></i></span>All Saloons</a>
       <a class="nav-link" onclick="showAdminSub('adUsers',this)"><span class="icon"><i class="fas fa-users"></i></span>All Users</a>
       <a class="nav-link" onclick="showAdminSub('adBookings',this)"><span class="icon"><i class="fas fa-clipboard-list"></i></span>All Bookings</a>
+      <a class="nav-link" onclick="showAdminSub('adApprovals',this)"><span class="icon"><i class="fas fa-hourglass-half"></i></span>Approvals<span class="nav-badge" id="adApprovalsBadge"></span></a>
       <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
     </aside>
     <div class="overlay" onclick="closeSidebar('adminSidebar')"></div>
@@ -104,6 +105,11 @@
               <tbody id="adBookingTable"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">Loading...</td></tr></tbody>
             </table></div>
           </div>
+        </div>
+        <!-- APPROVALS -->
+        <div id="adApprovals" class="sub-page">
+          <div style="margin-bottom:24px"><h2 style="font-size:24px">Salon Approvals</h2><p style="color:var(--text3);margin-top:4px">Review and approve new salon applications</p></div>
+          <div id="approvalsList"><div class="card"><p style="color:var(--text3)">Loading...</p></div></div>
         </div>
       </div>
     </div>

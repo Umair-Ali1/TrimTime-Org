@@ -152,6 +152,7 @@
         <div id="oSettings" class="sub-page">
           <div style="margin-bottom:24px"><h2 style="font-size:24px">Salon Settings</h2></div>
           <div class="card" style="max-width:560px">
+            <div id="approvalStatusCard" style="display:none;border-radius:10px;padding:16px;margin-bottom:20px"></div>
             <div class="field"><label class="label">Salon Name</label><input class="input" id="settSalonName" placeholder="Your salon name"></div>
             <div class="g2">
               <div class="field"><label class="label">City</label><input class="input" id="settCity" placeholder="City"></div>
@@ -167,6 +168,18 @@
               <img id="settImgTag" style="width:100%;height:200px;object-fit:cover" src="" alt="Preview">
             </div>
             <button class="btn" onclick="saveSalonSettings()"><i class="fas fa-floppy-disk"></i>&nbsp; Save Settings</button>
+            <div id="approvalActions" style="display:none;margin-top:10px"></div>
+          </div>
+        </div>
+        <!-- Approval Wait -->
+        <div id="oApprovalWait" class="sub-page">
+          <div style="display:flex;align-items:center;justify-content:center;min-height:400px">
+            <div class="card" style="text-align:center;padding:48px 40px;max-width:480px;width:100%">
+              <div id="approvalWaitIco" style="font-size:56px;margin-bottom:16px;color:#f59e0b"><i class="fas fa-clock"></i></div>
+              <h2 id="approvalWaitTitle" style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px">Awaiting Admin Approval</h2>
+              <p id="approvalWaitMsg" style="color:var(--text3);font-size:15px;line-height:1.7;margin-bottom:24px">Your application is under review. You'll have full access once the admin approves your salon.</p>
+              <button class="btn btn-outline btn-sm" onclick="showOwnerSub('oSettings')"><i class="fas fa-gear"></i>&nbsp; Go to Settings</button>
+            </div>
           </div>
         </div>
       </div>
