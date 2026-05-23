@@ -38,6 +38,8 @@ const STORE = {
 // ════ STATE ════
 let currentUser = null;
 let currentSaloon = null;        // active saloon for owner/employee
+let _approvalChannel  = null;    // Supabase Realtime channel for approval watching
+let _approvalPollInterval = null; // polling fallback
 let currentBookingSaloon = null; // saloon selected for the booking flow
 let currentStep = 1;
 let booking = { service:null, subService:null, seat:null, slot:null, barber:null, payment:'cash', date:'' };
@@ -226,7 +228,7 @@ function _clearAuthForms() {
   });
 }
 function doLogout() { openModal('logoutModal'); }
-async function _confirmLogout() { closeModal('logoutModal'); await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; _clearAuthForms(); showPage('pgLogin'); toast('Signed out successfully.','info'); }
+async function _confirmLogout() { closeModal('logoutModal'); _clearApprovalWatcher(); await _supabase.auth.signOut(); currentUser=null; currentSaloon=null; _clearAuthForms(); showPage('pgLogin'); toast('Signed out successfully.','info'); }
 
 // ════ HOME ════
 function setChip(f, el) {
@@ -640,6 +642,7 @@ async function refreshOwnerDash() {
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invoke_code||currentSaloon.invite_code||'TT-XXXX-0000';
   const approvalStatus = currentSaloon.approval_status;
   if (approvalStatus && approvalStatus !== 'approved') {
+    _watchApprovalStatus();
     if (approvalStatus === 'pending') {
       document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
       const waitEl = document.getElementById('oApprovalWait');
@@ -647,6 +650,8 @@ async function refreshOwnerDash() {
     } else {
       showOwnerSub('oSettings');
     }
+  } else {
+    _clearApprovalWatcher();
   }
 }
 function renderPopularServices(bookings) {
@@ -1114,6 +1119,41 @@ async function sendAIQuestion() {
     const data=await response.json();
     el.textContent=data.content?.map(c=>c.text||'').join('')||'No response.';
   } catch(err) { el.textContent='AI unavailable. Please try again later.'; }
+}
+
+// ════ APPROVAL WATCHER ════
+function _clearApprovalWatcher() {
+  if (_approvalChannel)    { _supabase.removeChannel(_approvalChannel); _approvalChannel = null; }
+  if (_approvalPollInterval) { clearInterval(_approvalPollInterval); _approvalPollInterval = null; }
+}
+function _onApprovalStatusChange(newStatus, newSalon) {
+  currentSaloon = { ...currentSaloon, ...newSalon };
+  if (newStatus === 'approved') {
+    _clearApprovalWatcher();
+    toast('Your salon has been approved! You now have full access.', 'success');
+    refreshOwnerDash();
+  } else if (newStatus === 'declined') {
+    showOwnerSub('oSettings');
+  }
+}
+function _watchApprovalStatus() {
+  if (!currentSaloon?.id) return;
+  _clearApprovalWatcher();
+  // Real-time subscription (instant)
+  _approvalChannel = _supabase
+    .channel('salon-approval-' + currentSaloon.id)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'saloons', filter: `id=eq.${currentSaloon.id}` },
+      payload => {
+        const s = payload.new;
+        if (s.approval_status !== currentSaloon.approval_status) _onApprovalStatusChange(s.approval_status, s);
+      })
+    .subscribe();
+  // Polling fallback every 30 seconds
+  _approvalPollInterval = setInterval(async () => {
+    if (!currentSaloon?.id) { _clearApprovalWatcher(); return; }
+    const { data } = await _supabase.from('saloons').select('approval_status,decline_reason').eq('id', currentSaloon.id).single();
+    if (data && data.approval_status !== currentSaloon.approval_status) _onApprovalStatusChange(data.approval_status, data);
+  }, 30000);
 }
 
 // ════ ADMIN DASHBOARD ════
