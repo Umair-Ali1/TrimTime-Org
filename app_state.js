@@ -1350,7 +1350,24 @@ async function adminDeclineSalon(id) {
 }
 
 // ════ INIT ════
-document.addEventListener('DOMContentLoaded', async () => {
+// ════ SESSION INIT ════
+// app_state.js is loaded dynamically so DOMContentLoaded has already fired.
+// Run immediately and listen for auth state changes.
+(async () => {
   const { data: { session } } = await _supabase.auth.getSession();
   if (session) await loadUserAndRoute(session.user);
+})();
+
+_supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session && !currentUser) {
+    await loadUserAndRoute(session.user);
+  }
+  if (event === 'SIGNED_OUT') {
+    currentUser = null; currentSaloon = null;
+    _clearApprovalWatcher();
+    showPage('pgLanding');
+  }
+  if (event === 'TOKEN_REFRESHED' && session && currentUser) {
+    // session silently refreshed — nothing needed, Supabase handles it
+  }
 });
