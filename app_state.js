@@ -2,14 +2,13 @@
 const _EJS_PUBLIC_KEY  = 'yILXV4sntRvEkh58q';
 const _EJS_SERVICE_ID  = 'service_xgkkf6m';
 const _EJS_TEMPLATE_ID = 'template_gm1s8y7';
-function _initEmailJS() { if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: _EJS_PUBLIC_KEY }); }
 function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, ctaText) {
-  if (typeof emailjs === 'undefined' || _EJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') return;
+  if (typeof emailjs === 'undefined') return;
   emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
     to_email: toEmail, to_name: toName,
     action_title: actionTitle, action_message: actionMessage,
     action_note: actionNote, cta_text: ctaText
-  }).catch(() => {});
+  }, { publicKey: _EJS_PUBLIC_KEY }).catch(err => console.warn('EmailJS error:', err));
 }
 
 // ════ SUPABASE CLIENT ════
@@ -1243,7 +1242,6 @@ async function adminDeclineSalon(id) {
 
 // ════ INIT ════
 document.addEventListener('DOMContentLoaded', async () => {
-  _initEmailJS();
   const { data: { session } } = await _supabase.auth.getSession();
   if (session) await loadUserAndRoute(session.user);
 });
