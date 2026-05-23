@@ -479,6 +479,8 @@ function renderFinalSummary() {
 }
 async function confirmBooking() {
   if (!booking.service||!booking.slot) { toast('Please complete all booking steps','error'); return; }
+  const btn = document.getElementById('confirmBookingBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Booking...'; }
   const salonName=currentBookingSaloon?.name||'Royal Cuts Studio';
   const { error } = await _supabase.from('bookings').insert({
     user_id:currentUser.id, saloon_id:currentBookingSaloon?.id||null, saloon_name:salonName,
@@ -487,7 +489,11 @@ async function confirmBooking() {
     date:booking.date, time:booking.slot, price:booking.servicePrice||300,
     status:'confirmed', payment_method:booking.payment
   });
-  if (error) { toast('Booking failed: '+error.message,'error'); return; }
+  if (error) {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Confirm Booking'; }
+    toast('Booking failed: '+error.message,'error'); return;
+  }
+  if (btn) { btn.innerHTML = '<i class="fas fa-check-circle"></i> Booked!'; }
   toast('🎉 Booking confirmed! See you at '+salonName+'.','gold');
   const bookingRef = 'TT-' + Date.now().toString(36).toUpperCase().slice(-6);
   _sendBookingEmail(
