@@ -2,7 +2,7 @@
 const _EJS_PUBLIC_KEY          = 'yILXV4sntRvEkh58q';
 const _EJS_SERVICE_ID          = 'service_xgkkf6m';
 const _EJS_TEMPLATE_ID         = 'template_gm1s8y7';   // login / signup
-const _EJS_BOOKING_TEMPLATE_ID = 'YOUR_BOOKING_TEMPLATE_ID'; // booking confirmation
+const _EJS_BOOKING_TEMPLATE_ID = 'template_1n6tf5c'; // booking confirmation
 function _sendBookingEmail(toEmail, toName, bookingRef, salonName, service, barber, date, time, paymentMethod, price) {
   if (typeof emailjs === 'undefined' || _EJS_BOOKING_TEMPLATE_ID === 'YOUR_BOOKING_TEMPLATE_ID') return;
   emailjs.send(_EJS_SERVICE_ID, _EJS_BOOKING_TEMPLATE_ID, {
