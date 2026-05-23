@@ -1137,32 +1137,60 @@ function toast(msg, type='info') {
 }
 
 // ════ AI ANALYSIS ════
+async function _callGemini(prompt) {
+  const res = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'AI error');
+  return data.text;
+}
 async function runAIAnalysis(type) {
-  const el=document.getElementById('aiResponse');
-  el.innerHTML='<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Analyzing your business data...</div>';
-  const bookings=_cachedOwnerBookings;
-  const stats={ totalBookings:bookings.length, completedBookings:bookings.filter(b=>b.status==='completed').length, totalRevenue:bookings.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0), topService:Object.entries(bookings.reduce((acc,b)=>{if(b.service) acc[b.service]=(acc[b.service]||0)+1;return acc},{})).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A' };
-  const prompts={overview:`You are a business analyst for TrimTime, a saloon management platform. Analyze this saloon data and give actionable insights in 3-4 short paragraphs:\n\nData: ${JSON.stringify(stats)}\n\nFocus on: revenue performance, booking trends, and key opportunities. Be specific and practical for a Pakistani saloon owner in Lahore.`,tips:`You are a business growth expert for TrimTime. Given this saloon data: ${JSON.stringify(stats)}\n\nProvide 5 specific, actionable growth tips for increasing bookings and revenue. Format as numbered list. Keep it practical for a Lahore-based saloon.`,peak:`You are a scheduling expert for TrimTime saloon platform. Given this data: ${JSON.stringify(stats)}\n\nAnalyze and recommend:\n1. Likely peak hours for a Lahore saloon\n2. How to optimize staffing\n3. How to handle slow periods\n\nBe specific and practical.`};
+  const el = document.getElementById('aiResponse');
+  el.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Analyzing your business data...</div>';
+  const bookings = _cachedOwnerBookings;
+  const stats = {
+    salonName: currentSaloon?.name || 'Unknown',
+    totalBookings: bookings.length,
+    completed: bookings.filter(b => b.status === 'completed').length,
+    cancelled: bookings.filter(b => b.status === 'cancelled').length,
+    totalRevenue: bookings.filter(b => b.status === 'completed').reduce((a, b) => a + (b.price || 0), 0),
+    topService: Object.entries(bookings.reduce((acc, b) => { if (b.service) acc[b.service] = (acc[b.service] || 0) + 1; return acc; }, {})).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A',
+    topBarber: Object.entries(bookings.reduce((acc, b) => { if (b.barber) acc[b.barber] = (acc[b.barber] || 0) + 1; return acc; }, {})).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A'
+  };
+  const prompts = {
+    overview: `You are a business analyst for TrimTime, a salon booking platform in Pakistan. Analyze this salon's data and provide actionable insights in 3-4 short paragraphs. Data: ${JSON.stringify(stats)}. Focus on revenue performance, booking trends, and opportunities. Be specific and practical for a Pakistani salon owner.`,
+    tips: `You are a business growth expert for TrimTime. Given this salon data: ${JSON.stringify(stats)}. Provide 5 specific, actionable growth tips to increase bookings and revenue. Format as a numbered list. Keep it practical for a Pakistan-based salon.`,
+    peak: `You are a scheduling expert for TrimTime. Given this salon data: ${JSON.stringify(stats)}. Recommend: 1) Likely peak hours for a Pakistani salon, 2) How to optimize staffing, 3) How to handle slow periods. Be specific and practical.`
+  };
   try {
-    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompts[type]}]})});
-    const data=await response.json();
-    el.textContent=data.content?.map(c=>c.text||'').join('')||'Unable to generate analysis.';
-  } catch(err) {
-    el.textContent='AI analysis unavailable. Sample insight: Your saloon has '+stats.totalBookings+' total bookings. Top service: '+stats.topService+'.';
+    el.textContent = await _callGemini(prompts[type]);
+  } catch (err) {
+    el.textContent = `AI unavailable: ${err.message}. Your salon has ${stats.totalBookings} bookings. Top service: ${stats.topService}.`;
   }
 }
 async function sendAIQuestion() {
-  const q=document.getElementById('aiQuestion').value.trim(); if(!q) return;
-  const el=document.getElementById('aiChatResponse');
-  el.style.display='block';
-  el.innerHTML='<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Thinking...</div>';
-  document.getElementById('aiQuestion').value='';
-  const stats={totalBookings:_cachedOwnerBookings.length,revenue:_cachedOwnerBookings.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0)};
+  const q = document.getElementById('aiQuestion').value.trim();
+  if (!q) return;
+  const el = document.getElementById('aiChatResponse');
+  el.style.display = 'block';
+  el.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp;Thinking...</div>';
+  document.getElementById('aiQuestion').value = '';
+  const stats = {
+    salonName: currentSaloon?.name || 'Unknown',
+    totalBookings: _cachedOwnerBookings.length,
+    revenue: _cachedOwnerBookings.filter(b => b.status === 'completed').reduce((a, b) => a + (b.price || 0), 0),
+    topService: Object.entries(_cachedOwnerBookings.reduce((acc, b) => { if (b.service) acc[b.service] = (acc[b.service] || 0) + 1; return acc; }, {})).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A'
+  };
   try {
-    const response=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:`You are a business advisor for a saloon in Lahore, Pakistan called "${currentSaloon?.name||'Royal Cuts Studio'}" using TrimTime platform. Business stats: ${JSON.stringify(stats)}. Answer this question concisely and practically: ${q}`}]})});
-    const data=await response.json();
-    el.textContent=data.content?.map(c=>c.text||'').join('')||'No response.';
-  } catch(err) { el.textContent='AI unavailable. Please try again later.'; }
+    el.textContent = await _callGemini(
+      `You are a business advisor for "${stats.salonName}", a salon using TrimTime in Pakistan. Stats: ${JSON.stringify(stats)}. Answer this question concisely and practically: ${q}`
+    );
+  } catch (err) {
+    el.textContent = 'AI unavailable. Please try again later.';
+  }
 }
 
 // ════ APPROVAL WATCHER ════
