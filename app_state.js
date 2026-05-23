@@ -24,8 +24,8 @@ function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, cta
 
 // ════ SUPABASE CLIENT ════
 const _supabase = supabase.createClient(
-  'https://cyekdfftxzqanmgmmsza.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN5ZWtkZmZ0eHpxYW5tZ21tc3phIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NjQyMDAsImV4cCI6MjA5NTA0MDIwMH0.MWE6eNaEBB2yKcRLSNWDMTRX4EbsVWdQW5MuYC6TGRM'
+  'https://xknavuihqdncfhetiepb.supabase.co',
+  'sb_publishable_FQ_L0XPj_iL2g0N92u6r5Q_A-8vZ4Y'
 );
 
 // ════ LOCAL UI STATE ════
