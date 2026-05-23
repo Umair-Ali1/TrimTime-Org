@@ -77,6 +77,10 @@
               <div class="field"><label class="label">City</label><input class="input" id="profCity"></div>
             </div>
             <button class="btn" onclick="saveProfile()">Save Changes</button>
+            <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+              <p style="font-size:13px;color:var(--text3);margin-bottom:10px">Danger Zone — this action is permanent and cannot be undone.</p>
+              <button class="btn btn-danger btn-sm" onclick="openDeleteAccountModal()"><i class="fas fa-trash"></i> Delete Account</button>
+            </div>
           </div>
         </div>
       </div>

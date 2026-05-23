@@ -15,6 +15,19 @@
   </div>
 </div>
 
+<div class="modal-bg" id="deleteAccountModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><div class="modal-title" style="color:var(--red)"><i class="fas fa-triangle-exclamation"></i> Delete Account</div><span class="modal-close" onclick="closeModal('deleteAccountModal')">✕</span></div>
+    <p id="deleteAccountMsg" style="font-size:14px;color:var(--text3);line-height:1.7;margin-bottom:16px"></p>
+    <p style="font-size:13px;font-weight:600;margin-bottom:8px">Type <strong>DELETE</strong> to confirm:</p>
+    <input class="input" id="deleteConfirmInput" placeholder="DELETE" oninput="document.getElementById('deleteAccountConfirmBtn').disabled=this.value!=='DELETE'">
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeModal('deleteAccountModal')">Cancel</button>
+      <button class="btn btn-danger" id="deleteAccountConfirmBtn" style="flex:1;justify-content:center" disabled onclick="deleteAccount()"><i class="fas fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="logoutModal">
   <div class="modal" style="max-width:360px;text-align:center">
     <div style="font-size:40px;margin-bottom:12px">👋</div>

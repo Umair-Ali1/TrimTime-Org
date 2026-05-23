@@ -215,6 +215,49 @@ async function loadUserAndRoute(authUser) {
   else if (profile.role === 'employee') showPage('pgEmpDash');
   else showPage('pgHome');
 }
+function openDeleteAccountModal() {
+  const role = currentUser?.role;
+  const msgEl = document.getElementById('deleteAccountMsg');
+  const inputEl = document.getElementById('deleteConfirmInput');
+  const btnEl = document.getElementById('deleteAccountConfirmBtn');
+  if (msgEl) {
+    if (role === 'owner') {
+      msgEl.textContent = 'This will permanently delete your salon, all its services, seats, bookings, and all employee accounts linked to your salon. This cannot be undone.';
+    } else if (role === 'employee') {
+      msgEl.textContent = 'This will permanently delete your employee account and remove you from your salon. This cannot be undone.';
+    } else {
+      msgEl.textContent = 'This will permanently delete your account and all your booking history. This cannot be undone.';
+    }
+  }
+  if (inputEl) inputEl.value = '';
+  if (btnEl) btnEl.disabled = true;
+  openModal('deleteAccountModal');
+}
+async function deleteAccount() {
+  closeModal('deleteAccountModal');
+  const role = currentUser?.role;
+  toast('Deleting account...', 'info');
+  try {
+    if (role === 'owner' && currentSaloon?.id) {
+      const { data: emps } = await _supabase.from('employees').select('user_id').eq('saloon_id', currentSaloon.id);
+      for (const emp of (emps || [])) {
+        if (emp.user_id) await _supabase.from('profiles').delete().eq('id', emp.user_id);
+      }
+      await _supabase.from('saloons').delete().eq('id', currentSaloon.id);
+    } else if (role === 'employee') {
+      await _supabase.from('employees').delete().eq('user_id', currentUser.id);
+    }
+    await _supabase.from('profiles').delete().eq('id', currentUser.id);
+    _clearApprovalWatcher();
+    await _supabase.auth.signOut();
+    currentUser = null; currentSaloon = null;
+    _clearAuthForms();
+    showPage('pgLogin');
+    toast('Account deleted successfully.', 'info');
+  } catch (e) {
+    toast('Delete failed: ' + e.message, 'error');
+  }
+}
 function _clearAuthForms() {
   ['loginEmail','loginPass','regFirst','regEmail','regPhone','regPass','regPass2','regSalon','regInvite'].forEach(id => {
     const el = document.getElementById(id);
