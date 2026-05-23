@@ -524,3 +524,207 @@ input[type=range]{width:100%;accent-color:var(--p)}
 .owner-seat-item.occupied{border-color:var(--red);background:var(--red10);cursor:default}
 .owner-seat-item.reserved{border-color:var(--amber);background:var(--amber10)}
 .owner-seat-item span{font-size:11px;margin-top:4px;font-weight:600;color:var(--text3)}
+
+/* ═══════════════════════════════════════
+   ENHANCED ANIMATIONS & VISUAL POLISH
+═══════════════════════════════════════ */
+
+/* ── Extra tokens ── */
+:root {
+  --glow:0 0 0 4px rgba(108,59,238,.18);
+  --shadow-lg:0 12px 40px rgba(108,59,238,.18);
+  --shadow-xl:0 20px 60px rgba(108,59,238,.22);
+  --grad-main:linear-gradient(135deg,#6C3BEE 0%,#8B5CF6 50%,#A78BFA 100%);
+  --grad-green:linear-gradient(135deg,#10B981 0%,#34D399 100%);
+  --grad-warm:linear-gradient(135deg,#F59E0B 0%,#FBBF24 100%);
+  --grad-red:linear-gradient(135deg,#EF4444 0%,#F87171 100%);
+  --dur2:.35s;
+}
+
+/* ── Keyframes ── */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.8) translateY(10px)}70%{transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes borderGlow{0%,100%{box-shadow:0 0 0 0 rgba(108,59,238,0)}50%{box-shadow:0 0 0 6px rgba(108,59,238,.15)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ripple{0%{transform:scale(0);opacity:.5}100%{transform:scale(4);opacity:0}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Page transitions ── */
+.page.active{animation:scaleIn .32s cubic-bezier(.4,0,.2,1) both}
+.sub-page.active{animation:slideUp .32s cubic-bezier(.4,0,.2,1) both}
+
+/* ── Modal entrance ── */
+.modal-bg.show .modal{animation:scaleIn .28s cubic-bezier(.34,1.56,.64,1) both}
+.modal-bg{backdrop-filter:blur(6px);background:rgba(0,0,0,.45)}
+
+/* ── Buttons – glow & ripple ── */
+.btn{position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle,rgba(255,255,255,.35) 0%,transparent 70%);opacity:0;transition:opacity .2s}
+.btn:active::after{opacity:1}
+.btn:hover{box-shadow:var(--shadow-lg)}
+.btn:focus-visible{outline:none;box-shadow:var(--glow)}
+
+/* ── Gradient text for key headings ── */
+.hero-title span,.sec-title .g,.stat-num,.earn-big,.sum-total,.kpi-n{
+  background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+
+/* ── Landing hero – animated gradient background ── */
+#pgLanding .hero-sec{
+  background:radial-gradient(ellipse 80% 60% at 70% 50%,rgba(108,59,238,.07) 0%,transparent 70%);
+}
+.hero-tag{animation:fadeUp .5s .1s both}
+.hero-title{animation:slideUp .55s .15s both}
+.hero-sub{animation:slideUp .55s .25s both}
+.hero-btns{animation:slideUp .55s .35s both}
+.hero-img-wrap{animation:slideUp .6s .2s both;background:var(--grad-main);box-shadow:var(--shadow-xl)}
+.hero-img-wrap img{border-radius:20px;object-fit:cover;width:100%;height:100%}
+
+/* ── Floating badges animation ── */
+.hero-float{box-shadow:0 8px 24px rgba(0,0,0,.12)}
+
+/* ── "How it works" step numbers ── */
+.hiw-num{background:var(--grad-main);box-shadow:0 4px 16px rgba(108,59,238,.35);transition:transform var(--dur2)}
+.hiw-step:hover .hiw-num{transform:scale(1.12) rotate(-4deg)}
+.hiw-step{transition:transform var(--dur2)}
+.hiw-step:hover{transform:translateY(-4px)}
+
+/* ── Why cards – lift & glow ── */
+.why-card{transition:all var(--dur2);will-change:transform}
+.why-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--p)}
+.why-ico{transition:transform var(--dur2)}
+.why-card:hover .why-ico{transform:scale(1.2) rotate(-6deg)}
+
+/* ── For-everyone cards ── */
+.fore-card{transition:all var(--dur2);will-change:transform}
+.fore-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.fore-card.cust:hover{border-color:var(--blue)}
+.fore-card.owner:hover{border-color:var(--p)}
+.fore-card.emp:hover{border-color:var(--g2)}
+.fore-card-ico{transition:transform var(--dur2)}
+.fore-card:hover .fore-card-ico{transform:scale(1.15)}
+
+/* ── Salon cards ── */
+.salon-card{transition:all var(--dur2);will-change:transform}
+.salon-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--p)}
+.salon-img{position:relative;overflow:hidden}
+.salon-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(108,59,238,.12));opacity:0;transition:opacity var(--dur2)}
+.salon-card:hover .salon-img::after{opacity:1}
+
+/* ── Stat cards ── */
+.stat-card{transition:all var(--dur2);will-change:transform}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--p20)}
+.stat-ico.p{background:var(--grad-main);color:#fff}
+.stat-ico.g{background:var(--grad-green);color:#fff}
+.stat-ico.b{background:linear-gradient(135deg,#3B82F6,#60A5FA);color:#fff}
+.stat-ico.r{background:var(--grad-red);color:#fff}
+.stat-num{animation:countUp .5s both}
+
+/* ── Nav links ── */
+.nav-link{transition:all .18s}
+.nav-link:hover{padding-left:26px;background:var(--p10);color:var(--p)}
+.nav-link.active{background:linear-gradient(90deg,var(--p10),transparent)}
+
+/* ── Sidebar logo icon ── */
+.sidebar-logo-ico,.hn-logo-ico,.form-logo-ico,.ll-logo-ico,.land-logo-ico{background:var(--grad-main)}
+
+/* ── Topbar ── */
+.topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(12px)}
+
+/* ── Banner gradient animation ── */
+.banner{background-size:200% 200%;animation:gradShift 6s ease infinite;background-image:linear-gradient(135deg,#6C3BEE,#8B5CF6,#A78BFA,#6C3BEE)}
+.banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");border-radius:inherit;pointer-events:none}
+.banner{position:relative;overflow:hidden}
+
+/* ── Service cards ── */
+.svc-card{transition:all var(--dur2)}
+.svc-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(108,59,238,.15)}
+.svc-card.picked{box-shadow:0 0 0 3px rgba(108,59,238,.25);transform:translateY(-2px)}
+
+/* ── Barber cards ── */
+.barber-card{transition:all var(--dur2)}
+.barber-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(108,59,238,.15)}
+.barber-card.picked{box-shadow:0 0 0 3px rgba(108,59,238,.25)}
+.barber-av{background:var(--grad-main);box-shadow:0 4px 12px rgba(108,59,238,.3)}
+
+/* ── Booking summary ── */
+.book-summary{border-top:3px solid var(--p);box-shadow:var(--shadow-lg)}
+.confirm-btn{background:var(--grad-main);background-size:200% 200%;animation:gradShift 4s ease infinite}
+.confirm-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow-xl)}
+
+/* ── Inputs focus glow ── */
+.input:focus{box-shadow:0 0 0 4px rgba(108,59,238,.14);border-color:var(--p)}
+
+/* ── Role cards ── */
+.role-card{transition:all var(--dur2)}
+.role-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.role-card.selected{box-shadow:0 0 0 3px rgba(108,59,238,.2);transform:translateY(-2px)}
+
+/* ── Toasts ── */
+.toast{animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.toast.gold,.toast.success{background:var(--grad-main)}
+.toast.error{background:var(--grad-red)}
+
+/* ── Chips ── */
+.chip{transition:all .18s}
+.chip:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(108,59,238,.12)}
+.chip.on{background:var(--grad-main);border-color:transparent;box-shadow:0 4px 12px rgba(108,59,238,.3)}
+
+/* ── Progress steps ── */
+.prog-step.active .prog-circle{animation:breathe 1.8s ease-in-out infinite;background:#fff;color:var(--p)}
+.prog-step.done .prog-circle{background:var(--grad-green);border-color:transparent}
+.prog-line.done{background:var(--grad-green)}
+
+/* ── Booking items ── */
+.booking-item{transition:all var(--dur2)}
+.booking-item:hover{transform:translateX(4px);border-color:var(--p);box-shadow:var(--shadow)}
+
+/* ── Home hero ── */
+.home-hero{background-size:200% 200%;animation:gradShift 8s ease infinite;background-image:linear-gradient(135deg,#4F29D4,#6C3BEE,#8B5CF6,#4F29D4);position:relative;overflow:hidden}
+.home-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+
+/* ── Newsletter section ── */
+.nl-sec{background-size:200% 200%;animation:gradShift 6s ease infinite;background-image:linear-gradient(135deg,#4F29D4,#6C3BEE,#8B5CF6,#4F29D4)}
+
+/* ── Table rows ── */
+.data-table tr{transition:background var(--dur)}
+.data-table tr:hover td{background:var(--p10)}
+
+/* ── Seat items ── */
+.seat-item{transition:all .18s}
+.seat-item.available:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(16,185,129,.2)}
+.seat-item.picked{background:var(--grad-main);border-color:transparent;box-shadow:0 4px 12px rgba(108,59,238,.3)}
+
+/* ── Owner seat items ── */
+.owner-seat-item{transition:all var(--dur2)}
+.owner-seat-item.available:hover{transform:scale(1.06);box-shadow:0 4px 12px rgba(16,185,129,.2)}
+
+/* ── Employee hero ── */
+.emp-hero{background-size:200% 200%;animation:gradShift 6s ease infinite;background-image:linear-gradient(135deg,#4F29D4,#6C3BEE,#8B5CF6,#4F29D4)}
+
+/* ── AI box ── */
+.ai-box{border-top:3px solid var(--p);box-shadow:var(--shadow-lg)}
+.ai-btn{transition:all var(--dur2)}
+.ai-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(108,59,238,.2)}
+
+/* ── Login left panel ── */
+.login-left{background-size:200% 200%;animation:gradShift 8s ease infinite;background-image:linear-gradient(135deg,#4F29D4,#6C3BEE,#8B5CF6,#4F29D4)}
+
+/* ── Shimmer skeleton loader ── */
+.shimmer{background:linear-gradient(90deg,var(--bg3) 25%,#e9e9f0 50%,var(--bg3) 75%);background-size:400px 100%;animation:shimmer 1.4s infinite}
+
+/* ── Dot / notification pulse ── */
+.dot{animation:borderGlow 2s ease-in-out infinite;background:var(--red)}
+.nav-badge{background:var(--grad-main);animation:breathe 2s ease-in-out infinite}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--p20);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--p)}
+
+/* ── Selection color ── */
+::selection{background:var(--p);color:#fff}
