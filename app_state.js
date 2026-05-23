@@ -1,7 +1,18 @@
 // ════ EMAILJS CONFIG ════
-const _EJS_PUBLIC_KEY  = 'yILXV4sntRvEkh58q';
-const _EJS_SERVICE_ID  = 'service_xgkkf6m';
-const _EJS_TEMPLATE_ID = 'template_gm1s8y7';
+const _EJS_PUBLIC_KEY          = 'yILXV4sntRvEkh58q';
+const _EJS_SERVICE_ID          = 'service_xgkkf6m';
+const _EJS_TEMPLATE_ID         = 'template_gm1s8y7';   // login / signup
+const _EJS_BOOKING_TEMPLATE_ID = 'YOUR_BOOKING_TEMPLATE_ID'; // booking confirmation
+function _sendBookingEmail(toEmail, toName, bookingRef, salonName, service, barber, date, time, paymentMethod, price) {
+  if (typeof emailjs === 'undefined' || _EJS_BOOKING_TEMPLATE_ID === 'YOUR_BOOKING_TEMPLATE_ID') return;
+  emailjs.send(_EJS_SERVICE_ID, _EJS_BOOKING_TEMPLATE_ID, {
+    to_email: toEmail, to_name: toName,
+    booking_ref: bookingRef, salon_name: salonName,
+    service, barber: barber || 'Any Available',
+    date, time, payment_method: paymentMethod || 'Cash',
+    price
+  }, { publicKey: _EJS_PUBLIC_KEY }).catch(err => console.warn('EmailJS booking error:', err));
+}
 function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, ctaText) {
   if (typeof emailjs === 'undefined') return;
   emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
@@ -478,6 +489,14 @@ async function confirmBooking() {
   });
   if (error) { toast('Booking failed: '+error.message,'error'); return; }
   toast('🎉 Booking confirmed! See you at '+salonName+'.','gold');
+  const bookingRef = 'TT-' + Date.now().toString(36).toUpperCase().slice(-6);
+  _sendBookingEmail(
+    currentUser.email, currentUser.firstName,
+    bookingRef, salonName,
+    booking.service, booking.barber,
+    booking.date, booking.slot,
+    booking.payment, booking.servicePrice || 300
+  );
   setTimeout(()=>showPage('pgUserDash'), 800);
 }
 
