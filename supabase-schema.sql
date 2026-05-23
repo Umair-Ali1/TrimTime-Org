@@ -123,6 +123,19 @@ ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews   DISABLE ROW LEVEL SECURITY;
 
 
+-- ════ DELETE CURRENT USER FUNCTION ════
+-- Allows the client to fully delete the auth.users record for the signed-in user.
+-- SECURITY DEFINER runs with owner privileges so it can access auth.users safely.
+CREATE OR REPLACE FUNCTION delete_current_user()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$;
+
 -- ════ ADMIN ACCOUNT SETUP ════
 -- Step 1: Go to Supabase Dashboard → Authentication → Users → Add user
 --         Email:    admin@trimtime.com

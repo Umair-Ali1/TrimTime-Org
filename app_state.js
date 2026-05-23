@@ -248,6 +248,7 @@ async function deleteAccount() {
       await _supabase.from('employees').delete().eq('user_id', currentUser.id);
     }
     await _supabase.from('profiles').delete().eq('id', currentUser.id);
+    await _supabase.rpc('delete_current_user');
     _clearApprovalWatcher();
     await _supabase.auth.signOut();
     currentUser = null; currentSaloon = null;
