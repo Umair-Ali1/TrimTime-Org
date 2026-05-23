@@ -1,7 +1,7 @@
 // ════ EMAILJS CONFIG ════
-const _EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // EmailJS → Account → Public Key
-const _EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // EmailJS → Email Services → Service ID
-const _EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // EmailJS → Email Templates → Template ID
+const _EJS_PUBLIC_KEY  = 'yILXV4sntRvEkh58q';
+const _EJS_SERVICE_ID  = 'service_xgkkf6m';
+const _EJS_TEMPLATE_ID = 'template_gm1s8y7';
 function _initEmailJS() { if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: _EJS_PUBLIC_KEY }); }
 function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, ctaText) {
   if (typeof emailjs === 'undefined' || _EJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') return;
