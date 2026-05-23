@@ -1,3 +1,17 @@
+// ════ EMAILJS CONFIG ════
+const _EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // EmailJS → Account → Public Key
+const _EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // EmailJS → Email Services → Service ID
+const _EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // EmailJS → Email Templates → Template ID
+function _initEmailJS() { if (typeof emailjs !== 'undefined') emailjs.init({ publicKey: _EJS_PUBLIC_KEY }); }
+function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, ctaText) {
+  if (typeof emailjs === 'undefined' || _EJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') return;
+  emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
+    to_email: toEmail, to_name: toName,
+    action_title: actionTitle, action_message: actionMessage,
+    action_note: actionNote, cta_text: ctaText
+  }).catch(() => {});
+}
+
 // ════ SUPABASE CLIENT ════
 const _supabase = supabase.createClient(
   'https://cyekdfftxzqanmgmmsza.supabase.co',
@@ -73,6 +87,12 @@ async function doLogin() {
       if (!existing) await _supabase.from('profiles').upsert({ id: data.user.id, role: 'admin', first_name: 'Admin', last_name: 'TrimTime' });
     }
     await loadUserAndRoute(data.user);
+    _sendEmail(email, currentUser?.firstName || 'there',
+      'New Sign-In to Your Account 🔐',
+      'We noticed a new sign-in to your TrimTime account. If this was you, no action is needed.',
+      'If you did not sign in, please contact us immediately at info@trimtime.com.',
+      'Go to TrimTime'
+    );
     _clearAuthForms();
     resetBtn();
   } catch (e) {
@@ -136,6 +156,12 @@ async function doRegister() {
     if (data.session) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
       await loadUserAndRoute(data.user);
+      _sendEmail(email, first,
+        'Welcome to TrimTime! 🎉',
+        'Your account has been successfully created. You\'re now ready to discover the best salons near you and book appointments in just a few clicks.',
+        'Browse salons, choose your barber, and enjoy your perfect look — anytime, anywhere.',
+        'Open TrimTime'
+      );
       _clearAuthForms();
       resetBtn();
     } else {
@@ -1217,6 +1243,7 @@ async function adminDeclineSalon(id) {
 
 // ════ INIT ════
 document.addEventListener('DOMContentLoaded', async () => {
+  _initEmailJS();
   const { data: { session } } = await _supabase.auth.getSession();
   if (session) await loadUserAndRoute(session.user);
 });
