@@ -76,6 +76,10 @@ CREATE TABLE IF NOT EXISTS bookings (
 -- Add customer_name to existing installs
 ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_name TEXT;
 
+-- ════ SUSPENSION COLUMNS (run these in SQL Editor if upgrading existing install) ════
+ALTER TABLE saloons  ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN DEFAULT false;
+
 -- 6. EMPLOYEES
 CREATE TABLE IF NOT EXISTS employees (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),

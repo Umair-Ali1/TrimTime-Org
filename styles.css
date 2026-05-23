@@ -33,6 +33,8 @@ h1,h2,h3,h4,h5{font-family:'Poppins',sans-serif;line-height:1.2}
 .btn-xs{padding:6px 12px;font-size:12px}
 .btn-danger{background:var(--red);color:#fff;box-shadow:none}
 .btn-danger:hover{background:#dc2626}
+.btn-warning{background:#f59e0b;color:#fff;box-shadow:none}
+.btn-warning:hover{background:#d97706}
 .btn-success{background:var(--g2);color:#fff;box-shadow:none}
 .btn-google{background:#fff;color:var(--text);border:1.5px solid var(--border2);box-shadow:var(--shadow2);justify-content:center}
 .btn-google:hover{background:var(--bg3);transform:none}

@@ -163,6 +163,7 @@ async function _setupNewOwnerSalon(ownerId, salonName) {
 async function loadUserAndRoute(authUser) {
   const { data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
   if (!profile) { toast('Profile not found — please sign up','error'); showPage('pgLogin'); return; }
+  if (profile.is_suspended) { await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return; }
   currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
   if (profile.role === 'owner') {
     const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
@@ -236,7 +237,7 @@ async function renderSaloons() {
   if (loginBtn) { loginBtn.style.display  = loggedIn ? 'none' : 'flex'; }
   if (notifBtn) { notifBtn.style.display  = loggedIn ? 'flex' : 'none'; }
   if (loggedIn && av) av.textContent = (currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-  const { data: saloons } = await _supabase.from('saloons').select('*').order('rating', { ascending: false });
+  const { data: saloons } = await _supabase.from('saloons').select('*').eq('is_suspended', false).order('rating', { ascending: false });
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   let list = (saloons || []).filter(s => {
     if (q && !s.name.toLowerCase().includes(q) && !(s.area||'').toLowerCase().includes(q)) return false;
@@ -1034,25 +1035,30 @@ async function renderAdminSaloons() {
   if (!el) return;
   if (!data?.length) { el.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No saloons yet</td></tr>'; return; }
   el.innerHTML = data.map(s=>`<tr style="border-bottom:1px solid var(--border)">
-    <td style="padding:10px 12px">${s.icon||'✂️'} <strong>${s.name}</strong></td>
+    <td style="padding:10px 12px"><i class="fas fa-scissors" style="color:var(--p);margin-right:6px"></i><strong>${s.name}</strong></td>
     <td style="padding:10px 12px">${s.area||'—'}, ${s.city||'—'}</td>
     <td style="padding:10px 12px">${s.rating}⭐ (${s.reviews})</td>
     <td style="padding:10px 12px">Rs. ${s.price_from}</td>
-    <td style="padding:10px 12px"><span class="badge ${s.is_open?'active':'cancelled'}">${s.is_open?'Open':'Closed'}</span></td>
-    <td style="padding:10px 12px"><button class="btn btn-danger btn-xs" onclick="adminDeleteSaloon('${s.id}')">Delete</button></td>
+    <td style="padding:10px 12px"><span class="badge ${s.is_suspended?'cancelled':(s.is_open?'active':'')}">${s.is_suspended?'Suspended':(s.is_open?'Open':'Closed')}</span></td>
+    <td style="padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-xs ${s.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleSalonSuspend('${s.id}',${!!s.is_suspended})">${s.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>
+      <button class="btn btn-danger btn-xs" onclick="adminDeleteSaloon('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+    </td>
   </tr>`).join('');
 }
 async function renderAdminUsers() {
   const { data } = await _supabase.from('profiles').select('*').order('created_at',{ascending:false});
   const el = document.getElementById('adUserTable');
   if (!el) return;
-  if (!data?.length) { el.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No users yet</td></tr>'; return; }
+  if (!data?.length) { el.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No users yet</td></tr>'; return; }
   el.innerHTML = data.map(u=>`<tr style="border-bottom:1px solid var(--border)">
     <td style="padding:10px 12px">${u.first_name||''} ${u.last_name||''}</td>
     <td style="padding:10px 12px">${u.phone||'—'}</td>
     <td style="padding:10px 12px"><span class="badge ${u.role}">${u.role}</span></td>
     <td style="padding:10px 12px">${u.city||'—'}</td>
     <td style="padding:10px 12px">${new Date(u.created_at).toLocaleDateString()}</td>
+    <td style="padding:10px 12px"><span class="badge ${u.is_suspended?'cancelled':'active'}">${u.is_suspended?'Suspended':'Active'}</span></td>
+    <td style="padding:10px 12px">${u.role==='admin'?'<span style="color:var(--text3);font-size:12px">—</span>':`<button class="btn btn-xs ${u.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleUserSuspend('${u.id}',${!!u.is_suspended})">${u.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>`}</td>
   </tr>`).join('');
 }
 async function renderAdminBookings() {
@@ -1074,6 +1080,20 @@ async function adminDeleteSaloon(id) {
   await _supabase.from('saloons').delete().eq('id', id);
   toast('Salon deleted','success');
   renderAdminSaloons();
+}
+async function adminToggleSalonSuspend(id, isSuspended) {
+  const action = isSuspended ? 'unsuspend' : 'suspend';
+  if (!confirm(`${isSuspended?'Unsuspend':'Suspend'} this salon? ${isSuspended?'It will reappear on the Discover page.':'It will be hidden from customers.'}`)) return;
+  await _supabase.from('saloons').update({ is_suspended: !isSuspended }).eq('id', id);
+  toast(`Salon ${action}ed`, 'success');
+  renderAdminSaloons();
+}
+async function adminToggleUserSuspend(id, isSuspended) {
+  const action = isSuspended ? 'unsuspend' : 'suspend';
+  if (!confirm(`${isSuspended?'Unsuspend':'Suspend'} this user? ${isSuspended?'They will be able to log in again.':'They will be blocked from logging in.'}`)) return;
+  await _supabase.from('profiles').update({ is_suspended: !isSuspended }).eq('id', id);
+  toast(`User ${action}ed`, 'success');
+  renderAdminUsers();
 }
 
 // ════ INIT ════
