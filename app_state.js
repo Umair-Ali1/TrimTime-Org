@@ -38,6 +38,7 @@ const STORE = {
 // ════ STATE ════
 let currentUser = null;
 let currentSaloon = null;        // active saloon for owner/employee
+let _routing = false;            // prevents duplicate loadUserAndRoute calls
 let _approvalChannel  = null;    // Supabase Realtime channel for approval watching
 let _approvalPollInterval = null; // polling fallback
 let currentBookingSaloon = null; // saloon selected for the booking flow
@@ -210,13 +211,15 @@ async function _setupNewOwnerSalon(ownerId, salonName) {
   await _supabase.from('seats').insert([1,2,3,4,5,6].map(n=>({ saloon_id:salon.id, seat_number:n, status:'available' })));
 }
 async function loadUserAndRoute(authUser) {
+  if (_routing) return;
+  _routing = true;
   let { data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
   if (!profile) {
     await new Promise(r => setTimeout(r, 1500));
     ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single());
   }
-  if (!profile) { toast('Profile not found — please sign up','error'); showPage('pgLogin'); return; }
-  if (profile.is_suspended) { await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return; }
+  if (!profile) { _routing=false; toast('Profile not found — please sign up','error'); showPage('pgLogin'); return; }
+  if (profile.is_suspended) { _routing=false; await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return; }
   currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
   if (profile.role === 'owner') {
     const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
@@ -225,6 +228,7 @@ async function loadUserAndRoute(authUser) {
     const { data: emp } = await _supabase.from('employees').select('*, saloons(*)').eq('user_id', authUser.id).single();
     currentSaloon = emp?.saloons || null;
   }
+  _routing = false;
   if (profile.role === 'admin') showPage('pgAdmin');
   else if (profile.role === 'owner') showPage('pgOwnerDash');
   else if (profile.role === 'employee') showPage('pgEmpDash');
