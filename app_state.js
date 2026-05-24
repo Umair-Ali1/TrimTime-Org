@@ -675,7 +675,19 @@ function showUserSub(id) {
 // ════ OWNER DASHBOARD ════
 async function refreshOwnerDash() {
   if (!currentSaloon) return;
-  const { data: bookings } = await _supabase.from('bookings').select('*').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false});
+  const [
+    { data: bookings },
+    { count: empCount },
+    { data: services },
+    { data: seats },
+    { data: emps }
+  ] = await Promise.all([
+    _supabase.from('bookings').select('*').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false}),
+    _supabase.from('employees').select('*',{count:'exact',head:true}).eq('saloon_id',currentSaloon.id),
+    _supabase.from('services').select('*').eq('saloon_id',currentSaloon.id),
+    _supabase.from('seats').select('*').eq('saloon_id',currentSaloon.id).order('seat_number'),
+    _supabase.from('employees').select('*').eq('saloon_id',currentSaloon.id)
+  ]);
   const bks=bookings||[];
   _cachedOwnerBookings=bks;
   const today=new Date().toISOString().split('T')[0];
@@ -692,11 +704,10 @@ async function refreshOwnerDash() {
     document.getElementById('ownerAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
     document.getElementById('ownerName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
   }
-  const { count: empCount } = await _supabase.from('employees').select('*',{count:'exact',head:true}).eq('saloon_id',currentSaloon.id);
   document.getElementById('ownerSeats').textContent = empCount || 0;
   renderOwnerOrdersTable(bks.slice(0,5));
-  renderOwnerOrders(); renderServicesList(); renderOwnerSeatGrid();
-  renderEmployeeList(); renderOwnerEarnings(bks); renderPopularServices(bks);
+  renderOwnerOrders(); renderOwnerEarnings(bks); renderPopularServices(bks);
+  renderServicesList(services); renderOwnerSeatGrid(seats); renderEmployeeList(emps);
   shopIsOpen=currentSaloon.is_open??true; updateShopToggle();
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invoke_code||currentSaloon.invite_code||'TT-XXXX-0000';
   const approvalStatus = currentSaloon.approval_status;
@@ -746,9 +757,9 @@ async function updateBookingStatus(id, status) {
   await _supabase.from('bookings').update({ status }).eq('id',id);
   refreshOwnerDash(); toast('Booking marked as '+status,'success');
 }
-async function renderServicesList() {
+async function renderServicesList(services) {
   if (!currentSaloon) return;
-  const { data: services } = await _supabase.from('services').select('*').eq('saloon_id',currentSaloon.id);
+  if (!services) ({ data: services } = await _supabase.from('services').select('*').eq('saloon_id',currentSaloon.id));
   const el=document.getElementById('servicesList'); if(!el) return;
   el.innerHTML=(services||[]).map(s=>`
     <div class="svc-row">
@@ -781,9 +792,9 @@ async function addService() {
   ['svcName','svcPrice','svcDuration'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('svcIcon').value='✂️';
 }
-async function renderOwnerSeatGrid() {
+async function renderOwnerSeatGrid(seats) {
   if (!currentSaloon) return;
-  const { data: seats } = await _supabase.from('seats').select('*').eq('saloon_id',currentSaloon.id).order('seat_number');
+  if (!seats) ({ data: seats } = await _supabase.from('seats').select('*').eq('saloon_id',currentSaloon.id).order('seat_number'));
   const el=document.getElementById('ownerSeatGrid'); if(!el) return;
   el.innerHTML=(seats||[]).map(s=>`
     <div class="owner-seat-item ${s.status}" onclick="ownerToggleSeat('${s.id}','${s.status}')">
@@ -796,9 +807,9 @@ async function ownerToggleSeat(id, currentStatus) {
   await _supabase.from('seats').update({ status:cycle[currentStatus]||'available' }).eq('id',id);
   renderOwnerSeatGrid();
 }
-async function renderEmployeeList() {
+async function renderEmployeeList(emps) {
   if (!currentSaloon) return;
-  const { data: emps } = await _supabase.from('employees').select('*').eq('saloon_id',currentSaloon.id);
+  if (!emps) ({ data: emps } = await _supabase.from('employees').select('*').eq('saloon_id',currentSaloon.id));
   const el=document.getElementById('employeeList'); if(!el) return;
   el.innerHTML=(emps||[]).map(e=>`
     <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--border)">
