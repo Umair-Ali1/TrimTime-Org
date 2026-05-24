@@ -66,6 +66,17 @@ function showPage(id) {
 }
 
 // ════ AUTH ════
+function togglePassword(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.classList.replace('fa-eye', 'fa-eye-slash');
+  } else {
+    inp.type = 'password';
+    icon.classList.replace('fa-eye-slash', 'fa-eye');
+  }
+}
 function switchLoginTab(tab, el) {
   document.querySelectorAll('.ftab').forEach(b => b.classList.remove('on'));
   el.classList.add('on');

@@ -728,3 +728,54 @@ input[type=range]{width:100%;accent-color:var(--p)}
 
 /* ── Selection color ── */
 ::selection{background:var(--p);color:#fff}
+
+/* ── Eye / show-password button ── */
+.input-icon{position:relative}
+.eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text4);font-size:15px;padding:4px;line-height:1;transition:color var(--dur)}
+.eye-btn:hover{color:var(--p)}
+.input-icon .input{padding-right:40px}
+
+/* ── Dark navy gradient – login left panel ── */
+.login-left{
+  background:linear-gradient(135deg,#0a0820 0%,#150d3a 35%,#1e1060 65%,#0d1b3e 100%) !important;
+  animation:none !important;
+}
+.ll-logo-ico{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25)}
+.ll-nums{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12)}
+.feat-ico{background:rgba(139,92,246,.25);border:1px solid rgba(139,92,246,.3)}
+
+/* ── Dark gradient hero (landing) ── */
+#pgLanding .hero-sec{
+  background:radial-gradient(ellipse 90% 70% at 60% 40%,rgba(108,59,238,.13) 0%,rgba(13,27,62,.04) 60%,transparent 100%);
+}
+
+/* ── Deep gradient home hero ── */
+.home-hero{
+  background:linear-gradient(135deg,#0a0820 0%,#150d3a 40%,#1e1060 70%,#0d1b3e 100%) !important;
+  animation:none !important;
+}
+
+/* ── Employee hero dark ── */
+.emp-hero{
+  background:linear-gradient(135deg,#0a0820 0%,#150d3a 40%,#1e1060 100%) !important;
+  animation:none !important;
+}
+
+/* ── Banner dark ── */
+.banner{
+  background:linear-gradient(135deg,#0a0820 0%,#150d3a 40%,#1e1060 70%,#0d1b3e 100%) !important;
+  animation:none !important;
+}
+
+/* ── Newsletter dark ── */
+.nl-sec{
+  background:linear-gradient(135deg,#0a0820 0%,#150d3a 40%,#1e1060 70%,#0d1b3e 100%) !important;
+  animation:none !important;
+}
+
+/* ── Confirm booking button – keep animated gradient ── */
+.confirm-btn{
+  background:linear-gradient(135deg,#6C3BEE,#8B5CF6,#A78BFA,#6C3BEE) !important;
+  background-size:200% 200% !important;
+  animation:gradShift 4s ease infinite !important;
+}

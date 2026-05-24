@@ -46,7 +46,7 @@
           </div>
           <div class="field">
             <label class="label">Password</label>
-            <div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="loginPass" type="password" placeholder="••••••••"></div>
+            <div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="loginPass" type="password" placeholder="••••••••"><button type="button" class="eye-btn" onclick="togglePassword('loginPass',this)"><i class="fas fa-eye"></i></button></div>
           </div>
           <button class="btn" id="loginBtn" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doLogin()">Login</button>
           <div style="margin-top:16px;text-align:center;font-size:14px;color:var(--text3)">Don't have an account? <a style="color:var(--p);font-weight:600;cursor:pointer" onclick="document.querySelectorAll('.ftab')[1].click()">Sign Up</a></div>
@@ -69,8 +69,8 @@
           <div class="field"><label class="label">Full Name</label><div class="input-icon"><span class="ico"><i class="fas fa-user"></i></span><input class="input" id="regFirst" placeholder="Your Full Name"></div></div>
           <div class="field"><label class="label">Email</label><div class="input-icon"><span class="ico"><i class="fas fa-envelope"></i></span><input class="input" id="regEmail" type="email" placeholder="your@email.com"></div></div>
           <div class="field"><label class="label">Phone Number</label><div class="input-icon"><span class="ico"><i class="fas fa-phone"></i></span><input class="input" id="regPhone" placeholder="+92 300 1234567"></div></div>
-          <div class="field"><label class="label">Password</label><div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="regPass" type="password" placeholder="Choose a password"></div></div>
-          <div class="field"><label class="label">Confirm Password</label><div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="regPass2" type="password" placeholder="Repeat password"></div></div>
+          <div class="field"><label class="label">Password</label><div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="regPass" type="password" placeholder="Choose a password"><button type="button" class="eye-btn" onclick="togglePassword('regPass',this)"><i class="fas fa-eye"></i></button></div></div>
+          <div class="field"><label class="label">Confirm Password</label><div class="input-icon"><span class="ico"><i class="fas fa-lock"></i></span><input class="input" id="regPass2" type="password" placeholder="Repeat password"><button type="button" class="eye-btn" onclick="togglePassword('regPass2',this)"><i class="fas fa-eye"></i></button></div></div>
           <div class="field" id="saloonNameField" style="display:none"><label class="label">Salon Name</label><input class="input" id="regSalon" placeholder="Your salon name"></div>
           <div class="field" id="inviteCodeField" style="display:none"><label class="label">Invite Code</label><input class="input" id="regInvite" placeholder="TT-XXXX-0000"></div>
           <button class="btn" id="regBtn" style="width:100%;justify-content:center;margin-bottom:12px" onclick="doRegister()">Create Account</button>
