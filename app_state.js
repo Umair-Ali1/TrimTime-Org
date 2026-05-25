@@ -144,7 +144,7 @@ async function doRegister() {
   try {
     const { data, error } = await _supabase.auth.signUp({ email, password: pass });
     if (error) return showErr(error.message);
-    if (!data.user) return showErr('This email may already be registered. Try logging in instead.');
+    if (!data.user || data.user.identities?.length === 0) return showErr('This email is already registered. Please log in instead.');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Setting up profile...';
     const nameParts = first.trim().split(' ');
     const { error: profErr } = await _supabase.from('profiles').upsert({
