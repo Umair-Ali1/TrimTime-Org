@@ -1,331 +1,436 @@
 <div id="pgLanding" class="page active">
+
   <!-- NAV -->
-  <nav class="land-nav" id="landNav">
-    <div class="land-logo">
-      <div class="land-logo-ico"><i class="fas fa-scissors"></i></div>
-      TrimTime
+  <nav class="lnav" id="landNav">
+    <div class="lnav-inner">
+      <a class="lnav-logo" onclick="showPage('pgLanding');scrollTo(0,0)">
+        <div class="lnav-logo-ico"><i class="fas fa-scissors"></i></div>
+        TrimTime
+      </a>
+      <div class="lnav-links">
+        <a class="lnav-link" onclick="showPage('pgLanding');scrollTo(0,0)">Home</a>
+        <a class="lnav-link" href="#how">How It Works</a>
+        <a class="lnav-link" href="#features">Features</a>
+        <a class="lnav-link" href="#barbers">Barbers</a>
+        <a class="lnav-link" href="#reviews">Reviews</a>
+      </div>
+      <div class="lnav-right">
+        <button class="btn btn-sm btn-ghost" onclick="showPage('pgLogin')">Log In</button>
+        <button class="btn btn-sm btn-accent" onclick="showPage('pgLogin')">Get Started</button>
+      </div>
+      <button class="lnav-ham" id="lnavHam" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <div class="land-nav-links">
-      <a class="land-nav-link" onclick="showPage('pgLanding');scrollTo(0,0)">Home</a>
-      <a class="land-nav-link" href="#features">Features</a>
-      <a class="land-nav-link" href="#how">How It Works</a>
-      <a class="land-nav-link" href="#reviews">Reviews</a>
-      <a class="land-nav-link" href="#contact">Contact</a>
-    </div>
-    <div class="land-nav-right">
-      <button class="btn btn-outline btn-sm" onclick="showPage('pgLogin')">Login</button>
-      <button class="btn btn-sm" onclick="showPage('pgLogin')">Get Started</button>
+    <div class="lnav-mobile" id="lnavMobile">
+      <a class="lnav-mobile-link" onclick="showPage('pgLanding');scrollTo(0,0);toggleMobileMenu()">Home</a>
+      <a class="lnav-mobile-link" href="#how" onclick="toggleMobileMenu()">How It Works</a>
+      <a class="lnav-mobile-link" href="#features" onclick="toggleMobileMenu()">Features</a>
+      <a class="lnav-mobile-link" href="#barbers" onclick="toggleMobileMenu()">Barbers</a>
+      <a class="lnav-mobile-link" href="#reviews" onclick="toggleMobileMenu()">Reviews</a>
+      <div class="lnav-mobile-btns">
+        <button class="btn btn-sm btn-ghost" onclick="showPage('pgLogin');toggleMobileMenu()" style="color:#fff;border-color:rgba(255,255,255,.25)">Log In</button>
+        <button class="btn btn-sm btn-accent" onclick="showPage('pgLogin');toggleMobileMenu()">Get Started</button>
+      </div>
     </div>
   </nav>
 
   <!-- HERO -->
-  <section class="hero-sec">
-    <div class="hero-left fade-up">
-      <div class="hero-badge"><i class="fas fa-award"></i> Pakistan's #1 Salon Booking Platform</div>
-      <h1 class="hero-title">Book Your<br><span>Perfect Look,</span><br>In Seconds.</h1>
-      <p class="hero-sub">No waiting. No phone calls. Find the best salons near you and book your appointment in just a few clicks.</p>
-      <div class="hero-btns">
-        <button class="btn" onclick="showPage('pgLogin')"><i class="fas fa-calendar-check"></i> Book Appointment</button>
-        <button class="btn btn-outline" onclick="browseAsGuest()"><i class="fas fa-search"></i> Browse Salons</button>
-      </div>
-      <div class="hero-proof">
-        <div class="hero-proof-avs">
-          <div class="hero-av" style="background:#6C3BEE">AK</div>
-          <div class="hero-av" style="background:#10B981">SK</div>
-          <div class="hero-av" style="background:#3B82F6">MR</div>
-          <div class="hero-av" style="background:#F59E0B">ZA</div>
-        </div>
-        <div>
-          <div class="hero-stars">★★★★★</div>
-          <span style="font-size:13px;color:var(--text3)">Loved by <strong style="color:var(--text)">1,200+</strong> customers</span>
-        </div>
-      </div>
-    </div>
-    <div class="hero-right fade-up">
-      <div class="hero-img-outer">
-        <div class="hero-img-wrap">
-          <img src="https://img.magnific.com/free-photo/stylish-man-sitting-barbershop_1157-20487.jpg" alt="Barbershop" style="width:100%;height:100%;object-fit:cover;border-radius:24px;display:block" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,var(--p10),var(--p20))'">
-        </div>
-        <div class="hero-float hero-float-1">
-          <div class="hf-ico" style="background:#E8F5E9;color:#10B981;font-size:14px">✅</div>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--text)">Booking Confirmed</div>
-            <div style="font-size:11px;color:var(--text3)">Haircut · Today 3:00 PM</div>
-          </div>
-        </div>
-        <div class="hero-float hero-float-2">
-          <div class="hf-ico" style="background:#FFF8E1;color:#F59E0B;font-size:14px">⭐</div>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--text)">4.9 / 5 Rating</div>
-            <div style="font-size:11px;color:var(--text3)">500+ Reviews</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <section class="l-hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="hero-grid-bg"></div>
 
-  <!-- STATS BAR -->
-  <section class="land-stats" id="stats">
-    <div class="land-stat">
-      <div class="land-stat-n" data-target="1200" data-suffix="+">1200+</div>
-      <div class="land-stat-l">Bookings Made</div>
+    <div class="l-hero-inner">
+      <div class="l-hero-left">
+        <div class="l-badge">
+          <i class="fas fa-award"></i>
+          Pakistan's #1 Salon Booking Platform
+        </div>
+        <h1 class="l-hero-title">
+          Book Your<br>
+          <span class="l-title-grad">Perfect Look,</span><br>
+          In Seconds.
+        </h1>
+        <p class="l-hero-sub">No waiting. No phone calls. Find the best salons near you and book your appointment in just a few clicks.</p>
+        <div class="l-hero-btns">
+          <button class="btn l-btn-p" onclick="showPage('pgLogin')">
+            <i class="fas fa-calendar-check"></i> Book Appointment
+          </button>
+          <button class="btn l-btn-s" onclick="browseAsGuest()">
+            <i class="fas fa-search"></i> Browse Salons
+          </button>
+        </div>
+        <div class="l-trust">
+          <div class="l-trust-avs">
+            <div class="l-trust-av" style="background:linear-gradient(135deg,#2563EB,#3B82F6)">AK</div>
+            <div class="l-trust-av" style="background:linear-gradient(135deg,#10B981,#34D399)">SK</div>
+            <div class="l-trust-av" style="background:linear-gradient(135deg,#F97316,#FB923C)">MR</div>
+            <div class="l-trust-av" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">ZA</div>
+          </div>
+          <div>
+            <div style="color:#FBBF24;font-size:14px;letter-spacing:1px">★★★★★</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:2px">Loved by <strong style="color:rgba(255,255,255,.8)">1,200+</strong> customers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="l-hero-right">
+        <div class="hero-cards">
+          <!-- Main booking card -->
+          <div class="h-card h-card-main">
+            <div class="hc-badge">✓ Confirmed</div>
+            <div class="hc-barber">
+              <div class="hc-av" style="background:linear-gradient(135deg,#2563EB,#60A5FA)">AM</div>
+              <div>
+                <div class="hc-name">Ahmed Malik</div>
+                <div class="hc-sub">Skin Fade Expert</div>
+              </div>
+            </div>
+            <div class="hc-row"><i class="fas fa-scissors"></i> Premium Fade + Beard Trim</div>
+            <div class="hc-row"><i class="fas fa-calendar"></i> Today, 3:30 PM</div>
+            <div class="hc-row"><i class="fas fa-map-marker-alt"></i> Royal Cuts, Lahore</div>
+            <div class="hc-price">Rs. 850</div>
+          </div>
+          <!-- Mini card 1: rating -->
+          <div class="h-card h-card-mini1">
+            <div style="font-size:22px;margin-bottom:6px">⭐</div>
+            <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px">4.9</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">500+ Reviews</div>
+          </div>
+          <!-- Mini card 2: live slots -->
+          <div class="h-card h-card-mini2">
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:6px;font-weight:600;letter-spacing:.5px">LIVE SLOTS</div>
+            <div style="font-size:18px;font-weight:900;color:#34D399;line-height:1">12</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">Available now</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="land-stat-sep"></div>
-    <div class="land-stat">
-      <div class="land-stat-n" data-target="120" data-suffix="+">120+</div>
-      <div class="land-stat-l">Partner Salons</div>
-    </div>
-    <div class="land-stat-sep"></div>
-    <div class="land-stat">
-      <div class="land-stat-n" data-target="98" data-suffix="%">98%</div>
-      <div class="land-stat-l">Satisfaction Rate</div>
-    </div>
-    <div class="land-stat-sep"></div>
-    <div class="land-stat">
-      <div class="land-stat-n" data-target="500" data-suffix="+">500+</div>
-      <div class="land-stat-l">Happy Customers</div>
+
+    <!-- Stats bar -->
+    <div class="l-hero-bar">
+      <div class="lhb-item">
+        <div class="lhb-n" data-target="1200" data-suffix="+">1200+</div>
+        <div class="lhb-l">Bookings Made</div>
+      </div>
+      <div class="lhb-sep"></div>
+      <div class="lhb-item">
+        <div class="lhb-n" data-target="120" data-suffix="+">120+</div>
+        <div class="lhb-l">Partner Salons</div>
+      </div>
+      <div class="lhb-sep"></div>
+      <div class="lhb-item">
+        <div class="lhb-n" data-target="98" data-suffix="%">98%</div>
+        <div class="lhb-l">Satisfaction Rate</div>
+      </div>
+      <div class="lhb-sep"></div>
+      <div class="lhb-item">
+        <div class="lhb-n" data-target="4.9" data-suffix="" data-decimals="1">4.9</div>
+        <div class="lhb-l">Avg. Rating</div>
+      </div>
     </div>
   </section>
 
   <!-- HOW IT WORKS -->
-  <section class="hiw-sec" id="how">
-    <div class="sec-head">
-      <div class="sec-tag">How It Works</div>
-      <h2 class="sec-title">Book in 4 Simple Steps</h2>
-      <p class="sec-sub">Get your perfect look without the wait — simple, fast, and hassle-free.</p>
-    </div>
-    <div class="hiw-steps hiw-steps-v2">
-      <div class="hiw-step">
-        <div class="hiw-num">1</div>
-        <div class="hiw-ico-wrap"><i class="fas fa-search"></i></div>
-        <h4>Find a Salon</h4>
-        <p>Search by location and discover top-rated salons near you</p>
+  <section class="l-how sec-pad" id="how">
+    <div class="sec-pad-inner">
+      <div class="sec-head reveal">
+        <div class="sec-tag">How It Works</div>
+        <h2 class="sec-title">Book in 4 Simple Steps</h2>
+        <p class="sec-sub">Get your perfect look without the wait — simple, fast, and hassle-free.</p>
       </div>
-      <div class="hiw-arrow">→</div>
-      <div class="hiw-step">
-        <div class="hiw-num">2</div>
-        <div class="hiw-ico-wrap"><i class="fas fa-scissors"></i></div>
-        <h4>Pick a Service</h4>
-        <p>Browse services and select your preferred barber</p>
-      </div>
-      <div class="hiw-arrow">→</div>
-      <div class="hiw-step">
-        <div class="hiw-num">3</div>
-        <div class="hiw-ico-wrap"><i class="fas fa-clock"></i></div>
-        <h4>Choose a Time</h4>
-        <p>View real-time availability and pick the perfect slot</p>
-      </div>
-      <div class="hiw-arrow">→</div>
-      <div class="hiw-step">
-        <div class="hiw-num">4</div>
-        <div class="hiw-ico-wrap"><i class="fas fa-check-circle"></i></div>
-        <h4>Confirm &amp; Relax</h4>
-        <p>Get an instant confirmation and show up looking fresh</p>
+      <div class="l-steps">
+        <div class="l-step reveal rd1">
+          <div class="l-step-num">Step 01</div>
+          <div class="l-step-ico"><i class="fas fa-search"></i></div>
+          <h4>Find a Salon</h4>
+          <p>Search by location and discover top-rated salons near you</p>
+        </div>
+        <div class="l-step reveal rd2">
+          <div class="l-step-num">Step 02</div>
+          <div class="l-step-ico"><i class="fas fa-scissors"></i></div>
+          <h4>Pick a Service</h4>
+          <p>Browse services and select your preferred barber</p>
+        </div>
+        <div class="l-step reveal rd3">
+          <div class="l-step-num">Step 03</div>
+          <div class="l-step-ico"><i class="fas fa-clock"></i></div>
+          <h4>Choose a Time</h4>
+          <p>View real-time availability and pick the perfect slot</p>
+        </div>
+        <div class="l-step reveal rd4">
+          <div class="l-step-num">Step 04</div>
+          <div class="l-step-ico"><i class="fas fa-check-circle"></i></div>
+          <h4>Confirm &amp; Relax</h4>
+          <p>Get an instant confirmation and show up looking fresh</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FEATURES -->
-  <section class="why-sec" id="features">
-    <div class="sec-head">
-      <div class="sec-tag">Why TrimTime?</div>
-      <h2 class="sec-title">Everything You Need</h2>
-      <p class="sec-sub">Built to make your salon experience faster, easier, and better.</p>
-    </div>
-    <div class="why-grid">
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-purple"><i class="fas fa-bolt"></i></div>
-        <h4>Real-time Booking</h4>
-        <p>Find available slots instantly. No phone calls, no waiting on hold.</p>
+  <section class="l-features sec-pad" id="features">
+    <div class="sec-pad-inner">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Why TrimTime?</div>
+        <h2 class="sec-title">Everything You Need</h2>
+        <p class="sec-sub">Built to make your salon experience faster, easier, and better than ever.</p>
       </div>
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-blue"><i class="fas fa-user-tie"></i></div>
-        <h4>Choose Your Barber</h4>
-        <p>Select your favorite stylist and get consistent results every visit.</p>
-      </div>
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-green"><i class="fas fa-bell"></i></div>
-        <h4>Smart Reminders</h4>
-        <p>Never miss an appointment with automatic booking reminders.</p>
-      </div>
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-orange"><i class="fas fa-credit-card"></i></div>
-        <h4>Flexible Payments</h4>
-        <p>Pay via card, Easypaisa, JazzCash, or cash at the salon.</p>
-      </div>
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-purple"><i class="fas fa-chart-bar"></i></div>
-        <h4>Owner Dashboard</h4>
-        <p>Manage your salon, employees, and bookings all from one place.</p>
-      </div>
-      <div class="why-card why-card-v2">
-        <div class="why-ico-v2 why-ico-blue"><i class="fas fa-shield-alt"></i></div>
-        <h4>Verified Salons</h4>
-        <p>Every salon on TrimTime is verified for quality and service.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- BARBER PROFILES -->
-  <section class="barbers-sec">
-    <div class="sec-head">
-      <div class="sec-tag">Featured Professionals</div>
-      <h2 class="sec-title">Meet Our Top Barbers</h2>
-      <p class="sec-sub">Real professionals, real results. Book your favorite barber directly.</p>
-    </div>
-    <div class="barbers-grid">
-      <div class="barber-prof-card" onclick="showPage('pgLogin')">
-        <div class="bpc-av" style="background:linear-gradient(135deg,#6C3BEE,#8B5CF6)">AM</div>
-        <h4 class="bpc-name">Ahmed Malik</h4>
-        <div class="bpc-role">Skin Fade Expert</div>
-        <div class="bpc-rating">⭐ 4.9 <span>(124 reviews)</span></div>
-        <div class="bpc-tags"><span>Fade</span><span>Beard Trim</span><span>Hair Design</span></div>
-        <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:14px" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
-      </div>
-      <div class="barber-prof-card" onclick="showPage('pgLogin')">
-        <div class="bpc-av" style="background:linear-gradient(135deg,#10B981,#34D399)">SK</div>
-        <h4 class="bpc-name">Sara Khan</h4>
-        <div class="bpc-role">Color &amp; Style Specialist</div>
-        <div class="bpc-rating">⭐ 4.8 <span>(98 reviews)</span></div>
-        <div class="bpc-tags"><span>Coloring</span><span>Highlights</span><span>Styling</span></div>
-        <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:14px" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
-      </div>
-      <div class="barber-prof-card" onclick="showPage('pgLogin')">
-        <div class="bpc-av" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">MR</div>
-        <h4 class="bpc-name">Muhammad Raza</h4>
-        <div class="bpc-role">Classic Cut Specialist</div>
-        <div class="bpc-rating">⭐ 4.7 <span>(87 reviews)</span></div>
-        <div class="bpc-tags"><span>Classic Cut</span><span>Hot Towel</span><span>Shave</span></div>
-        <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:14px" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
+      <div class="l-feat-grid">
+        <div class="l-feat-card reveal rd1">
+          <div class="l-feat-ico lfi-blue"><i class="fas fa-bolt"></i></div>
+          <h4>Real-time Booking</h4>
+          <p>Find available slots instantly. No phone calls, no waiting on hold. Book in under 60 seconds.</p>
+        </div>
+        <div class="l-feat-card reveal rd2">
+          <div class="l-feat-ico lfi-orange"><i class="fas fa-user-tie"></i></div>
+          <h4>Choose Your Barber</h4>
+          <p>Select your favorite stylist and get consistent, high-quality results every single visit.</p>
+        </div>
+        <div class="l-feat-card reveal rd3">
+          <div class="l-feat-ico lfi-green"><i class="fas fa-bell"></i></div>
+          <h4>Smart Reminders</h4>
+          <p>Never miss an appointment. Automatic email reminders keep you on schedule effortlessly.</p>
+        </div>
+        <div class="l-feat-card reveal rd1">
+          <div class="l-feat-ico lfi-purple"><i class="fas fa-credit-card"></i></div>
+          <h4>Flexible Payments</h4>
+          <p>Pay via card, Easypaisa, JazzCash, or cash at the salon. Your choice, always.</p>
+        </div>
+        <div class="l-feat-card reveal rd2">
+          <div class="l-feat-ico lfi-blue"><i class="fas fa-chart-bar"></i></div>
+          <h4>Owner Dashboard</h4>
+          <p>Manage your salon, employees, and bookings all from one powerful, intuitive dashboard.</p>
+        </div>
+        <div class="l-feat-card reveal rd3">
+          <div class="l-feat-ico lfi-green"><i class="fas fa-shield-alt"></i></div>
+          <h4>Verified Salons</h4>
+          <p>Every salon on TrimTime is verified for quality, hygiene, and professional service standards.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FOR EVERYONE -->
-  <section class="fore-sec" id="pricing">
-    <div class="sec-head">
-      <div class="sec-tag">For Everyone</div>
-      <h2 class="sec-title">Built for Every Role</h2>
-      <p class="sec-sub">Whether you're a customer, salon owner, or employee — TrimTime has you covered.</p>
-    </div>
-    <div class="fore-cards">
-      <div class="fore-card cust" onclick="showPage('pgLogin')">
-        <div class="fore-card-ico"><i class="fas fa-user"></i></div>
-        <h4><span>Customer</span>Book Your Favorite Services</h4>
-        <p>Book appointments at your favorite salons anytime, anywhere from your phone.</p>
-        <div class="fore-link">Get Started →</div>
+  <!-- BARBERS -->
+  <section class="l-barbers sec-pad" id="barbers">
+    <div class="sec-pad-inner">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Featured Professionals</div>
+        <h2 class="sec-title">Meet Our Top Barbers</h2>
+        <p class="sec-sub">Real professionals, real results. Book your favorite barber directly.</p>
       </div>
-      <div class="fore-card owner" onclick="showPage('pgLogin')">
-        <div class="fore-card-ico"><i class="fas fa-store"></i></div>
-        <h4><span>Salon Owner</span>Manage Your Business</h4>
-        <p>Manage your salon, employees, and bookings easily from one powerful dashboard.</p>
-        <div class="fore-link">Get Started →</div>
-      </div>
-      <div class="fore-card emp" onclick="showPage('pgLogin')">
-        <div class="fore-card-ico"><i class="fas fa-scissors"></i></div>
-        <h4><span>Employee</span>Track Your Schedule</h4>
-        <p>Manage your schedule and provide the best services to your clients efficiently.</p>
-        <div class="fore-link">Get Started →</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section class="test-sec" id="reviews">
-    <div class="sec-head">
-      <div class="sec-tag">Customer Reviews</div>
-      <h2 class="sec-title">What Our Customers Say</h2>
-      <p class="sec-sub">Real reviews from real customers who love TrimTime.</p>
-    </div>
-    <div class="test-grid">
-      <div class="test-item">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote">"TrimTime made booking so easy! I love the convenience. I can't imagine going back to calling salons again."</p>
-        <div class="test-auth">
-          <div class="test-av" style="background:var(--p)">SK</div>
-          <div>
-            <div style="font-weight:700;font-size:15px">Sarah Khan</div>
-            <div style="font-size:13px;color:var(--text3)">Regular Customer · Lahore</div>
+      <div class="l-barbers-grid">
+        <!-- Featured barber -->
+        <div class="l-barber-card l-barber-feat reveal rd1" onclick="showPage('pgLogin')">
+          <div class="lbf-badge">⭐ Top Rated</div>
+          <div class="lbc-top">
+            <div class="lbc-av" style="background:linear-gradient(135deg,#F97316,#FB923C)">AM</div>
+            <div class="lbc-open">Available</div>
+          </div>
+          <div class="lbc-name">Ahmed Malik</div>
+          <div class="lbc-role">Skin Fade Expert · 7 yrs exp</div>
+          <div class="lbc-meta">
+            <span><i class="fas fa-star" style="color:#FBBF24"></i> 4.9</span>
+            <span><i class="fas fa-comment" style="color:var(--text4)"></i> 124 reviews</span>
+            <span><i class="fas fa-map-marker-alt" style="color:var(--text4)"></i> Lahore</span>
+          </div>
+          <div class="lbc-tags">
+            <span>Fade</span><span>Beard Trim</span><span>Hair Design</span>
+          </div>
+          <div class="lbc-foot">
+            <div class="lbc-price">From <strong>Rs. 800</strong></div>
+            <button class="btn btn-sm" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
+          </div>
+        </div>
+        <!-- Barber 2 -->
+        <div class="l-barber-card reveal rd2" onclick="showPage('pgLogin')">
+          <div class="lbc-top">
+            <div class="lbc-av" style="background:linear-gradient(135deg,#10B981,#34D399)">SK</div>
+            <div class="lbc-open">Available</div>
+          </div>
+          <div class="lbc-name">Sara Khan</div>
+          <div class="lbc-role">Color &amp; Style Specialist · 5 yrs exp</div>
+          <div class="lbc-meta">
+            <span><i class="fas fa-star" style="color:#FBBF24"></i> 4.8</span>
+            <span><i class="fas fa-comment" style="color:var(--text4)"></i> 98 reviews</span>
+            <span><i class="fas fa-map-marker-alt" style="color:var(--text4)"></i> Karachi</span>
+          </div>
+          <div class="lbc-tags">
+            <span>Coloring</span><span>Highlights</span><span>Styling</span>
+          </div>
+          <div class="lbc-foot">
+            <div class="lbc-price">From <strong>Rs. 1,200</strong></div>
+            <button class="btn btn-sm" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
+          </div>
+        </div>
+        <!-- Barber 3 -->
+        <div class="l-barber-card reveal rd3" onclick="showPage('pgLogin')">
+          <div class="lbc-top">
+            <div class="lbc-av" style="background:linear-gradient(135deg,#2563EB,#60A5FA)">MR</div>
+            <div class="lbc-open">Available</div>
+          </div>
+          <div class="lbc-name">Muhammad Raza</div>
+          <div class="lbc-role">Classic Cut Specialist · 4 yrs exp</div>
+          <div class="lbc-meta">
+            <span><i class="fas fa-star" style="color:#FBBF24"></i> 4.7</span>
+            <span><i class="fas fa-comment" style="color:var(--text4)"></i> 87 reviews</span>
+            <span><i class="fas fa-map-marker-alt" style="color:var(--text4)"></i> Islamabad</span>
+          </div>
+          <div class="lbc-tags">
+            <span>Classic Cut</span><span>Hot Towel</span><span>Shave</span>
+          </div>
+          <div class="lbc-foot">
+            <div class="lbc-price">From <strong>Rs. 600</strong></div>
+            <button class="btn btn-sm" onclick="event.stopPropagation();showPage('pgLogin')">Book Now</button>
           </div>
         </div>
       </div>
-      <div class="test-item test-dark">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote" style="color:rgba(255,255,255,.88)">"As a salon owner, the dashboard changed everything. Our bookings are up 40% since joining TrimTime!"</p>
-        <div class="test-auth">
-          <div class="test-av" style="background:var(--g2)">AM</div>
-          <div>
-            <div style="font-weight:700;font-size:15px;color:#fff">Ahmed Malik</div>
-            <div style="font-size:13px;color:rgba(255,255,255,.55)">Salon Owner · Karachi</div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="l-reviews sec-pad" id="reviews">
+    <div class="sec-pad-inner">
+      <div class="sec-head reveal">
+        <div class="sec-tag">Customer Reviews</div>
+        <h2 class="sec-title">What Our Customers Say</h2>
+        <p class="sec-sub">Real reviews from real customers who love TrimTime.</p>
+      </div>
+      <div class="l-rev-grid">
+        <div class="l-rev-card reveal rd1">
+          <div class="l-rev-stars">★★★★★</div>
+          <p class="l-rev-text">"TrimTime made booking so easy! I love the convenience. I can't imagine going back to calling salons again."</p>
+          <div class="l-rev-auth">
+            <div class="l-rev-av" style="background:var(--p)">SK</div>
+            <div>
+              <div class="l-rev-name">Sarah Khan</div>
+              <div class="l-rev-role">Regular Customer · Lahore</div>
+            </div>
+          </div>
+        </div>
+        <div class="l-rev-card l-rev-dark reveal rd2">
+          <div class="l-rev-stars">★★★★★</div>
+          <p class="l-rev-text" style="color:rgba(255,255,255,.75)">"As a salon owner, the dashboard changed everything. Our bookings are up 40% since joining TrimTime!"</p>
+          <div class="l-rev-auth">
+            <div class="l-rev-av" style="background:var(--g2)">AM</div>
+            <div>
+              <div class="l-rev-name" style="color:#fff">Ahmed Malik</div>
+              <div class="l-rev-role" style="color:rgba(255,255,255,.45)">Salon Owner · Karachi</div>
+            </div>
+          </div>
+        </div>
+        <div class="l-rev-card reveal rd3">
+          <div class="l-rev-stars">★★★★★</div>
+          <p class="l-rev-text">"Finally an app that lets me book with my favorite barber every time. No more surprises!"</p>
+          <div class="l-rev-auth">
+            <div class="l-rev-av" style="background:var(--blue)">MR</div>
+            <div>
+              <div class="l-rev-name">Muhammad Raza</div>
+              <div class="l-rev-role">Customer · Islamabad</div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="test-item">
-        <div class="test-stars">★★★★★</div>
-        <p class="test-quote">"Finally an app that lets me book with my favorite barber every time. No more surprises!"</p>
-        <div class="test-auth">
-          <div class="test-av" style="background:var(--blue)">MR</div>
-          <div>
-            <div style="font-weight:700;font-size:15px">Muhammad Raza</div>
-            <div style="font-size:13px;color:var(--text3)">Customer · Islamabad</div>
-          </div>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section class="l-roles sec-pad">
+    <div class="sec-pad-inner">
+      <div class="sec-head reveal">
+        <div class="sec-tag">For Everyone</div>
+        <h2 class="sec-title">Built for Every Role</h2>
+        <p class="sec-sub">Whether you're a customer, salon owner, or employee — TrimTime has you covered.</p>
+      </div>
+      <div class="l-roles-grid">
+        <div class="l-role-card reveal rd1" onclick="showPage('pgLogin')">
+          <div class="lrc-ico lri-blue"><i class="fas fa-user"></i></div>
+          <div class="lrc-lbl">Customer</div>
+          <h4>Book Your Favorite Services</h4>
+          <p>Book appointments at your favorite salons anytime, anywhere from your phone.</p>
+          <div class="lrc-cta">Get Started <i class="fas fa-arrow-right"></i></div>
+        </div>
+        <div class="l-role-card reveal rd2" onclick="showPage('pgLogin')">
+          <div class="lrc-ico lri-orange"><i class="fas fa-store"></i></div>
+          <div class="lrc-lbl">Salon Owner</div>
+          <h4>Manage Your Business</h4>
+          <p>Manage your salon, employees, and bookings easily from one powerful dashboard.</p>
+          <div class="lrc-cta">Get Started <i class="fas fa-arrow-right"></i></div>
+        </div>
+        <div class="l-role-card reveal rd3" onclick="showPage('pgLogin')">
+          <div class="lrc-ico lri-green"><i class="fas fa-scissors"></i></div>
+          <div class="lrc-lbl">Employee</div>
+          <h4>Track Your Schedule</h4>
+          <p>Manage your schedule and provide the best services to your clients efficiently.</p>
+          <div class="lrc-cta">Get Started <i class="fas fa-arrow-right"></i></div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA -->
-  <section class="land-cta-sec" id="contact">
-    <div class="land-cta-content">
+  <section class="l-cta">
+    <div class="l-cta-inner reveal">
+      <div class="l-cta-badge"><i class="fas fa-bolt"></i> FREE TO JOIN</div>
       <h2>Ready to Book Your<br>Perfect Look?</h2>
       <p>Join 1,200+ customers who trust TrimTime for their salon bookings. It's completely free to sign up.</p>
-      <div class="land-cta-btns">
-        <button class="btn land-cta-btn-primary" onclick="showPage('pgLogin')"><i class="fas fa-calendar-check"></i> Book Now — It's Free</button>
-        <button class="btn land-cta-btn-outline" onclick="showPage('pgLogin')"><i class="fas fa-store"></i> Register Your Salon</button>
+      <div class="l-cta-btns">
+        <button class="btn l-cta-btn-w" onclick="showPage('pgLogin')">
+          <i class="fas fa-calendar-check"></i> Book Now — It's Free
+        </button>
+        <button class="btn l-cta-btn-o" onclick="showPage('pgLogin')">
+          <i class="fas fa-store"></i> Register Your Salon
+        </button>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="land-footer">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <h3>Trim<span>Time</span></h3>
+  <footer class="l-footer">
+    <div class="l-footer-inner">
+      <div class="l-ft-brand">
+        <div class="l-ft-logo">
+          <div class="l-ft-logo-ico"><i class="fas fa-scissors"></i></div>
+          <span>TrimTime</span>
+        </div>
         <p>The smarter way to book salon appointments. Find the best salons near you in seconds.</p>
-        <div class="footer-socials">
-          <a class="footer-social-btn"><i class="fab fa-instagram"></i></a>
-          <a class="footer-social-btn"><i class="fab fa-facebook"></i></a>
-          <a class="footer-social-btn"><i class="fab fa-twitter"></i></a>
-          <a class="footer-social-btn"><i class="fab fa-linkedin"></i></a>
+        <div class="l-ft-socials">
+          <a class="l-ft-social"><i class="fab fa-instagram"></i></a>
+          <a class="l-ft-social"><i class="fab fa-facebook"></i></a>
+          <a class="l-ft-social"><i class="fab fa-twitter"></i></a>
+          <a class="l-ft-social"><i class="fab fa-linkedin"></i></a>
         </div>
       </div>
-      <div class="footer-col">
+      <div class="l-ft-col">
         <h5>Product</h5>
-        <a class="footer-link" onclick="showPage('pgLanding');scrollTo(0,0)">Home</a>
-        <a class="footer-link" href="#features">Features</a>
-        <a class="footer-link" href="#how">How It Works</a>
-        <a class="footer-link" href="#reviews">Reviews</a>
+        <a onclick="showPage('pgLanding');scrollTo(0,0)">Home</a>
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#reviews">Reviews</a>
       </div>
-      <div class="footer-col">
+      <div class="l-ft-col">
         <h5>For Users</h5>
-        <a class="footer-link" onclick="showPage('pgLogin')">Find Salons</a>
-        <a class="footer-link" onclick="showPage('pgLogin')">My Bookings</a>
-        <a class="footer-link" onclick="showPage('pgLogin')">Register Salon</a>
-        <a class="footer-link">Help Center</a>
+        <a onclick="showPage('pgLogin')">Find Salons</a>
+        <a onclick="showPage('pgLogin')">My Bookings</a>
+        <a onclick="showPage('pgLogin')">Register Salon</a>
+        <a>Help Center</a>
       </div>
-      <div class="footer-col">
-        <h5>Contact Us</h5>
-        <a class="footer-link"><i class="fas fa-phone" style="width:16px;margin-right:4px"></i>+92 300 1234567</a>
-        <a class="footer-link"><i class="fas fa-envelope" style="width:16px;margin-right:4px"></i>info@trimtime.com</a>
-        <a class="footer-link"><i class="fas fa-map-marker-alt" style="width:16px;margin-right:4px"></i>Lahore, Pakistan</a>
+      <div class="l-ft-col">
+        <h5>Contact</h5>
+        <a><i class="fas fa-phone" style="width:16px;margin-right:6px;color:rgba(255,255,255,.35)"></i>+92 300 1234567</a>
+        <a><i class="fas fa-envelope" style="width:16px;margin-right:6px;color:rgba(255,255,255,.35)"></i>info@trimtime.com</a>
+        <a><i class="fas fa-map-marker-alt" style="width:16px;margin-right:6px;color:rgba(255,255,255,.35)"></i>Lahore, Pakistan</a>
       </div>
     </div>
-    <div class="footer-bot">
+    <div class="l-footer-bot">
       <div>© 2026 TrimTime. All rights reserved.</div>
       <div style="display:flex;gap:16px">
-        <a class="footer-link" style="margin:0">Privacy Policy</a>
-        <a class="footer-link" style="margin:0">Terms of Service</a>
+        <a style="font-size:13px;color:rgba(255,255,255,.25);cursor:pointer;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">Privacy Policy</a>
+        <a style="font-size:13px;color:rgba(255,255,255,.25);cursor:pointer;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">Terms of Service</a>
       </div>
     </div>
   </footer>
+
 </div>

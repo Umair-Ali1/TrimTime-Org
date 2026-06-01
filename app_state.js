@@ -1398,18 +1398,41 @@ async function adminDeclineSalon(id) {
     syncNav();
   }
 
-  // Animated stats counter (runs once when section scrolls into view)
+  // Hamburger mobile menu toggle
+  window.toggleMobileMenu = function() {
+    const ham = document.getElementById('lnavHam');
+    const mob = document.getElementById('lnavMobile');
+    if (!ham || !mob) return;
+    const open = mob.classList.toggle('open');
+    ham.classList.toggle('open', open);
+  };
+
+  // Scroll reveal: fade-up sections as they enter viewport
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(({target, isIntersecting}) => {
+      if (isIntersecting) {
+        target.classList.add('visible');
+        revealObserver.unobserve(target);
+      }
+    });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // Animated stats counter for .lhb-n elements (supports decimals via data-decimals)
   const animateStat = (el) => {
-    const target = parseInt(el.dataset.target, 10);
-    const suffix = el.dataset.suffix || '+';
+    const raw = el.dataset.target;
+    const decimals = parseInt(el.dataset.decimals || '0', 10);
+    const target = parseFloat(raw);
+    const suffix = el.dataset.suffix !== undefined ? el.dataset.suffix : '+';
     let step = 0;
     const steps = 72;
     const tick = () => {
       step++;
       const eased = 1 - Math.pow(1 - step / steps, 3);
-      el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+      const val = eased * target;
+      el.textContent = (decimals > 0 ? val.toFixed(decimals) : Math.floor(val).toLocaleString()) + suffix;
       if (step < steps) requestAnimationFrame(tick);
-      else el.textContent = target.toLocaleString() + suffix;
+      else el.textContent = (decimals > 0 ? target.toFixed(decimals) : target.toLocaleString()) + suffix;
     };
     requestAnimationFrame(tick);
   };
@@ -1420,7 +1443,7 @@ async function adminDeclineSalon(id) {
       statObserver.unobserve(el);
     });
   }, {threshold: 0.5});
-  document.querySelectorAll('.land-stat-n[data-target]').forEach(el => statObserver.observe(el));
+  document.querySelectorAll('.lhb-n[data-target]').forEach(el => statObserver.observe(el));
 }
 
 // ════ INIT ════
