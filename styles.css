@@ -1348,3 +1348,24 @@ table{width:100%;overflow-x:auto;display:block}
 @media(max-width:768px){
   .input,.sb-input,select.input{font-size:16px}
 }
+
+/* ── Landing hero: real photo + floating cards ── */
+.hero-img-frame{position:relative;width:430px;height:490px;flex-shrink:0;z-index:2}
+@media(max-width:1080px){.hero-img-frame{width:360px;height:410px}}
+@media(max-width:960px){.hero-img-frame{width:310px;height:350px;margin:0 auto}}
+@media(max-width:600px){.hero-img-frame{width:260px;height:290px}}
+.hero-img-photo{width:100%;height:100%;object-fit:cover;border-radius:28px;display:block;box-shadow:0 24px 64px rgba(0,0,0,.48)}
+/* floating cards on the image */
+.hf-book{position:absolute;bottom:-22px;left:-32px;width:215px;padding:16px;animation:float1 4.5s ease-in-out infinite}
+.hf-rating{position:absolute;top:22px;right:-26px;width:98px;padding:14px;text-align:center;animation:float1 4.5s ease-in-out 2s infinite}
+.hf-slots{position:absolute;top:165px;right:-26px;width:108px;padding:14px;text-align:center;animation:float1 4.5s ease-in-out 1s infinite}
+@media(max-width:960px){
+  .hf-book{left:-14px;bottom:-14px;width:185px;padding:13px}
+  .hf-rating{right:-14px;top:18px}
+  .hf-slots{right:-14px;top:140px}
+}
+@media(max-width:600px){
+  .hf-book{display:none}
+  .hf-slots{display:none}
+  .hf-rating{right:-10px;top:14px;width:82px;padding:10px}
+}

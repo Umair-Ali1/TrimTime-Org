@@ -77,9 +77,16 @@
       </div>
 
       <div class="l-hero-right">
-        <div class="hero-cards">
-          <!-- Main booking card -->
-          <div class="h-card h-card-main">
+        <div class="hero-img-frame">
+          <!-- Real barbershop photo -->
+          <img
+            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=560&q=80"
+            alt="Professional barber at work"
+            class="hero-img-photo"
+            onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,rgba(37,99,235,.25),rgba(249,115,22,.15))'">
+
+          <!-- Floating booking confirmation card -->
+          <div class="h-card hf-book">
             <div class="hc-badge">✓ Confirmed</div>
             <div class="hc-barber">
               <div class="hc-av" style="background:linear-gradient(135deg,#2563EB,#60A5FA)">AM</div>
@@ -90,20 +97,21 @@
             </div>
             <div class="hc-row"><i class="fas fa-scissors"></i> Premium Fade + Beard Trim</div>
             <div class="hc-row"><i class="fas fa-calendar"></i> Today, 3:30 PM</div>
-            <div class="hc-row"><i class="fas fa-map-marker-alt"></i> Royal Cuts, Lahore</div>
             <div class="hc-price">Rs. 850</div>
           </div>
-          <!-- Mini card 1: rating -->
-          <div class="h-card h-card-mini1">
+
+          <!-- Rating badge -->
+          <div class="h-card hf-rating">
             <div style="font-size:22px;margin-bottom:6px">⭐</div>
-            <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px">4.9</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:2px">500+ Reviews</div>
+            <div style="font-size:22px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px">4.9</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);margin-top:4px">500+ Reviews</div>
           </div>
-          <!-- Mini card 2: live slots -->
-          <div class="h-card h-card-mini2">
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:6px;font-weight:600;letter-spacing:.5px">LIVE SLOTS</div>
-            <div style="font-size:18px;font-weight:900;color:#34D399;line-height:1">12</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px">Available now</div>
+
+          <!-- Live slots badge -->
+          <div class="h-card hf-slots">
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:5px;font-weight:600;letter-spacing:.5px">LIVE SLOTS</div>
+            <div style="font-size:20px;font-weight:900;color:#34D399;line-height:1">12</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px">Available</div>
           </div>
         </div>
       </div>

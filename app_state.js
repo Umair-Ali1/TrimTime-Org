@@ -57,11 +57,25 @@ let _cachedOwnerBookings = [];
 let _reviewedBookingIds  = new Set();
 let _reviewModalBookingId = null;
 
+// ════ PAGE TITLES ════
+const _PAGE_TITLES = {
+  pgLanding:  'TrimTime — Book Your Perfect Look',
+  pgLogin:    'TrimTime — Login or Sign Up',
+  pgHome:     'TrimTime — Discover Salons',
+  pgBooking:  'TrimTime — Book Appointment',
+  pgUserDash: 'TrimTime — My Dashboard',
+  pgOwnerDash:'TrimTime — Owner Dashboard',
+  pgEmpDash:  'TrimTime — Employee Dashboard',
+  pgAdmin:    'TrimTime — Admin Panel',
+};
+
 // ════ PAGES ════
-function showPage(id) {
+function showPage(id, _pushHistory = true) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
+  document.title = _PAGE_TITLES[id] || 'TrimTime';
+  if (_pushHistory) window.history.pushState({ _ttPage: id }, '');
   if (id === 'pgHome') renderSaloons();
   if (id === 'pgBooking') initBooking();
   if (id === 'pgUserDash') refreshUserDash();
@@ -69,6 +83,13 @@ function showPage(id) {
   if (id === 'pgEmpDash') refreshEmpDash();
   if (id === 'pgAdmin') refreshAdminDash();
 }
+
+// Browser back/forward button support
+window.addEventListener('popstate', e => {
+  const id = e.state?._ttPage;
+  if (id && document.getElementById(id)) showPage(id, false);
+  else showPage('pgLanding', false);
+});
 
 // ════ AUTH ════
 function togglePassword(inputId, btn) {
@@ -1494,6 +1515,9 @@ async function adminDeclineSalon(id) {
 // ════ INIT ════
 // ════ SESSION INIT ════
 // app_state.js is loaded dynamically so DOMContentLoaded has already fired.
+// Seed initial history state so browser back works from the landing page.
+window.history.replaceState({ _ttPage: 'pgLanding' }, '');
+
 // Run immediately and listen for auth state changes.
 (async () => {
   const { data: { session } } = await _supabase.auth.getSession();
