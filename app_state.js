@@ -22,6 +22,10 @@ function _sendEmail(toEmail, toName, actionTitle, actionMessage, actionNote, cta
   }, { publicKey: _EJS_PUBLIC_KEY }).catch(err => console.warn('EmailJS error:', err));
 }
 
+// ════ ADMIN CREDENTIALS (hardcoded — no signup required) ════
+const _ADMIN_EMAIL = 'admin@trimtime.com';
+const _ADMIN_PASS  = 'Admin@123';
+
 // ════ SUPABASE CLIENT ════
 const _supabase = supabase.createClient(
   'https://xknavuihqdncfhetiepb.supabase.co',
@@ -103,13 +107,18 @@ async function doLogin() {
   btn.classList.add('btn-loading');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Logging in...';
   try {
+    // Admin shortcut — credentials are hardcoded, no Supabase Auth account needed
+    if (email === _ADMIN_EMAIL && pass === _ADMIN_PASS) {
+      currentUser = { id: 'admin', email: _ADMIN_EMAIL, role: 'admin', firstName: 'Admin', lastName: 'TrimTime', phone: '', city: '' };
+      _clearAuthForms();
+      resetBtn();
+      showPage('pgAdmin');
+      refreshAdminDash();
+      return;
+    }
     const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
     if (error) return showErr(error.message);
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Loading your account...';
-    if (email === 'admin@trimtime.com') {
-      const { data: existing } = await _supabase.from('profiles').select('id').eq('id', data.user.id).single();
-      if (!existing) await _supabase.from('profiles').upsert({ id: data.user.id, role: 'admin', first_name: 'Admin', last_name: 'TrimTime' });
-    }
     await loadUserAndRoute(data.user);
     _sendEmail(email, currentUser?.firstName || 'there',
       'New Sign-In to Your Account 🔐',
