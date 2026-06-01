@@ -108,7 +108,7 @@ async function doLogin() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Logging in...';
   try {
     // Admin shortcut — credentials are hardcoded, no Supabase Auth account needed
-    if (email === _ADMIN_EMAIL && pass === _ADMIN_PASS) {
+    if (email.toLowerCase() === _ADMIN_EMAIL && pass.trim() === _ADMIN_PASS) {
       currentUser = { id: 'admin', email: _ADMIN_EMAIL, role: 'admin', firstName: 'Admin', lastName: 'TrimTime', phone: '', city: '' };
       _clearAuthForms();
       resetBtn();
