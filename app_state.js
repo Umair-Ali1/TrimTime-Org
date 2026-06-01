@@ -1434,7 +1434,16 @@ async function adminDeclineSalon(id) {
     }
   });
 
-  // Hamburger mobile menu toggle
+  // Home nav mobile hamburger toggle
+  window.hnToggle = function() {
+    const ham = document.getElementById('hnHam');
+    const mob = document.getElementById('hnMobile');
+    if (!ham || !mob) return;
+    const open = mob.classList.toggle('open');
+    ham.classList.toggle('open', open);
+  };
+
+  // Hamburger mobile menu toggle (landing nav)
   window.toggleMobileMenu = function() {
     const ham = document.getElementById('lnavHam');
     const mob = document.getElementById('lnavMobile');

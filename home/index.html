@@ -15,8 +15,17 @@
       <div class="icon-btn" id="homeNotifBtn" style="display:none"><span><i class="fas fa-bell"></i></span><span class="dot"></span></div>
       <button class="btn btn-sm btn-outline" id="homeLoginBtn" style="display:none" onclick="showPage('pgLogin')"><i class="fas fa-right-to-bracket"></i> Login</button>
       <div class="nav-av" id="homeAv" onclick="showPage('pgUserDash')" style="display:none">AK</div>
+      <button class="hn-ham" id="hnHam" onclick="hnToggle()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
+  <div class="hn-mobile" id="hnMobile">
+    <a class="hn-mobile-link" onclick="showPage('pgHome');hnToggle()"><i class="fas fa-compass"></i> Discover</a>
+    <a class="hn-mobile-link" onclick="showPage('pgBooking');hnToggle()"><i class="fas fa-calendar-check"></i> Book Now</a>
+    <a class="hn-mobile-link" onclick="showPage('pgUserDash');hnToggle()"><i class="fas fa-gauge-high"></i> Dashboard</a>
+    <a class="hn-mobile-link" onclick="showPage('pgLanding');hnToggle()"><i class="fas fa-home"></i> Home</a>
+  </div>
 
   <!-- HERO -->
   <div class="home-hero">
