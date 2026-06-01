@@ -358,19 +358,32 @@ async function renderSaloons() {
   });
   const container = document.getElementById('saloonCards');
   if (!container) return;
-  container.innerHTML = list.map(s => `
+  container.innerHTML = list.map(s => {
+    const tags = Array.isArray(s.tags) ? s.tags : (s.tags||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const tagHtml = tags.slice(0,3).map(t=>`<span class="sc-tag">${t}</span>`).join('');
+    return `
     <div class="salon-card" onclick="bookSaloon('${s.id}')">
-      <div class="salon-img" style="${s.image_url?'background:none;padding:0':''}">
-        ${s.image_url?`<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-scissors\\' style=\\'font-size:40px;color:var(--p)\\'></i><div class=\\'salon-status${s.is_open?'':' closed'}\\'>${s.is_open?'Open':'Closed'}</div>'">`:`<i class="fas fa-scissors" style="font-size:40px;color:var(--p)"></i>`}
-        <div class="salon-status${s.is_open?'':' closed'}">${s.is_open?'Open':'Closed'}</div>
+      <div class="salon-img"${s.image_url?' style="background:none"':''}>
+        ${s.image_url
+          ? `<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+          : `<i class="fas fa-scissors" style="font-size:44px;color:var(--p)"></i>`}
+        <div class="salon-status${s.is_open?'':' closed'}">● ${s.is_open?'Open':'Closed'}</div>
+        <div class="sc-fav" onclick="event.stopPropagation()"><i class="fas fa-heart"></i></div>
       </div>
       <div class="salon-body">
         <div class="salon-name">${s.name}</div>
-        <div class="salon-loc"><i class="fas fa-location-dot" style="color:var(--p);margin-right:4px"></i>${s.area||'Lahore'}, ${s.city||'Lahore'}</div>
-        <div class="salon-meta"><span class="salon-rating">★ ${s.rating||4.5}</span><span>(${s.reviews||0} reviews)</span></div>
-        <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book Now</button></div>
+        <div class="salon-loc"><i class="fas fa-location-dot"></i>${s.area||'Lahore'}, ${s.city||'Lahore'}</div>
+        ${tagHtml ? `<div class="sc-tags">${tagHtml}</div>` : ''}
+        <div class="salon-meta">
+          <span class="salon-rating"><i class="fas fa-star"></i> ${s.rating||4.5} <span style="font-weight:400;color:var(--text3);font-size:12px">(${s.reviews||0} reviews)</span></span>
+        </div>
+        <div class="salon-foot">
+          <div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div>
+          <button class="btn btn-sm" style="pointer-events:none">Book Now</button>
+        </div>
       </div>
-    </div>`).join('') || '<p style="color:var(--text3);padding:24px">No salons found.</p>';
+    </div>`;
+  }).join('') || '<div style="text-align:center;padding:64px 24px;color:var(--text3)"><i class="fas fa-scissors" style="font-size:40px;margin-bottom:12px;display:block;opacity:.3"></i><div style="font-size:15px;font-weight:600">No salons found</div><div style="font-size:13px;margin-top:4px">Try adjusting your filters or search</div></div>';
 }
 async function bookSaloon(id) {
   if (!currentUser) { toast('Please log in to book a salon.', 'error'); showPage('pgLogin'); return; }
@@ -1397,6 +1410,29 @@ async function adminDeclineSalon(id) {
     window.addEventListener('scroll', syncNav, {passive: true});
     syncNav();
   }
+
+  // Home filter bar — dropdown panel toggle
+  window.hfbToggle = function(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    const wasOpen = panel.classList.contains('open');
+    document.querySelectorAll('.hfb-panel').forEach(p => {
+      p.classList.remove('open');
+      p.previousElementSibling?.classList.remove('active');
+    });
+    if (!wasOpen) {
+      panel.classList.add('open');
+      panel.previousElementSibling?.classList.add('active');
+    }
+  };
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.hfb-drop-wrap')) {
+      document.querySelectorAll('.hfb-panel').forEach(p => {
+        p.classList.remove('open');
+        p.previousElementSibling?.classList.remove('active');
+      });
+    }
+  });
 
   // Hamburger mobile menu toggle
   window.toggleMobileMenu = function() {
