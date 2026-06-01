@@ -1379,6 +1379,41 @@ async function adminDeclineSalon(id) {
   refreshAdminDash();
 }
 
+// ════ LANDING PAGE INTERACTIVITY ════
+{
+  // Navbar blur on scroll
+  const landNav = document.getElementById('landNav');
+  if (landNav) {
+    const syncNav = () => landNav.classList.toggle('scrolled', window.scrollY > 50);
+    window.addEventListener('scroll', syncNav, {passive: true});
+    syncNav();
+  }
+
+  // Animated stats counter (runs once when section scrolls into view)
+  const animateStat = (el) => {
+    const target = parseInt(el.dataset.target, 10);
+    const suffix = el.dataset.suffix || '+';
+    let step = 0;
+    const steps = 72;
+    const tick = () => {
+      step++;
+      const eased = 1 - Math.pow(1 - step / steps, 3);
+      el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+      if (step < steps) requestAnimationFrame(tick);
+      else el.textContent = target.toLocaleString() + suffix;
+    };
+    requestAnimationFrame(tick);
+  };
+  const statObserver = new IntersectionObserver(entries => {
+    entries.forEach(({target: el, isIntersecting}) => {
+      if (!isIntersecting) return;
+      animateStat(el);
+      statObserver.unobserve(el);
+    });
+  }, {threshold: 0.5});
+  document.querySelectorAll('.land-stat-n[data-target]').forEach(el => statObserver.observe(el));
+}
+
 // ════ INIT ════
 // ════ SESSION INIT ════
 // app_state.js is loaded dynamically so DOMContentLoaded has already fired.

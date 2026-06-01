@@ -779,3 +779,104 @@ input[type=range]{width:100%;accent-color:var(--p)}
   background-size:200% 200% !important;
   animation:gradShift 4s ease infinite !important;
 }
+
+/* ══════════════════════════════════════════
+   LANDING PAGE V2 — UI ENHANCEMENTS
+══════════════════════════════════════════ */
+
+/* Navbar scroll blur */
+.land-nav{transition:background .3s ease,box-shadow .3s ease}
+.land-nav.scrolled{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 4px 28px rgba(0,0,0,.09)!important}
+
+/* Hero badge */
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--p10);border:1.5px solid var(--p20);color:var(--p);padding:8px 18px;border-radius:30px;font-size:13px;font-weight:600;margin-bottom:22px;white-space:nowrap}
+
+/* Social proof row */
+.hero-proof{display:flex;align-items:center;gap:14px;margin-top:24px;flex-wrap:wrap}
+.hero-proof-avs{display:flex}
+.hero-av{width:32px;height:32px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;margin-left:-8px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.hero-av:first-child{margin-left:0}
+.hero-stars{color:#F59E0B;font-size:14px;letter-spacing:2px;margin-bottom:3px}
+
+/* Hero image outer wrapper — allows floats to sit outside the image box */
+.hero-img-outer{position:relative;padding:20px 28px;display:inline-flex;justify-content:center}
+.hero-img-wrap{width:420px;height:400px;background:linear-gradient(135deg,var(--p10),var(--p20));border-radius:24px;overflow:hidden;box-shadow:var(--shadow);flex-shrink:0}
+@media(max-width:900px){.hero-img-wrap{width:300px;height:260px}}
+
+/* Floating info badges */
+.hero-float{position:absolute;background:#fff;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.13);z-index:10;min-width:172px;white-space:nowrap}
+.hero-float-1{top:4px;right:0;animation:float1 3s ease-in-out infinite}
+.hero-float-2{bottom:16px;left:0;animation:float1 3s ease-in-out .6s infinite}
+.hf-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+/* Stats bar */
+.land-stats{display:flex;align-items:center;justify-content:center;background:#fff;border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);padding:28px 40px;flex-wrap:wrap;gap:0}
+.land-stat{flex:1;min-width:110px;text-align:center;padding:8px 20px}
+.land-stat-n{font-family:'Poppins',sans-serif;font-size:36px;font-weight:900;color:var(--p);line-height:1.1}
+.land-stat-l{font-size:13px;color:var(--text3);margin-top:5px;font-weight:500}
+.land-stat-sep{width:1.5px;height:48px;background:var(--border);flex-shrink:0;align-self:center}
+@media(max-width:640px){.land-stat-sep{display:none}.land-stats{gap:12px;padding:20px}.land-stat-n{font-size:28px}.land-stat{min-width:80px;padding:8px 10px}}
+
+/* How It Works v2 — 4 steps with explicit arrow elements */
+.hiw-steps-v2{display:flex;align-items:flex-start;gap:0;max-width:960px;margin:0 auto}
+.hiw-steps-v2 .hiw-step{flex:1;padding:0 10px}
+.hiw-steps-v2 .hiw-step:not(:last-child)::after{display:none}
+.hiw-ico-wrap{width:52px;height:52px;background:var(--p10);border:2px solid var(--p20);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--p);margin:0 auto 14px;transition:all .22s var(--ease)}
+.hiw-step:hover .hiw-ico-wrap{background:var(--p);color:#fff;border-color:var(--p);transform:scale(1.1)}
+.hiw-arrow{font-size:20px;color:var(--p);padding-top:46px;opacity:.35;flex-shrink:0;font-weight:800}
+@media(max-width:680px){.hiw-steps-v2{flex-direction:column;align-items:center;gap:20px}.hiw-arrow{padding:0;transform:rotate(90deg)}}
+
+/* Feature cards v2 — icon color fills on hover */
+.why-card-v2{transition:transform .22s var(--ease),box-shadow .22s var(--ease),border-color .22s var(--ease)}
+.why-card-v2:hover{transform:translateY(-5px);border-color:var(--p);box-shadow:var(--shadow)}
+.why-ico-v2{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;transition:all .22s var(--ease)}
+.why-ico-purple{background:var(--p10);color:var(--p)}
+.why-card-v2:hover .why-ico-purple{background:var(--p);color:#fff}
+.why-ico-blue{background:var(--blue10);color:var(--blue)}
+.why-card-v2:hover .why-ico-blue{background:var(--blue);color:#fff}
+.why-ico-green{background:var(--g210);color:var(--g2)}
+.why-card-v2:hover .why-ico-green{background:var(--g2);color:#fff}
+.why-ico-orange{background:rgba(249,115,22,.1);color:#F97316}
+.why-card-v2:hover .why-ico-orange{background:#F97316;color:#fff}
+
+/* Barber Profiles Section */
+.barbers-sec{background:var(--bg);padding:60px 40px}
+@media(max-width:768px){.barbers-sec{padding:40px 20px}}
+.barbers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;max-width:1000px;margin:0 auto}
+.barber-prof-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:28px 24px;text-align:center;box-shadow:var(--shadow2);transition:all var(--dur);cursor:pointer}
+.barber-prof-card:hover{transform:translateY(-5px);border-color:var(--p);box-shadow:var(--shadow)}
+.bpc-av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;margin:0 auto 14px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.bpc-name{font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.bpc-role{font-size:13px;color:var(--text3);margin-bottom:10px}
+.bpc-rating{font-size:14px;color:#F59E0B;font-weight:700;margin-bottom:14px}
+.bpc-rating span{color:var(--text4);font-size:12px;font-weight:400}
+.bpc-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.bpc-tags span{background:var(--p10);color:var(--p);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
+
+/* Testimonials — 3-column grid */
+.test-sec{padding:60px 40px;max-width:1200px;margin:0 auto;text-align:center}
+@media(max-width:768px){.test-sec{padding:40px 20px}}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;text-align:left}
+.test-item{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);padding:28px;box-shadow:var(--shadow2);transition:all var(--dur);display:flex;flex-direction:column;gap:14px}
+.test-item:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.test-item .test-stars{color:#F59E0B;font-size:16px;letter-spacing:2px;margin:0}
+.test-item .test-quote{font-size:15px;color:var(--text2);line-height:1.75;font-style:italic;flex:1;margin:0}
+.test-item .test-auth{display:flex;align-items:center;gap:12px;margin:0}
+.test-dark{background:linear-gradient(135deg,#0a0820,#150d3a)!important;border-color:rgba(108,59,238,.35)!important}
+.test-dark .test-quote{color:rgba(255,255,255,.88)!important}
+
+/* CTA Section */
+.land-cta-sec{background:linear-gradient(135deg,#0a0820 0%,#150d3a 40%,#1e1060 70%,#0d1b3e 100%);padding:80px 40px;text-align:center;color:#fff}
+@media(max-width:768px){.land-cta-sec{padding:56px 20px}}
+.land-cta-sec h2{font-family:'Poppins',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;color:#fff;margin-bottom:14px;line-height:1.15}
+.land-cta-sec p{font-size:17px;color:rgba(255,255,255,.72);max-width:500px;margin:0 auto;line-height:1.6}
+.land-cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.land-cta-btn-primary{background:#fff;color:var(--p);font-size:15px;padding:14px 28px;box-shadow:0 4px 24px rgba(255,255,255,.2)}
+.land-cta-btn-primary:hover{background:var(--bg3);transform:translateY(-2px)}
+.land-cta-btn-outline{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-size:15px;padding:14px 28px}
+.land-cta-btn-outline:hover{background:rgba(255,255,255,.15);transform:translateY(-2px)}
+
+/* Footer social icons */
+.footer-socials{display:flex;gap:10px;margin-top:16px}
+.footer-social-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:15px;color:rgba(255,255,255,.5);transition:all var(--dur);cursor:pointer}
+.footer-social-btn:hover{background:var(--p);border-color:var(--p);color:#fff;transform:translateY(-2px)}
