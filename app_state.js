@@ -240,6 +240,20 @@ async function _setupNewOwnerSalon(ownerId, salonName) {
   ]);
   await _supabase.from('seats').insert([1,2,3,4,5,6].map(n=>({ saloon_id:salon.id, seat_number:n, status:'available' })));
 }
+async function doGoogleLogin() {
+  const btn = document.getElementById('googleLoginBtn');
+  if (btn) { btn.classList.add('btn-loading'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Connecting to Google...'; }
+  const { error } = await _supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+  if (error) {
+    toast('Google sign-in failed: ' + error.message, 'error');
+    if (btn) { btn.classList.remove('btn-loading'); btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" style="vertical-align:middle;margin-right:8px" alt="G"> Continue with Google'; }
+  }
+  // On success the page redirects — onAuthStateChange fires on return
+}
+
 async function loadUserAndRoute(authUser) {
   if (_routing) return;
   _routing = true;
@@ -247,6 +261,20 @@ async function loadUserAndRoute(authUser) {
   if (!profile) {
     await new Promise(r => setTimeout(r, 1500));
     ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single());
+  }
+  // Auto-create profile for first-time Google/OAuth sign-in users
+  if (!profile && authUser.app_metadata?.provider && authUser.app_metadata.provider !== 'email') {
+    const meta = authUser.user_metadata || {};
+    const fullName = (meta.full_name || meta.name || '').trim();
+    const parts = fullName.split(' ');
+    const firstName = parts[0] || authUser.email?.split('@')[0] || 'User';
+    const lastName  = parts.slice(1).join(' ') || '';
+    const { data: created } = await _supabase.from('profiles').upsert({
+      id: authUser.id, role: 'customer',
+      first_name: firstName, last_name: lastName,
+      phone: '', city: ''
+    }).select().single();
+    profile = created;
   }
   if (!profile) { _routing=false; toast('Profile not found — please sign up','error'); showPage('pgLogin'); return; }
   if (profile.is_suspended) { _routing=false; await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return; }

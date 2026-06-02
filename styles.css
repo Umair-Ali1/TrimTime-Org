@@ -309,6 +309,17 @@ select.input{cursor:pointer}
 .invite-note{display:none;background:var(--blue10);border:1.5px solid var(--blue20);border-radius:var(--r);padding:12px;font-size:13px;color:var(--blue);gap:8px;align-items:flex-start;margin-bottom:12px}
 .invite-note.show{display:flex}
 
+/* Google Sign-In button */
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px;border:1.5px solid var(--border2);border-radius:var(--r);background:#fff;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all var(--dur);margin-bottom:4px;font-family:'Inter',sans-serif}
+.btn-google:hover{border-color:#4285F4;background:#F8FBFF;box-shadow:0 2px 12px rgba(66,133,244,.15);transform:translateY(-1px)}
+.btn-google:active{transform:none;box-shadow:none}
+.btn-google img{flex-shrink:0}
+.btn-google.btn-loading{opacity:.7;pointer-events:none}
+/* Divider between Google and email form */
+.auth-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text4);font-size:12px;font-weight:500}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-divider span{white-space:nowrap;text-transform:uppercase;letter-spacing:.6px}
+
 /* ═══ HOME / DISCOVER ═══ */
 .home-nav{background:#fff;border-bottom:1.5px solid var(--border);padding:0 24px;display:flex;align-items:center;height:64px;position:sticky;top:0;z-index:50;gap:16px;box-shadow:var(--shadow2)}
 .hn-logo{display:flex;align-items:center;gap:10px;cursor:pointer}

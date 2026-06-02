@@ -39,6 +39,14 @@
         <div id="loginSection">
           <h2 class="form-head">Welcome Back!</h2>
           <p class="form-sub">Login to continue to your account</p>
+
+          <!-- Google Sign-In -->
+          <button class="btn-google" id="googleLoginBtn" onclick="doGoogleLogin()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" alt="Google">
+            Continue with Google
+          </button>
+          <div class="auth-divider"><span>or continue with email</span></div>
+
           <div class="error-msg" id="loginError"></div>
           <div class="field">
             <label class="label">Email</label>
@@ -57,6 +65,14 @@
         <div id="registerSection" style="display:none">
           <h2 class="form-head">Create Your Account</h2>
           <p class="form-sub">Join TrimTime and book your favorite services</p>
+
+          <!-- Google Sign-Up (customer only) -->
+          <button class="btn-google" onclick="doGoogleLogin()">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20" alt="Google">
+            Sign up with Google
+          </button>
+          <div class="auth-divider"><span>or sign up with email</span></div>
+
           <div class="error-msg" id="regError"></div>
           <div class="success-msg" id="regSuccess"></div>
           <div class="label" style="margin-bottom:8px">I am a:</div>
