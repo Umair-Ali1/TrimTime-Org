@@ -30,15 +30,18 @@
       <div class="content">
         <!-- OVERVIEW -->
         <div id="adOverview" class="sub-page active">
-          <div class="fade-up" style="margin-bottom:24px">
-            <h2 style="font-size:24px">Platform Overview</h2>
-            <p style="color:var(--text3);margin-top:4px">Real-time stats from all across TrimTime</p>
+          <div class="fade-up" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div>
+              <h2 style="font-size:24px">Platform Overview</h2>
+              <p style="color:var(--text3);margin-top:4px">Real-time stats from all across TrimTime</p>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="refreshAdminDash()"><i class="fas fa-rotate-right"></i>&nbsp; Refresh Data</button>
           </div>
           <div class="g4 fade-up" style="margin-bottom:24px">
-            <div class="stat-card"><div class="stat-row"><div class="stat-ico p"><i class="fas fa-store"></i></div></div><div class="stat-num" id="adStatSaloons">—</div><div class="stat-label">Total Saloons</div></div>
-            <div class="stat-card"><div class="stat-row"><div class="stat-ico b"><i class="fas fa-users"></i></div></div><div class="stat-num" id="adStatUsers">—</div><div class="stat-label">Registered Users</div></div>
-            <div class="stat-card"><div class="stat-row"><div class="stat-ico g"><i class="fas fa-clipboard-list"></i></div></div><div class="stat-num" id="adStatBookings">—</div><div class="stat-label">Total Bookings</div></div>
-            <div class="stat-card"><div class="stat-row"><div class="stat-ico r"><i class="fas fa-coins"></i></div></div><div class="stat-num" id="adStatRevenue">—</div><div class="stat-label">Total Revenue</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico p"><i class="fas fa-store"></i></div></div><div class="stat-num" id="adStatSaloons">0</div><div class="stat-label">Total Saloons</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico b"><i class="fas fa-users"></i></div></div><div class="stat-num" id="adStatUsers">0</div><div class="stat-label">Registered Users</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico g"><i class="fas fa-clipboard-list"></i></div></div><div class="stat-num" id="adStatBookings">0</div><div class="stat-label">Total Bookings</div></div>
+            <div class="stat-card"><div class="stat-row"><div class="stat-ico r"><i class="fas fa-coins"></i></div></div><div class="stat-num" id="adStatRevenue">Rs. 0</div><div class="stat-label">Total Revenue</div></div>
           </div>
           <div class="card fade-up">
             <div style="font-family:'Poppins',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px">Recent Bookings</div>

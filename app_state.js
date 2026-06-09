@@ -132,12 +132,18 @@ async function doLogin() {
   btn.classList.add('btn-loading');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Logging in...';
   try {
-    // Admin shortcut — credentials are hardcoded, no Supabase Auth account needed
+    // Admin shortcut — allow access even if admin has no Supabase Auth account
     if (email.toLowerCase() === _ADMIN_EMAIL && pass.trim() === _ADMIN_PASS) {
       currentUser = { id: 'admin', email: _ADMIN_EMAIL, role: 'admin', firstName: 'Admin', lastName: 'TrimTime', phone: '', city: '' };
       _clearAuthForms();
       resetBtn();
-      showPage('pgAdmin'); // showPage triggers refreshAdminDash() automatically
+      showPage('pgAdmin');
+      // Sign into Supabase in background so DB queries use authenticated role (full SELECT/INSERT)
+      // onAuthStateChange is safe: !currentUser is false so loadUserAndRoute won't fire
+      _handlingAuthDirectly = true;
+      _supabase.auth.signInWithPassword({ email: _ADMIN_EMAIL, password: _ADMIN_PASS })
+        .then(({ error }) => { _handlingAuthDirectly = false; if (!error) refreshAdminDash(); })
+        .catch(() => { _handlingAuthDirectly = false; });
       return;
     }
     _handlingAuthDirectly = true;
@@ -1418,6 +1424,7 @@ function showAdminSub(id, el) {
 }
 async function refreshAdminDash() {
   const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  _set('adStatSaloons', '…'); _set('adStatUsers', '…'); _set('adStatBookings', '…'); _set('adStatRevenue', '…');
   try {
     // allSettled never throws — safe even if individual queries fail
     const [r0, r1, r2] = await Promise.allSettled([
