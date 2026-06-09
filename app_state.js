@@ -137,8 +137,7 @@ async function doLogin() {
       currentUser = { id: 'admin', email: _ADMIN_EMAIL, role: 'admin', firstName: 'Admin', lastName: 'TrimTime', phone: '', city: '' };
       _clearAuthForms();
       resetBtn();
-      showPage('pgAdmin');
-      refreshAdminDash();
+      showPage('pgAdmin'); // showPage triggers refreshAdminDash() automatically
       return;
     }
     _handlingAuthDirectly = true;
@@ -1410,7 +1409,12 @@ function showAdminSub(id, el) {
   if (sub) sub.classList.add('active');
   document.querySelectorAll('#adminSidebar .nav-link').forEach(l => l.classList.remove('active'));
   if (el) el.classList.add('active');
-  if (id === 'adApprovals') renderAdminApprovals();
+  // Refresh data every time a tab is opened so stale Loading... never persists
+  if      (id === 'adOverview')  refreshAdminDash();
+  else if (id === 'adSaloons')   renderAdminSaloons();
+  else if (id === 'adUsers')     renderAdminUsers();
+  else if (id === 'adBookings')  renderAdminBookings();
+  else if (id === 'adApprovals') renderAdminApprovals();
 }
 async function refreshAdminDash() {
   const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -1441,8 +1445,8 @@ async function refreshAdminDash() {
     console.error('refreshAdminDash error:', e);
     _set('adStatSaloons', 0); _set('adStatUsers', 0);
     _set('adStatBookings', 0); _set('adStatRevenue', 'Rs. 0');
-    const el = document.getElementById('adRecentBody');
-    if (el) el.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No data available</td></tr>';
+    const noData = (id, cols) => { const el=document.getElementById(id); if(el) el.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;padding:20px;color:var(--text3)">No data — check Supabase permissions</td></tr>`; };
+    noData('adRecentBody', 5); noData('adSaloonTable', 6); noData('adUserTable', 7); noData('adBookingTable', 6);
   }
 }
 async function renderAdminRecent() {
