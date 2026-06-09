@@ -10,12 +10,12 @@
         <div class="sidebar-user-info"><div class="name" id="empName">Usman Sheikh</div><div class="role">Senior Barber</div></div>
       </div>
       <div class="nav-section">My Work</div>
-      <a class="nav-link active" onclick="showEmpSub('eOverview')"><span class="icon"><i class="fas fa-gauge-high"></i></span>Overview</a>
-      <a class="nav-link" onclick="showEmpSub('eSubSchedule')"><span class="icon"><i class="fas fa-calendar-days"></i></span>My Schedule</a>
-      <a class="nav-link" onclick="showEmpSub('eSubOrders')"><span class="icon"><i class="fas fa-clipboard-list"></i></span>Assigned Orders<span class="nav-badge" id="empOrdersBadge">0</span></a>
-      <a class="nav-link" onclick="showEmpSub('eSubEarnings')"><span class="icon"><i class="fas fa-coins"></i></span>My Earnings</a>
-      <a class="nav-link" onclick="showEmpSub('eSubReviews')"><span class="icon"><i class="fas fa-star"></i></span>Reviews</a>
-      <a class="nav-link" onclick="showEmpSub('eSubProfile')"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile</a>
+      <a class="nav-link active" onclick="showEmpSub('eOverview',this)"><span class="icon"><i class="fas fa-gauge-high"></i></span>Overview</a>
+      <a class="nav-link" onclick="showEmpSub('eSubSchedule',this)"><span class="icon"><i class="fas fa-calendar-days"></i></span>My Schedule</a>
+      <a class="nav-link" onclick="showEmpSub('eSubOrders',this)"><span class="icon"><i class="fas fa-clipboard-list"></i></span>Assigned Orders<span class="nav-badge" id="empOrdersBadge">0</span></a>
+      <a class="nav-link" onclick="showEmpSub('eSubEarnings',this)"><span class="icon"><i class="fas fa-coins"></i></span>My Earnings</a>
+      <a class="nav-link" onclick="showEmpSub('eSubReviews',this)"><span class="icon"><i class="fas fa-star"></i></span>Reviews</a>
+      <a class="nav-link" onclick="showEmpSub('eSubProfile',this)"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile</a>
       <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
     </aside>
     <div class="overlay" onclick="closeSidebar('empSidebar')"></div>

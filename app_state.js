@@ -43,6 +43,7 @@ const STORE = {
 let currentUser = null;
 let currentSaloon = null;        // active saloon for owner/employee
 let _routing = false;            // prevents duplicate loadUserAndRoute calls
+let _handlingAuthDirectly = false; // set by doLogin/doRegister so onAuthStateChange doesn't race them
 let _approvalChannel  = null;    // Supabase Realtime channel for approval watching
 let _approvalPollInterval = null; // polling fallback
 let currentBookingSaloon = null; // saloon selected for the booking flow
@@ -71,8 +72,10 @@ const _PAGE_TITLES = {
 
 // ════ PAGES ════
 function showPage(id, _pushHistory = true) {
+  const pageEl = document.getElementById(id);
+  if (!pageEl) { console.error('showPage: page not found:', id); return; }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  pageEl.classList.add('active');
   window.scrollTo(0, 0);
   document.title = _PAGE_TITLES[id] || 'TrimTime';
   if (_pushHistory) window.history.pushState({ _ttPage: id }, '');
@@ -137,10 +140,12 @@ async function doLogin() {
       refreshAdminDash();
       return;
     }
+    _handlingAuthDirectly = true;
     const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
-    if (error) return showErr(error.message);
+    if (error) { _handlingAuthDirectly = false; return showErr(error.message); }
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Loading your account...';
     const loginSuccess = await loadUserAndRoute(data.user);
+    _handlingAuthDirectly = false;
     if (!loginSuccess) {
       showErr('Login succeeded, but your account could not be loaded. Please refresh or contact support.');
       return;
@@ -154,6 +159,7 @@ async function doLogin() {
     _clearAuthForms();
     resetBtn();
   } catch (e) {
+    _handlingAuthDirectly = false;
     showErr('Unexpected error: ' + e.message);
   }
 }
@@ -183,8 +189,9 @@ async function doRegister() {
       if (!inviteCode) return showErr('Please enter the invite code you received from your salon owner.');
     }
 
+    _handlingAuthDirectly = true;
     const { data, error } = await _supabase.auth.signUp({ email, password: pass });
-    if (error) return showErr(error.message);
+    if (error) { _handlingAuthDirectly = false; return showErr(error.message); }
     if (!data.user || data.user.identities?.length === 0) return showErr('This email is already registered. Please log in instead.');
 
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Setting up profile...';
@@ -251,6 +258,7 @@ async function doRegister() {
     if (data.session) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
       const signupSuccess = await loadUserAndRoute(data.user);
+      _handlingAuthDirectly = false;
       if (!signupSuccess) {
         showErr('Signup succeeded, but your account could not be completed. Please refresh or contact support.');
         return;
@@ -264,12 +272,14 @@ async function doRegister() {
       _clearAuthForms();
       resetBtn();
     } else {
+      _handlingAuthDirectly = false;
       resetBtn();
       sucEl.textContent = 'Account created! Check your email to confirm, then log in.';
       sucEl.classList.add('show');
       setTimeout(() => { document.querySelectorAll('.ftab')[0].click(); document.getElementById('loginEmail').value = email; }, 2000);
     }
   } catch (e) {
+    _handlingAuthDirectly = false;
     showErr('Unexpected error: ' + e.message);
   }
 }
@@ -300,43 +310,58 @@ async function doGoogleLogin() {
 }
 
 async function loadUserAndRoute(authUser) {
-  if (_routing) return;
+  if (_routing) return false;
   _routing = true;
-  let { data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
-  if (!profile) {
-    await new Promise(r => setTimeout(r, 1500));
-    ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single());
+  try {
+    let { data: profile, error: profileErr } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
+    if (!profile) {
+      await new Promise(r => setTimeout(r, 1500));
+      ({ data: profile, error: profileErr } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single());
+    }
+    // Auto-create profile for any authenticated user who doesn't have one yet
+    if (!profile) {
+      const meta = authUser.user_metadata || {};
+      const fullName = (meta.full_name || meta.name || '').trim();
+      const nameParts = fullName ? fullName.split(' ') : [];
+      const firstName = nameParts[0] || authUser.email?.split('@')[0] || 'User';
+      const lastName  = nameParts.slice(1).join(' ') || '';
+      const { data: created, error: createErr } = await _supabase.from('profiles').upsert({
+        id: authUser.id, role: 'customer',
+        first_name: firstName, last_name: lastName,
+        phone: '', city: ''
+      }).select().single();
+      if (createErr) console.error('Profile auto-create error:', createErr);
+      profile = created;
+    }
+    if (!profile) {
+      const reason = profileErr?.message || 'Profile not found and could not be created';
+      console.error('loadUserAndRoute failed:', reason, 'user:', authUser.id, authUser.email);
+      toast('Login error: ' + reason, 'error');
+      showPage('pgLogin');
+      return false;
+    }
+    if (profile.is_suspended) { console.warn('loadUserAndRoute failed: suspended account', authUser.id, authUser.email); await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return false; }
+    currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
+    if (profile.role === 'owner') {
+      const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
+      currentSaloon = salon;
+    } else if (profile.role === 'employee') {
+      const { data: emp } = await _supabase.from('employees').select('*, saloons(*)').eq('user_id', authUser.id).single();
+      currentSaloon = emp?.saloons || null;
+    }
+    if (profile.role === 'admin') showPage('pgAdmin');
+    else if (profile.role === 'owner') showPage('pgOwnerDash');
+    else if (profile.role === 'employee') showPage('pgEmpDash');
+    else showPage('pgHome');
+    return true;
+  } catch (e) {
+    console.error('loadUserAndRoute error:', e);
+    toast('An error occurred loading your account. Please try again.', 'error');
+    showPage('pgLogin');
+    return false;
+  } finally {
+    _routing = false;
   }
-  // Auto-create profile for first-time Google/OAuth sign-in users
-  if (!profile && authUser.app_metadata?.provider && authUser.app_metadata.provider !== 'email') {
-    const meta = authUser.user_metadata || {};
-    const fullName = (meta.full_name || meta.name || '').trim();
-    const parts = fullName.split(' ');
-    const firstName = parts[0] || authUser.email?.split('@')[0] || 'User';
-    const lastName  = parts.slice(1).join(' ') || '';
-    const { data: created } = await _supabase.from('profiles').upsert({
-      id: authUser.id, role: 'customer',
-      first_name: firstName, last_name: lastName,
-      phone: '', city: ''
-    }).select().single();
-    profile = created;
-  }
-  if (!profile) { console.error('loadUserAndRoute failed: profile not found for user', authUser.id, authUser.email); _routing=false; toast('Profile not found — please sign up','error'); showPage('pgLogin'); return false; }
-  if (profile.is_suspended) { console.warn('loadUserAndRoute failed: suspended account', authUser.id, authUser.email); _routing=false; await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return false; }
-  currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
-  if (profile.role === 'owner') {
-    const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
-    currentSaloon = salon;
-  } else if (profile.role === 'employee') {
-    const { data: emp } = await _supabase.from('employees').select('*, saloons(*)').eq('user_id', authUser.id).single();
-    currentSaloon = emp?.saloons || null;
-  }
-  _routing = false;
-  if (profile.role === 'admin') showPage('pgAdmin');
-  else if (profile.role === 'owner') showPage('pgOwnerDash');
-  else if (profile.role === 'employee') showPage('pgEmpDash');
-  else showPage('pgHome');
-  return true;
 }
 function openDeleteAccountModal() {
   const role = currentUser?.role;
@@ -787,10 +812,15 @@ async function saveProfile() {
   currentUser.phone=phone; currentUser.city=city;
   toast('Profile updated!','success'); refreshUserDash();
 }
-function showUserSub(id) {
+function showUserSub(id, el) {
   document.querySelectorAll('#pgUserDash .sub-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.getElementById(id)?.classList.add('active');
   document.querySelectorAll('#userSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const match = [...document.querySelectorAll('#userSidebar .nav-link')].find(l=>l.getAttribute('onclick')?.includes(`'${id}'`));
+    if (match) match.classList.add('active');
+  }
 }
 
 // ════ OWNER DASHBOARD ════
@@ -830,7 +860,7 @@ async function refreshOwnerDash() {
   renderOwnerOrders(); renderOwnerEarnings(bks); renderPopularServices(bks);
   renderServicesList(services); renderOwnerSeatGrid(seats); renderEmployeeList(emps);
   shopIsOpen=currentSaloon.is_open??true; updateShopToggle();
-  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invoke_code||currentSaloon.invite_code||'TT-XXXX-0000';
+  const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon.invite_code||'TT-XXXX-0000';
   const approvalStatus = currentSaloon.approval_status;
   if (approvalStatus && approvalStatus !== 'approved') {
     _watchApprovalStatus();
@@ -973,10 +1003,10 @@ function updateShopToggle() {
   const btn=document.getElementById('shopToggle'),dot=document.getElementById('shopDot'),txt=document.getElementById('shopTxt');
   if(!btn) return;
   btn.classList.toggle('on',shopIsOpen); btn.classList.toggle('off-red',!shopIsOpen);
-  dot.classList.toggle('on',shopIsOpen); dot.classList.toggle('off',!shopIsOpen);
-  txt.textContent=shopIsOpen?'Shop Open':'Shop Closed';
+  if(dot) { dot.classList.toggle('on',shopIsOpen); dot.classList.toggle('off',!shopIsOpen); }
+  if(txt) txt.textContent=shopIsOpen?'Shop Open':'Shop Closed';
 }
-function showOwnerSub(id) {
+function showOwnerSub(id, el) {
   const status = currentSaloon?.approval_status;
   const isApproved = !status || status === 'approved';
   if (!isApproved && id !== 'oSettings') {
@@ -989,6 +1019,11 @@ function showOwnerSub(id) {
   document.querySelectorAll('#pgOwnerDash .sub-page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id)?.classList.add('active');
   document.querySelectorAll('#ownerSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const match = [...document.querySelectorAll('#ownerSidebar .nav-link')].find(l=>l.getAttribute('onclick')?.includes(`'${id}'`));
+    if (match) match.classList.add('active');
+  }
   const ic=document.getElementById('inviteCode'); if(ic) ic.textContent=currentSaloon?.invite_code||'TT-XXXX-0000';
   if (id === 'oSettings' && currentSaloon) {
     const set = (eid, val) => { const el = document.getElementById(eid); if (el) el.value = val || ''; };
@@ -1195,13 +1230,18 @@ function updateAvailToggle() {
   const btn=document.getElementById('availToggle'),dot=document.getElementById('availDot'),txt=document.getElementById('availTxt');
   if(!btn) return;
   btn.classList.toggle('on',empIsAvail); btn.classList.toggle('off-red',!empIsAvail);
-  dot.classList.toggle('on',empIsAvail); dot.classList.toggle('off',!empIsAvail);
-  txt.textContent=empIsAvail?'Available':'Unavailable';
+  if(dot) { dot.classList.toggle('on',empIsAvail); dot.classList.toggle('off',!empIsAvail); }
+  if(txt) txt.textContent=empIsAvail?'Available':'Unavailable';
 }
-function showEmpSub(id) {
+function showEmpSub(id, el) {
   document.querySelectorAll('#pgEmpDash .sub-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.getElementById(id)?.classList.add('active');
   document.querySelectorAll('#empSidebar .nav-link').forEach(l=>l.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const match = [...document.querySelectorAll('#empSidebar .nav-link')].find(l=>l.getAttribute('onclick')?.includes(`'${id}'`));
+    if (match) match.classList.add('active');
+  }
 }
 function setRating(n) {
   empRatingVal=n;
@@ -1599,15 +1639,13 @@ window.history.replaceState({ _ttPage: 'pgLanding' }, '');
 })();
 
 _supabase.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session && !currentUser) {
+  // Skip routing when doLogin/doRegister is already handling it directly (avoids race condition)
+  if (event === 'SIGNED_IN' && session && !currentUser && !_handlingAuthDirectly) {
     await loadUserAndRoute(session.user);
   }
   if (event === 'SIGNED_OUT') {
     currentUser = null; currentSaloon = null;
     _clearApprovalWatcher();
     showPage('pgLanding');
-  }
-  if (event === 'TOKEN_REFRESHED' && session && currentUser) {
-    // session silently refreshed — nothing needed, Supabase handles it
   }
 });

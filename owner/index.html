@@ -10,15 +10,15 @@
         <div class="sidebar-user-info"><div class="name" id="ownerName">Muhammad Khan</div><div class="role">Salon Owner</div></div>
       </div>
       <div class="nav-section">Management</div>
-      <a class="nav-link active" onclick="showOwnerSub('oDash')"><span class="icon"><i class="fas fa-chart-line"></i></span>Dashboard</a>
-      <a class="nav-link" onclick="showOwnerSub('oBookings')"><span class="icon"><i class="fas fa-clipboard-list"></i></span>Bookings<span class="nav-badge" id="ownerOrdersBadge">0</span></a>
-      <a class="nav-link" onclick="showOwnerSub('oServices')"><span class="icon"><i class="fas fa-scissors"></i></span>Services</a>
-      <a class="nav-link" onclick="showOwnerSub('oEmployees')"><span class="icon"><i class="fas fa-users"></i></span>Employees</a>
-      <a class="nav-link" onclick="showOwnerSub('oSeats')"><span class="icon"><i class="fas fa-chair"></i></span>Seat Management</a>
+      <a class="nav-link active" onclick="showOwnerSub('oDash',this)"><span class="icon"><i class="fas fa-chart-line"></i></span>Dashboard</a>
+      <a class="nav-link" onclick="showOwnerSub('oBookings',this)"><span class="icon"><i class="fas fa-clipboard-list"></i></span>Bookings<span class="nav-badge" id="ownerOrdersBadge">0</span></a>
+      <a class="nav-link" onclick="showOwnerSub('oServices',this)"><span class="icon"><i class="fas fa-scissors"></i></span>Services</a>
+      <a class="nav-link" onclick="showOwnerSub('oEmployees',this)"><span class="icon"><i class="fas fa-users"></i></span>Employees</a>
+      <a class="nav-link" onclick="showOwnerSub('oSeats',this)"><span class="icon"><i class="fas fa-chair"></i></span>Seat Management</a>
       <div class="nav-section">Finance</div>
-      <a class="nav-link" onclick="showOwnerSub('oEarnings')"><span class="icon"><i class="fas fa-coins"></i></span>Earnings</a>
+      <a class="nav-link" onclick="showOwnerSub('oEarnings',this)"><span class="icon"><i class="fas fa-coins"></i></span>Earnings</a>
       <div class="nav-section">Settings</div>
-      <a class="nav-link" onclick="showOwnerSub('oSettings')"><span class="icon"><i class="fas fa-gear"></i></span>Settings</a>
+      <a class="nav-link" onclick="showOwnerSub('oSettings',this)"><span class="icon"><i class="fas fa-gear"></i></span>Settings</a>
       <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
     </aside>
     <div class="overlay" onclick="closeSidebar('ownerSidebar')"></div>

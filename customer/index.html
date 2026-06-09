@@ -13,10 +13,10 @@
       <a class="nav-link" onclick="showPage('pgHome')"><span class="icon"><i class="fas fa-compass"></i></span>Discover Salons</a>
       <a class="nav-link" onclick="showPage('pgBooking')"><span class="icon"><i class="fas fa-calendar-plus"></i></span>Book Appointment</a>
       <div class="nav-section">My Account</div>
-      <a class="nav-link active" onclick="showUserSub('subOverview')"><span class="icon"><i class="fas fa-gauge-high"></i></span>My Dashboard</a>
-      <a class="nav-link" onclick="showUserSub('subBookings')"><span class="icon"><i class="fas fa-list"></i></span>My Bookings<span class="nav-badge" id="userBookingsBadge">0</span></a>
-      <a class="nav-link" onclick="showUserSub('subFavs')"><span class="icon"><i class="fas fa-heart"></i></span>Favourites</a>
-      <a class="nav-link" onclick="showUserSub('subProfile')"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile Settings</a>
+      <a class="nav-link active" onclick="showUserSub('subOverview',this)"><span class="icon"><i class="fas fa-gauge-high"></i></span>My Dashboard</a>
+      <a class="nav-link" onclick="showUserSub('subBookings',this)"><span class="icon"><i class="fas fa-list"></i></span>My Bookings<span class="nav-badge" id="userBookingsBadge">0</span></a>
+      <a class="nav-link" onclick="showUserSub('subFavs',this)"><span class="icon"><i class="fas fa-heart"></i></span>Favourites</a>
+      <a class="nav-link" onclick="showUserSub('subProfile',this)"><span class="icon"><i class="fas fa-circle-user"></i></span>Profile Settings</a>
       <div class="sidebar-foot"><a class="logout-link" onclick="doLogout()"><span><i class="fas fa-right-from-bracket"></i></span>Sign Out</a></div>
     </aside>
     <div class="overlay" onclick="closeSidebar('userSidebar')"></div>
