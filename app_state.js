@@ -1406,7 +1406,8 @@ function _watchApprovalStatus() {
 // ════ ADMIN DASHBOARD ════
 function showAdminSub(id, el) {
   document.querySelectorAll('#pgAdmin .sub-page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const sub = document.getElementById(id);
+  if (sub) sub.classList.add('active');
   document.querySelectorAll('#adminSidebar .nav-link').forEach(l => l.classList.remove('active'));
   if (el) el.classList.add('active');
   if (id === 'adApprovals') renderAdminApprovals();
@@ -1536,31 +1537,31 @@ async function adminToggleUserSuspend(id, isSuspended) {
   renderAdminUsers();
 }
 async function renderAdminApprovals() {
-  const { data } = await _supabase.from('saloons').select('*').eq('approval_status','pending').order('created_at',{ascending:true});
   const el = document.getElementById('approvalsList');
   if (!el) return;
-  const apBadge = document.getElementById('adApprovalsBadge');
-  if (apBadge) apBadge.textContent = data?.length || '';
-  if (!data?.length) {
-    el.innerHTML = '<div class="card" style="text-align:center;padding:48px"><i class="fas fa-check-circle" style="font-size:48px;color:var(--g2);display:block;margin-bottom:12px"></i><p style="color:var(--text3)">No pending approvals</p></div>';
-    return;
-  }
-  el.innerHTML = data.map(s=>`
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
-        ${s.image_url?`<img src="${s.image_url}" style="width:130px;height:96px;object-fit:cover;border-radius:10px;flex-shrink:0" onerror="this.style.display='none'">` : '<div style="width:130px;height:96px;border-radius:10px;background:var(--p10);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-scissors" style="font-size:32px;color:var(--p)"></i></div>'}
-        <div style="flex:1;min-width:180px">
-          <div style="font-family:\'Poppins\',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px">${s.name}</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-location-dot" style="width:14px"></i> ${s.area||'—'}, ${s.city||'—'}</div>
-          ${s.address?`<div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-map-pin" style="width:14px"></i> ${s.address}</div>`:''}
-          <div style="font-size:12px;color:var(--text3);margin-top:4px"><i class="fas fa-calendar" style="width:14px"></i> Applied: ${new Date(s.created_at).toLocaleDateString()}</div>
+  const empty = '<div class="card" style="text-align:center;padding:48px"><i class="fas fa-check-circle" style="font-size:48px;color:var(--g2);display:block;margin-bottom:12px"></i><p style="color:var(--text3)">No pending approvals</p></div>';
+  try {
+    const { data } = await _supabase.from('saloons').select('*').eq('approval_status','pending').order('created_at',{ascending:true});
+    const apBadge = document.getElementById('adApprovalsBadge');
+    if (apBadge) apBadge.textContent = data?.length || '';
+    if (!data?.length) { el.innerHTML = empty; return; }
+    el.innerHTML = data.map(s=>`
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
+          ${s.image_url?`<img src="${s.image_url}" style="width:130px;height:96px;object-fit:cover;border-radius:10px;flex-shrink:0" onerror="this.style.display='none'">` : '<div style="width:130px;height:96px;border-radius:10px;background:var(--p10);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas fa-scissors" style="font-size:32px;color:var(--p)"></i></div>'}
+          <div style="flex:1;min-width:180px">
+            <div style="font-family:\'Poppins\',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px">${s.name||'—'}</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-location-dot" style="width:14px"></i> ${s.area||'—'}, ${s.city||'—'}</div>
+            ${s.address?`<div style="font-size:13px;color:var(--text3);margin-bottom:3px"><i class="fas fa-map-pin" style="width:14px"></i> ${s.address}</div>`:''}
+            <div style="font-size:12px;color:var(--text3);margin-top:4px"><i class="fas fa-calendar" style="width:14px"></i> Applied: ${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-sm" style="background:var(--g2)" onclick="adminApproveSalon('${s.id}')"><i class="fas fa-check"></i> Approve</button>
+            <button class="btn btn-sm btn-danger" onclick="adminDeclineSalon('${s.id}')"><i class="fas fa-times"></i> Decline</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <button class="btn btn-sm" style="background:var(--g2)" onclick="adminApproveSalon('${s.id}')"><i class="fas fa-check"></i> Approve</button>
-          <button class="btn btn-sm btn-danger" onclick="adminDeclineSalon('${s.id}')"><i class="fas fa-times"></i> Decline</button>
-        </div>
-      </div>
-    </div>`).join('');
+      </div>`).join('');
+  } catch(e) { el.innerHTML = empty; }
 }
 async function adminApproveSalon(id) {
   await _supabase.from('saloons').update({ approval_status:'approved', decline_reason:null }).eq('id', id);
