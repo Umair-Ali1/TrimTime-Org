@@ -326,11 +326,11 @@ async function loadUserAndRoute(authUser) {
   if (_routing) return false;
   _routing = true;
   try {
-    // maybeSingle() returns null (no error) when row is missing — safe for missing profiles
-    let { data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+    // _qt: 9 s timeout so a paused Supabase project never hangs the login button forever
+    let { data: profile } = await _qt(_supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
     if (!profile) {
-      await new Promise(r => setTimeout(r, 1500));
-      ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
+      await new Promise(r => setTimeout(r, 1200));
+      ({ data: profile } = await _qt(_supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle()));
     }
     // Auto-create profile for any authenticated user who doesn't have one yet
     if (!profile) {
@@ -339,30 +339,30 @@ async function loadUserAndRoute(authUser) {
       const nameParts = fullName ? fullName.split(' ') : [];
       const firstName = nameParts[0] || authUser.email?.split('@')[0] || 'User';
       const lastName  = nameParts.slice(1).join(' ') || '';
-      // Upsert WITHOUT .select() chained — then refetch separately (more reliable)
-      const { error: upsertErr } = await _supabase.from('profiles').upsert({
+      const { error: upsertErr } = await _qt(_supabase.from('profiles').upsert({
         id: authUser.id, role: 'customer',
         first_name: firstName, last_name: lastName,
         phone: '', city: ''
-      });
+      }));
       if (upsertErr) {
         console.error('Profile upsert error:', upsertErr);
-        // Even if upsert errored, maybe the row already exists — try fetching it
-        ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
+        // Even if upsert errored, maybe the row exists — try one more fetch
+        ({ data: profile } = await _qt(_supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle()));
         if (!profile) {
-          _lastRouteError = 'DB error: ' + (upsertErr.message || 'permission denied on profiles table — run the GRANT SQL in Supabase.');
+          _lastRouteError = 'Cannot create your profile. Please go to app.supabase.com → SQL Editor and run the GRANT SQL (see console for details).';
+          console.error('SUPABASE PERMISSIONS ERROR — run this SQL in your Supabase project:\n\nGRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;\nGRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;\nALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;\n\nError:', upsertErr.message);
           toast(_lastRouteError, 'error');
           showPage('pgLogin');
           return false;
         }
       } else {
-        // Upsert succeeded — fetch the created row
-        ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
+        ({ data: profile } = await _qt(_supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle()));
       }
     }
     if (!profile) {
-      _lastRouteError = 'No profile found for this account. Run the backfill SQL in Supabase, or sign up via the website.';
-      console.error('loadUserAndRoute: profile still null. User:', authUser.id, authUser.email);
+      _lastRouteError = 'Profile not found. Please open your browser console (F12) and follow the SQL instructions shown there.';
+      console.error('loadUserAndRoute: profile still null for user:', authUser.id, authUser.email,
+        '\n\nFix: run this SQL in Supabase SQL Editor:\n\nGRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;\nGRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;\nALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;\n\nINSERT INTO public.profiles (id, role, first_name, last_name, phone, city)\nSELECT u.id, \'customer\', split_part(u.email,\'@\',1), \'\', \'\', \'\'\nFROM auth.users u WHERE NOT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = u.id)\nON CONFLICT (id) DO NOTHING;');
       toast(_lastRouteError, 'error');
       showPage('pgLogin');
       return false;
