@@ -147,7 +147,7 @@ async function doLogin() {
     const loginSuccess = await loadUserAndRoute(data.user);
     _handlingAuthDirectly = false;
     if (!loginSuccess) {
-      showErr('Login succeeded, but your account could not be loaded. Please refresh or contact support.');
+      showErr('Login succeeded but profile could not be loaded — check the toast message for details, or try signing up if you have no account yet.');
       return;
     }
     _sendEmail(email, currentUser?.firstName || 'there',
@@ -313,10 +313,11 @@ async function loadUserAndRoute(authUser) {
   if (_routing) return false;
   _routing = true;
   try {
-    let { data: profile, error: profileErr } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
+    // maybeSingle() returns null (no error) when row is missing — safe for missing profiles
+    let { data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
     if (!profile) {
       await new Promise(r => setTimeout(r, 1500));
-      ({ data: profile, error: profileErr } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single());
+      ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
     }
     // Auto-create profile for any authenticated user who doesn't have one yet
     if (!profile) {
@@ -325,18 +326,29 @@ async function loadUserAndRoute(authUser) {
       const nameParts = fullName ? fullName.split(' ') : [];
       const firstName = nameParts[0] || authUser.email?.split('@')[0] || 'User';
       const lastName  = nameParts.slice(1).join(' ') || '';
-      const { data: created, error: createErr } = await _supabase.from('profiles').upsert({
+      // Upsert WITHOUT .select() chained — then refetch separately (more reliable)
+      const { error: upsertErr } = await _supabase.from('profiles').upsert({
         id: authUser.id, role: 'customer',
         first_name: firstName, last_name: lastName,
         phone: '', city: ''
-      }).select().single();
-      if (createErr) console.error('Profile auto-create error:', createErr);
-      profile = created;
+      });
+      if (upsertErr) {
+        console.error('Profile upsert error:', upsertErr);
+        // Even if upsert errored, maybe the row already exists — try fetching it
+        ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
+        if (!profile) {
+          toast('Account setup failed: ' + (upsertErr.message || 'Could not create profile. Check Supabase permissions.'), 'error');
+          showPage('pgLogin');
+          return false;
+        }
+      } else {
+        // Upsert succeeded — fetch the created row
+        ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
+      }
     }
     if (!profile) {
-      const reason = profileErr?.message || 'Profile not found and could not be created';
-      console.error('loadUserAndRoute failed:', reason, 'user:', authUser.id, authUser.email);
-      toast('Login error: ' + reason, 'error');
+      console.error('loadUserAndRoute: profile still null after all attempts. User:', authUser.id, authUser.email);
+      toast('Profile not found. Please sign up first or contact support.', 'error');
       showPage('pgLogin');
       return false;
     }
