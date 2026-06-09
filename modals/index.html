@@ -45,8 +45,8 @@
     <div class="modal-head"><div class="modal-title">✂️ Add New Service</div><span class="modal-close" onclick="closeModal('addServiceModal')">✕</span></div>
     <div class="field"><label class="label">Service Name</label><input class="input" id="svcName" placeholder="e.g. Hair Coloring"></div>
     <div class="field"><label class="label">Icon (emoji)</label><input class="input" id="svcIcon" placeholder="e.g. 🎨" value="✂️"></div>
-    <div class="field"><label class="label">Price (Rs.)</label><input class="input" id="svcPrice" type="number" placeholder="300"></div>
-    <div class="field"><label class="label">Duration</label><input class="input" id="svcDuration" placeholder="e.g. 30–45 min"></div>
+    <div class="field"><label class="label">Price (Rs.)</label><input class="input" id="svcPrice" type="number" min="0" placeholder="300"></div>
+    <div class="field"><label class="label">Duration</label><input class="input" id="svcDuration" placeholder="e.g. 30 min or 30–45 min"></div>
     <button class="btn" style="width:100%;justify-content:center" onclick="addService()">Add Service</button>
   </div>
 </div>

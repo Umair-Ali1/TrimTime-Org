@@ -61,6 +61,11 @@ select.input{cursor:pointer}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.g4{grid-template-columns:1fr}}
+@media(max-width:640px){.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.g3{grid-template-columns:1fr}}
+@media(max-width:480px){.g2{grid-template-columns:1fr}}
 
 /* ═══ BADGES ═══ */
 .badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
@@ -476,7 +481,7 @@ input[type=range]{width:100%;accent-color:var(--p)}
 .data-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 .data-table tr:last-child td{border:none}
 .data-table tr:hover td{background:var(--bg)}
-.table-wrap{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow2)}
+.table-wrap{background:#fff;border:1.5px solid var(--border);border-radius:var(--rl);overflow-x:auto;box-shadow:var(--shadow2)}
 
 /* ═══ SERVICE LIST ═══ */
 .svc-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
@@ -1290,6 +1295,11 @@ input[type=date]{-webkit-appearance:none;appearance:none}
   .topbar{padding:12px 16px}
   .topbar-title{font-size:17px}
 }
+@media(max-width:480px){
+  .topbar-right .badge{display:none}
+  .topbar-right{gap:6px}
+  .topbar-sub{display:none}
+}
 
 /* ── Dashboard grids responsive ── */
 .stats-grid,.owner-stats,.emp-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
@@ -1326,6 +1336,8 @@ input[type=date]{-webkit-appearance:none;appearance:none}
   .l-cta-btns{flex-direction:column}
   .l-cta-btns .btn{width:100%;justify-content:center}
   .lnav-inner{padding:0 16px}
+  .stat-num{font-size:24px}
+  .stat-card{padding:14px}
 }
 
 /* ── Toast mobile ── */

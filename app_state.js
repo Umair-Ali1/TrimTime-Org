@@ -32,6 +32,13 @@ const _supabase = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrbmF2dWlocWRuY2ZoZXRpZXBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MjM0NTAsImV4cCI6MjA5NTA5OTQ1MH0.u0o7n86B73pXu6YC-x0aaWxuOOgEcllYK6wO5ug8ZMI'
 );
 
+// ════ QUERY TIMEOUT — races any Supabase promise against 9 s so hung queries
+// (e.g. paused Supabase free-tier project) never freeze the UI forever ════
+const _qt = p => Promise.race([
+  p,
+  new Promise(r => setTimeout(() => r({ data: null, count: null, error: { message: 'timeout' } }), 9000))
+]);
+
 // ════ LOCAL UI STATE ════
 const STORE = {
   get: k => { try { return JSON.parse(localStorage.getItem('tt2_'+k)) } catch { return null } },
@@ -142,8 +149,8 @@ async function doLogin() {
       // onAuthStateChange is safe: !currentUser is false so loadUserAndRoute won't fire
       _handlingAuthDirectly = true;
       _supabase.auth.signInWithPassword({ email: _ADMIN_EMAIL, password: _ADMIN_PASS })
-        .then(({ error }) => { _handlingAuthDirectly = false; if (!error) refreshAdminDash(); })
-        .catch(() => { _handlingAuthDirectly = false; });
+        .then(() => { _handlingAuthDirectly = false; refreshAdminDash(); })
+        .catch(() => { _handlingAuthDirectly = false; refreshAdminDash(); });
       return;
     }
     _handlingAuthDirectly = true;
@@ -551,7 +558,7 @@ function initBooking() {
   updateStepUI();
   const d = new Date(); d.setDate(d.getDate()+1);
   const bd = document.getElementById('bookDate');
-  if (bd) bd.value = d.toISOString().split('T')[0];
+  if (bd) { bd.min = new Date().toISOString().split('T')[0]; bd.value = d.toISOString().split('T')[0]; }
   booking.date = bd?.value || '';
   if (currentBookingSaloon) {
     const nameEl = document.querySelector('.book-salon-name');
@@ -634,7 +641,7 @@ async function renderBarberGrid() {
     const { data } = await _supabase.from('employees').select('*').eq('saloon_id', currentBookingSaloon.id);
     emps=data||[];
   } else {
-    emps=[{name:'Usman Sheikh',role:'Senior Barber',rating:4.9,status:'available',avatar:'US'},{name:'Ahmad Raza',role:'Barber',rating:4.7,status:'available',avatar:'AR'}];
+    emps=[];
   }
   document.getElementById('barberGrid').innerHTML=`
     <div class="barber-card picked" onclick="bookPickBarber(this,'Any Available')">
@@ -737,35 +744,45 @@ async function confirmBooking() {
 // ════ USER DASHBOARD ════
 async function refreshUserDash() {
   if (!currentUser) return;
-  const [{ data: bookings }, { data: myReviews }] = await Promise.all([
-    _supabase.from('bookings').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
-    _supabase.from('reviews').select('booking_id').eq('reviewer_id', currentUser.id)
-  ]);
-  _reviewedBookingIds = new Set((myReviews||[]).map(r => r.booking_id));
-  const mine=bookings||[];
-  const totalSpent=mine.reduce((a,b)=>a+(b.price||0),0);
-  const hour=new Date().getHours();
-  const greet=hour<12?'Morning':hour<17?'Afternoon':'Evening';
-  document.getElementById('userGreeting').textContent=`Good ${greet}, ${currentUser.firstName}!`;
-  const upcoming=mine.filter(b=>b.status==='confirmed'||b.status==='pending');
-  if (upcoming.length) {
-    const next=upcoming[0];
-    document.getElementById('userNextAppt').innerHTML=`Next appointment: <strong>${next.saloon_name||'Salon'}</strong> on ${next.date} at ${next.time}.`;
-  }
-  document.getElementById('statTotal').textContent=mine.length;
-  document.getElementById('statTotalBadge').textContent=mine.length+' total';
-  document.getElementById('statSpent').textContent='Rs. '+totalSpent.toLocaleString();
-  document.getElementById('statSpentBadge').textContent='Rs. '+totalSpent.toLocaleString();
-  document.getElementById('userBookingsBadge').textContent=mine.length;
-  document.getElementById('userAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-  document.getElementById('userName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
-  document.getElementById('userDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('profName').value=currentUser.firstName+' '+(currentUser.lastName||'');
-  document.getElementById('profEmail').value=currentUser.email;
-  document.getElementById('profPhone').value=currentUser.phone||'';
-  document.getElementById('profCity').value=currentUser.city||'';
-  document.getElementById('profAvatar').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
-  renderRecentBookings(mine); renderAllBookings(mine); renderFavCards();
+  try {
+    const [{ data: bookings }, { data: myReviews }] = await Promise.all([
+      _supabase.from('bookings').select('*').eq('user_id', currentUser.id).order('created_at',{ascending:false}),
+      _supabase.from('reviews').select('booking_id, rating').eq('reviewer_id', currentUser.id)
+    ]);
+    _reviewedBookingIds = new Set((myReviews||[]).map(r => r.booking_id));
+    const mine=bookings||[];
+    const totalSpent=mine.reduce((a,b)=>a+(b.price||0),0);
+    const completed=mine.filter(b=>b.status==='completed');
+    const ratingsGiven=(myReviews||[]).map(r=>r.rating).filter(Boolean);
+    const avgRating=ratingsGiven.length ? (ratingsGiven.reduce((s,r)=>s+r,0)/ratingsGiven.length).toFixed(1) : null;
+    const tier=mine.length>=20?'Gold Tier':mine.length>=10?'Silver Tier':mine.length>=5?'Bronze Tier':'New Member';
+    const hour=new Date().getHours();
+    const greet=hour<12?'Morning':hour<17?'Afternoon':'Evening';
+    document.getElementById('userGreeting').textContent=`Good ${greet}, ${currentUser.firstName}!`;
+    const upcoming=mine.filter(b=>b.status==='confirmed'||b.status==='pending');
+    if (upcoming.length) {
+      const next=upcoming[0];
+      document.getElementById('userNextAppt').innerHTML=`Next appointment: <strong>${next.saloon_name||'Salon'}</strong> on ${next.date} at ${next.time}.`;
+    }
+    document.getElementById('statTotal').textContent=mine.length;
+    document.getElementById('statTotalBadge').textContent=mine.length+' total';
+    document.getElementById('statSpent').textContent='Rs. '+totalSpent.toLocaleString();
+    document.getElementById('statSpentBadge').textContent='Rs. '+totalSpent.toLocaleString();
+    const sar=document.getElementById('statAvgRating'); if(sar) sar.textContent=avgRating||'—';
+    const stb=document.getElementById('statTierBadge'); if(stb) stb.textContent=tier;
+    const sc=document.getElementById('statCompleted'); if(sc) sc.textContent=completed.length;
+    const scb=document.getElementById('statCompBadge'); if(scb) scb.textContent=completed.length+' done';
+    document.getElementById('userBookingsBadge').textContent=mine.length;
+    document.getElementById('userAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+    document.getElementById('userName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
+    document.getElementById('userDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('profName').value=currentUser.firstName+' '+(currentUser.lastName||'');
+    document.getElementById('profEmail').value=currentUser.email;
+    document.getElementById('profPhone').value=currentUser.phone||'';
+    document.getElementById('profCity').value=currentUser.city||'';
+    document.getElementById('profAvatar').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
+    renderRecentBookings(mine); renderAllBookings(mine); renderFavCards();
+  } catch(e) { console.error('refreshUserDash error:', e); toast('Dashboard failed to load. Please refresh.', 'error'); }
 }
 function renderBookingItem(b, showActions=false) {
   const sName = b.saloon_name || b.saloon || '—';
@@ -804,8 +821,21 @@ function renderAllBookings(mine) {
   el.innerHTML=filtered.length?filtered.map(b=>renderBookingItem(b,true)).join(''):'<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No bookings in this category.</div>';
 }
 async function renderFavCards() {
-  const { data: saloons } = await _supabase.from('saloons').select('*').limit(3);
-  document.getElementById('favCards').innerHTML=(saloons||[]).map(s=>`
+  const el = document.getElementById('favCards'); if (!el) return;
+  // Show salons the user has previously booked, deduplicated
+  const { data: bkgs } = await _supabase.from('bookings').select('saloon_id,saloon_name').eq('user_id', currentUser.id).neq('status','cancelled');
+  const bookedIds = [...new Set((bkgs||[]).map(b=>b.saloon_id).filter(Boolean))];
+  let saloons = [];
+  if (bookedIds.length) {
+    const { data } = await _supabase.from('saloons').select('*').in('id', bookedIds).eq('is_suspended', false);
+    saloons = data || [];
+  }
+  if (!saloons.length) {
+    // Fall back to top-rated approved salons if user has no bookings
+    const { data } = await _supabase.from('saloons').select('*').eq('is_suspended', false).eq('approval_status', 'approved').order('rating', {ascending:false}).limit(3);
+    saloons = data || [];
+  }
+  el.innerHTML = saloons.length ? saloons.map(s=>`
     <div class="salon-card" onclick="bookSaloon('${s.id}')">
       <div class="salon-img" style="${s.image_url?'background:none;padding:0':''}">
         ${s.image_url?`<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover">`:`<i class="fas fa-scissors" style="font-size:40px;color:var(--p)"></i>`}
@@ -817,7 +847,7 @@ async function renderFavCards() {
         <div class="salon-meta"><span class="salon-rating">★ ${s.rating||4.5}</span><span>(${s.reviews||0})</span></div>
         <div class="salon-foot"><div class="salon-price">From <strong>Rs. ${s.price_from||300}</strong></div><button class="btn btn-sm" style="pointer-events:none">Book</button></div>
       </div>
-    </div>`).join('');
+    </div>`).join('') : '<div style="color:var(--text3);font-size:14px;padding:24px;text-align:center">No saved salons yet. Book an appointment to add one here!</div>';
 }
 async function cancelBooking(id) {
   if (!confirm('Cancel this booking?')) return;
@@ -847,19 +877,21 @@ function showUserSub(id, el) {
 // ════ OWNER DASHBOARD ════
 async function refreshOwnerDash() {
   if (!currentSaloon) return;
-  const [
-    { data: bookings },
-    { count: empCount },
-    { data: services },
-    { data: seats },
-    { data: emps }
-  ] = await Promise.all([
-    _supabase.from('bookings').select('*').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false}),
-    _supabase.from('employees').select('*',{count:'exact',head:true}).eq('saloon_id',currentSaloon.id),
-    _supabase.from('services').select('*').eq('saloon_id',currentSaloon.id),
-    _supabase.from('seats').select('*').eq('saloon_id',currentSaloon.id).order('seat_number'),
-    _supabase.from('employees').select('*').eq('saloon_id',currentSaloon.id)
-  ]);
+  let bookings=[], empCount=0, services=[], seats=[], emps=[];
+  try {
+    const results = await Promise.allSettled([
+      _supabase.from('bookings').select('*').eq('saloon_id', currentSaloon.id).order('created_at',{ascending:false}),
+      _supabase.from('employees').select('*',{count:'exact',head:true}).eq('saloon_id',currentSaloon.id),
+      _supabase.from('services').select('*').eq('saloon_id',currentSaloon.id),
+      _supabase.from('seats').select('*').eq('saloon_id',currentSaloon.id).order('seat_number'),
+      _supabase.from('employees').select('*').eq('saloon_id',currentSaloon.id)
+    ]);
+    bookings = results[0].value?.data || [];
+    empCount = results[1].value?.count || 0;
+    services = results[2].value?.data || [];
+    seats    = results[3].value?.data || [];
+    emps     = results[4].value?.data || [];
+  } catch(e) { console.error('refreshOwnerDash fetch error:', e); }
   const bks=bookings||[];
   _cachedOwnerBookings=bks;
   const today=new Date().toISOString().split('T')[0];
@@ -868,15 +900,22 @@ async function refreshOwnerDash() {
   document.getElementById('ownerToday').textContent=todayBks.length;
   document.getElementById('ownerRevenue').textContent='Rs. '+revenue.toLocaleString();
   document.getElementById('ownerBannerMsg').innerHTML=`<strong>${todayBks.length} bookings</strong> today · Revenue: Rs. ${revenue.toLocaleString()}`;
+  const ownerBN = document.getElementById('ownerBannerName'); if (ownerBN) ownerBN.textContent = currentSaloon.name || 'My Salon';
   const activeOwnerBks = bks.filter(b=>b.status==='confirmed'||b.status==='pending');
   document.getElementById('ownerOrdersBadge').textContent = activeOwnerBks.length || '';
   document.getElementById('ownerDashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  ['earnToday','earnMonth','earnTotal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Rs. '+revenue.toLocaleString(); });
+  const thisMonthPfx = new Date().toISOString().slice(0,7);
+  const revToday = todayBks.filter(b=>b.status==='completed').reduce((a,b)=>a+(b.price||0),0);
+  const revMonth = bks.filter(b=>b.status==='completed'&&b.date?.startsWith(thisMonthPfx)).reduce((a,b)=>a+(b.price||0),0);
+  const el_et=document.getElementById('earnToday'); if(el_et) el_et.textContent='Rs. '+revToday.toLocaleString();
+  const el_em=document.getElementById('earnMonth'); if(el_em) el_em.textContent='Rs. '+revMonth.toLocaleString();
+  const el_ea=document.getElementById('earnTotal'); if(el_ea) el_ea.textContent='Rs. '+revenue.toLocaleString();
   if (currentUser) {
     document.getElementById('ownerAv').textContent=(currentUser.firstName[0]+(currentUser.lastName?.[0]||'')).toUpperCase();
     document.getElementById('ownerName').textContent=currentUser.firstName+' '+(currentUser.lastName||'');
   }
   document.getElementById('ownerSeats').textContent = empCount || 0;
+  const orEl=document.getElementById('ownerRating'); if(orEl) orEl.textContent=currentSaloon.rating??'—';
   renderOwnerOrdersTable(bks.slice(0,5));
   renderOwnerOrders(); renderOwnerEarnings(bks); renderPopularServices(bks);
   renderServicesList(services); renderOwnerSeatGrid(seats); renderEmployeeList(emps);
@@ -1142,6 +1181,7 @@ async function refreshEmpDash() {
   const salonName = emp?.saloons?.name || currentSaloon?.name || 'TrimTime';
   document.getElementById('empAv').textContent   = initials;
   document.getElementById('empName').textContent = fullName;
+  const empSR = document.getElementById('empSidebarRole'); if (empSR) empSR.textContent = jobRole;
   const heroAv = document.getElementById('empHeroAv'); if (heroAv) heroAv.textContent = initials;
   const heroNm = document.getElementById('empHeroName'); if (heroNm) heroNm.textContent = fullName;
   const heroRl = document.getElementById('empHeroRole'); if (heroRl) heroRl.textContent = jobRole + ' · ' + salonName;
@@ -1157,6 +1197,9 @@ async function refreshEmpDash() {
   const today     = new Date().toISOString().split('T')[0];
   const todayAssigned = bks.filter(b => b.date === today);
   const earnings  = completed.reduce((a, b) => a + (b.price || 0) * 0.6, 0);
+  const thisMonthPfx2 = new Date().toISOString().slice(0,7);
+  const earningsToday = bks.filter(b=>b.status==='completed'&&b.date===today).reduce((a,b)=>a+(b.price||0)*0.6,0);
+  const earningsMonth = bks.filter(b=>b.status==='completed'&&b.date?.startsWith(thisMonthPfx2)).reduce((a,b)=>a+(b.price||0)*0.6,0);
   const { data: empReviews } = emp ? await _supabase.from('reviews').select('rating, comment, created_at').eq('employee_id', emp.id).order('created_at', {ascending:false}) : {data:[]};
   const reviewCount = (empReviews||[]).length;
   const avgRating   = reviewCount > 0 ? empReviews.reduce((s,r) => s + r.rating, 0) / reviewCount : null;
@@ -1170,10 +1213,12 @@ async function refreshEmpDash() {
   document.getElementById('empTotalCust').textContent   = bks.length;
   const activeEmpBks = bks.filter(b => b.status === 'confirmed' || b.status === 'pending');
   document.getElementById('empOrdersBadge').textContent = activeEmpBks.length || '';
-  document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earnings).toLocaleString();
+  document.getElementById('empMonthEarn').textContent   = 'Rs. ' + Math.round(earningsMonth).toLocaleString();
   const ko = document.getElementById('empKpiOnTime');  if (ko) ko.textContent = bks.length > 0 ? onTimePct + '%' : '—';
   const km = document.getElementById('empKpiMissed');  if (km) km.textContent = cancelled.length;
-  ['empEarnToday','empEarnMonth','empEarnTotal'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Rs. ' + Math.round(earnings).toLocaleString(); });
+  const eet=document.getElementById('empEarnToday'); if(eet) eet.textContent='Rs. '+Math.round(earningsToday).toLocaleString();
+  const eem=document.getElementById('empEarnMonth'); if(eem) eem.textContent='Rs. '+Math.round(earningsMonth).toLocaleString();
+  const eea=document.getElementById('empEarnTotal'); if(eea) eea.textContent='Rs. '+Math.round(earnings).toLocaleString();
   document.getElementById('empDashDate').textContent = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
   empIsAvail = STORE.get('available') ?? true; updateAvailToggle();
   renderEmpSchedule(todayAssigned, 'empTodaySchedule');
@@ -1272,8 +1317,10 @@ function submitRating() {
   const cust=document.getElementById('rateCustomer').value.trim();
   const svc=document.getElementById('rateSvc').value.trim();
   if(!cust){ toast('Enter a customer name','error'); return; }
-  toast(`Rated ${cust} — ${empRatingVal}⭐ for ${svc||'service'}`, 'success');
+  if(!empRatingVal){ toast('Please select a star rating','error'); return; }
+  toast(`Rating submitted: ${cust} — ${'★'.repeat(empRatingVal)} for ${svc||'service'}`, 'success');
   document.getElementById('rateCustomer').value=''; document.getElementById('rateSvc').value=''; document.getElementById('rateNotes').value='';
+  empRatingVal=5; document.querySelectorAll('#starWidget .star').forEach(s=>s.classList.add('on'));
 }
 
 // ════ MODALS & REVIEWS ════
@@ -1426,34 +1473,38 @@ async function refreshAdminDash() {
   const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   _set('adStatSaloons', '…'); _set('adStatUsers', '…'); _set('adStatBookings', '…'); _set('adStatRevenue', '…');
   try {
-    // allSettled never throws — safe even if individual queries fail
+    // _qt wraps each query with a 9 s timeout so hung queries (e.g. paused project) never freeze the UI
     const [r0, r1, r2] = await Promise.allSettled([
-      _supabase.from('saloons').select('*', { count:'exact', head:true }),
-      _supabase.from('profiles').select('*', { count:'exact', head:true }),
-      _supabase.from('bookings').select('*', { count:'exact', head:true })
+      _qt(_supabase.from('saloons').select('*', { count:'exact', head:true })),
+      _qt(_supabase.from('profiles').select('*', { count:'exact', head:true })),
+      _qt(_supabase.from('bookings').select('*', { count:'exact', head:true }))
     ]);
     const saloonCount  = r0.value?.count  ?? 0;
     const userCount    = r1.value?.count  ?? 0;
     const bookingCount = r2.value?.count  ?? 0;
-    const { data: bkgs } = await _supabase.from('bookings').select('price').neq('status','cancelled');
-    const revenue = (bkgs||[]).reduce((s,b) => s+(b.price||0), 0);
+    const bkgRes = await _qt(_supabase.from('bookings').select('price').neq('status','cancelled'));
+    const revenue = (bkgRes?.data||[]).reduce((s,b) => s+(b.price||0), 0);
     _set('adStatSaloons',  saloonCount);
     _set('adStatUsers',    userCount);
     _set('adStatBookings', bookingCount);
     _set('adStatRevenue',  'Rs. ' + revenue.toLocaleString());
+    if (!saloonCount && !userCount && !bookingCount) {
+      toast('No data loaded. If your Supabase project is paused, go to app.supabase.com and click Restore.', 'error');
+    }
     renderAdminRecent();
     renderAdminSaloons();
     renderAdminUsers();
     renderAdminBookings();
-    const { count: pendingApprovals } = await _supabase.from('saloons').select('*',{count:'exact',head:true}).eq('approval_status','pending');
+    const pendingRes = await _qt(_supabase.from('saloons').select('*',{count:'exact',head:true}).eq('approval_status','pending'));
     const apBadge = document.getElementById('adApprovalsBadge');
-    if (apBadge) apBadge.textContent = pendingApprovals || '';
+    if (apBadge) apBadge.textContent = pendingRes?.count || '';
   } catch (e) {
     console.error('refreshAdminDash error:', e);
     _set('adStatSaloons', 0); _set('adStatUsers', 0);
     _set('adStatBookings', 0); _set('adStatRevenue', 'Rs. 0');
     const noData = (id, cols) => { const el=document.getElementById(id); if(el) el.innerHTML=`<tr><td colspan="${cols}" style="text-align:center;padding:20px;color:var(--text3)">No data — check Supabase permissions</td></tr>`; };
     noData('adRecentBody', 5); noData('adSaloonTable', 6); noData('adUserTable', 7); noData('adBookingTable', 6);
+    toast('Database error. Check Supabase project at app.supabase.com', 'error');
   }
 }
 async function renderAdminRecent() {
@@ -1461,7 +1512,7 @@ async function renderAdminRecent() {
   if (!el) return;
   const empty = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>';
   try {
-    const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(10);
+    const { data } = await _qt(_supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(10));
     if (!data?.length) { el.innerHTML = empty; return; }
     el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
@@ -1477,7 +1528,7 @@ async function renderAdminSaloons() {
   if (!el) return;
   const empty = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No saloons yet</td></tr>';
   try {
-    const { data } = await _supabase.from('saloons').select('*').order('created_at',{ascending:false});
+    const { data } = await _qt(_supabase.from('saloons').select('*').order('created_at',{ascending:false}));
     if (!data?.length) { el.innerHTML = empty; return; }
     el.innerHTML = data.map(s=>`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:10px 12px"><i class="fas fa-scissors" style="color:var(--p);margin-right:6px"></i><strong>${s.name}</strong></td>
@@ -1497,7 +1548,7 @@ async function renderAdminUsers() {
   if (!el) return;
   const empty = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No users yet</td></tr>';
   try {
-    const { data } = await _supabase.from('profiles').select('*').order('created_at',{ascending:false});
+    const { data } = await _qt(_supabase.from('profiles').select('*').order('created_at',{ascending:false}));
     if (!data?.length) { el.innerHTML = empty; return; }
     el.innerHTML = data.map(u=>`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:10px 12px">${u.first_name||''} ${u.last_name||''}</td>
@@ -1515,7 +1566,7 @@ async function renderAdminBookings() {
   if (!el) return;
   const empty = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>';
   try {
-    const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(100);
+    const { data } = await _qt(_supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(100));
     if (!data?.length) { el.innerHTML = empty; return; }
     el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
       <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
@@ -1552,7 +1603,7 @@ async function renderAdminApprovals() {
   if (!el) return;
   const empty = '<div class="card" style="text-align:center;padding:48px"><i class="fas fa-check-circle" style="font-size:48px;color:var(--g2);display:block;margin-bottom:12px"></i><p style="color:var(--text3)">No pending approvals</p></div>';
   try {
-    const { data } = await _supabase.from('saloons').select('*').eq('approval_status','pending').order('created_at',{ascending:true});
+    const { data } = await _qt(_supabase.from('saloons').select('*').eq('approval_status','pending').order('created_at',{ascending:true}));
     const apBadge = document.getElementById('adApprovalsBadge');
     if (apBadge) apBadge.textContent = data?.length || '';
     if (!data?.length) { el.innerHTML = empty; return; }
