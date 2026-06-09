@@ -140,7 +140,11 @@ async function doLogin() {
     const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
     if (error) return showErr(error.message);
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Loading your account...';
-    await loadUserAndRoute(data.user);
+    const loginSuccess = await loadUserAndRoute(data.user);
+    if (!loginSuccess) {
+      showErr('Login succeeded, but your account could not be loaded. Please refresh or contact support.');
+      return;
+    }
     _sendEmail(email, currentUser?.firstName || 'there',
       'New Sign-In to Your Account 🔐',
       'We noticed a new sign-in to your TrimTime account. If this was you, no action is needed.',
@@ -172,29 +176,63 @@ async function doRegister() {
   btn.classList.add('btn-loading');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Creating your account...';
   try {
+    // Pre-validate invite code for employees to avoid creating accounts that will fail later
+    let inviteCode = null;
+    if (role === 'employee') {
+      inviteCode = document.getElementById('regInvite')?.value.trim().toUpperCase();
+      if (!inviteCode) return showErr('Please enter the invite code you received from your salon owner.');
+    }
+
     const { data, error } = await _supabase.auth.signUp({ email, password: pass });
     if (error) return showErr(error.message);
     if (!data.user || data.user.identities?.length === 0) return showErr('This email is already registered. Please log in instead.');
+
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Setting up profile...';
     const nameParts = first.trim().split(' ');
-    const { error: profErr } = await _supabase.from('profiles').upsert({
+
+    // Upsert profile and (for employees) lookup salon in parallel to reduce sequential waits
+    const profPromise = _supabase.from('profiles').upsert({
       id: data.user.id, role,
       first_name: nameParts[0],
       last_name:  nameParts.slice(1).join(' '),
       phone, city: ''
     });
-    if (profErr) return showErr('Database error: ' + profErr.message + '. Make sure the schema SQL has been run in Supabase.');
+
+    let salonResult = null;
+    if (role === 'employee') {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Joining salon...';
+      // Try local cache first
+      const cache = STORE.get('inviteCache') || {};
+      if (cache[inviteCode]) {
+        salonResult = Promise.resolve({ data: { id: cache[inviteCode] }, error: null });
+      } else {
+        salonResult = _supabase.from('saloons').select('id').eq('invite_code', inviteCode).single();
+      }
+    }
+
+    const [profRes, salonRes] = await Promise.all([profPromise, salonResult ?? Promise.resolve(null)]);
+    if (profRes?.error) return showErr('Database error: ' + profRes.error.message + '. Make sure the schema SQL has been run in Supabase.');
+
     if (role === 'owner') {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Creating your salon...';
       const salonName = document.getElementById('regSalon')?.value.trim() || nameParts[0] + "'s Salon";
-      await _setupNewOwnerSalon(data.user.id, salonName);
+      // Create owner salon in background so UI isn't blocked. Any failure is logged.
+      _setupNewOwnerSalon(data.user.id, salonName).catch(err => console.warn('Owner salon setup failed:', err));
     }
+
     if (role === 'employee') {
-      const inviteCode = document.getElementById('regInvite')?.value.trim().toUpperCase();
-      if (!inviteCode) return showErr('Please enter the invite code you received from your salon owner.');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Joining salon...';
-      const { data: salon, error: salonErr } = await _supabase.from('saloons').select('id').eq('invite_code', inviteCode).single();
-      if (salonErr || !salon) return showErr('Invalid invite code. Ask your salon owner for the correct code.');
+      const { data: salon, error: salonErr } = salonRes || { data: null, error: null };
+      if (salonErr || !salon) {
+        console.warn('Invite-code lookup failed', salonErr);
+        return showErr('Invalid invite code. Ask your salon owner for the correct code.');
+      }
+      // Cache invite code -> saloon id locally to avoid repeated lookups
+      try {
+        const cache = STORE.get('inviteCache') || {};
+        cache[inviteCode] = salon.id;
+        STORE.set('inviteCache', cache);
+      } catch (e) { console.debug('invite cache set failed', e); }
+
       const fullName = first.trim();
       const initials = nameParts.map(p => p[0]).slice(0, 2).join('').toUpperCase();
       const { error: empErr } = await _supabase.from('employees').insert({
@@ -205,11 +243,18 @@ async function doRegister() {
         status:    'available',
         avatar:    initials
       });
-      if (empErr) return showErr('Failed to join salon: ' + empErr.message);
+      if (empErr) {
+        console.error('Employee insert failed:', empErr);
+        return showErr('Failed to join salon: ' + (empErr.message || 'unknown error'));
+      }
     }
     if (data.session) {
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Taking you in...';
-      await loadUserAndRoute(data.user);
+      const signupSuccess = await loadUserAndRoute(data.user);
+      if (!signupSuccess) {
+        showErr('Signup succeeded, but your account could not be completed. Please refresh or contact support.');
+        return;
+      }
       _sendEmail(email, first,
         'Welcome to TrimTime! 🎉',
         'Your account has been successfully created. You\'re now ready to discover the best salons near you and book appointments in just a few clicks.',
@@ -276,8 +321,8 @@ async function loadUserAndRoute(authUser) {
     }).select().single();
     profile = created;
   }
-  if (!profile) { _routing=false; toast('Profile not found — please sign up','error'); showPage('pgLogin'); return; }
-  if (profile.is_suspended) { _routing=false; await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return; }
+  if (!profile) { console.error('loadUserAndRoute failed: profile not found for user', authUser.id, authUser.email); _routing=false; toast('Profile not found — please sign up','error'); showPage('pgLogin'); return false; }
+  if (profile.is_suspended) { console.warn('loadUserAndRoute failed: suspended account', authUser.id, authUser.email); _routing=false; await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return false; }
   currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
   if (profile.role === 'owner') {
     const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
@@ -291,6 +336,7 @@ async function loadUserAndRoute(authUser) {
   else if (profile.role === 'owner') showPage('pgOwnerDash');
   else if (profile.role === 'employee') showPage('pgEmpDash');
   else showPage('pgHome');
+  return true;
 }
 function openDeleteAccountModal() {
   const role = currentUser?.role;
