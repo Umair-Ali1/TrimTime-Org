@@ -1396,83 +1396,108 @@ function showAdminSub(id, el) {
   if (id === 'adApprovals') renderAdminApprovals();
 }
 async function refreshAdminDash() {
-  const [{ count: saloonCount }, { count: userCount }, { count: bookingCount }] = await Promise.all([
-    _supabase.from('saloons').select('*', { count:'exact', head:true }),
-    _supabase.from('profiles').select('*', { count:'exact', head:true }),
-    _supabase.from('bookings').select('*', { count:'exact', head:true })
-  ]);
-  const { data: bkgs } = await _supabase.from('bookings').select('price').neq('status','cancelled');
-  const revenue = (bkgs||[]).reduce((s,b) => s+(b.price||0), 0);
-  document.getElementById('adStatSaloons').textContent = saloonCount||0;
-  document.getElementById('adStatUsers').textContent = userCount||0;
-  document.getElementById('adStatBookings').textContent = bookingCount||0;
-  document.getElementById('adStatRevenue').textContent = 'Rs. '+revenue.toLocaleString();
-  renderAdminRecent();
-  renderAdminSaloons();
-  renderAdminUsers();
-  renderAdminBookings();
-  const { count: pendingApprovals } = await _supabase.from('saloons').select('*',{count:'exact',head:true}).eq('approval_status','pending');
-  const apBadge = document.getElementById('adApprovalsBadge');
-  if (apBadge) apBadge.textContent = pendingApprovals || '';
+  const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  try {
+    // allSettled never throws — safe even if individual queries fail
+    const [r0, r1, r2] = await Promise.allSettled([
+      _supabase.from('saloons').select('*', { count:'exact', head:true }),
+      _supabase.from('profiles').select('*', { count:'exact', head:true }),
+      _supabase.from('bookings').select('*', { count:'exact', head:true })
+    ]);
+    const saloonCount  = r0.value?.count  ?? 0;
+    const userCount    = r1.value?.count  ?? 0;
+    const bookingCount = r2.value?.count  ?? 0;
+    const { data: bkgs } = await _supabase.from('bookings').select('price').neq('status','cancelled');
+    const revenue = (bkgs||[]).reduce((s,b) => s+(b.price||0), 0);
+    _set('adStatSaloons',  saloonCount);
+    _set('adStatUsers',    userCount);
+    _set('adStatBookings', bookingCount);
+    _set('adStatRevenue',  'Rs. ' + revenue.toLocaleString());
+    renderAdminRecent();
+    renderAdminSaloons();
+    renderAdminUsers();
+    renderAdminBookings();
+    const { count: pendingApprovals } = await _supabase.from('saloons').select('*',{count:'exact',head:true}).eq('approval_status','pending');
+    const apBadge = document.getElementById('adApprovalsBadge');
+    if (apBadge) apBadge.textContent = pendingApprovals || '';
+  } catch (e) {
+    console.error('refreshAdminDash error:', e);
+    _set('adStatSaloons', 0); _set('adStatUsers', 0);
+    _set('adStatBookings', 0); _set('adStatRevenue', 'Rs. 0');
+    const el = document.getElementById('adRecentBody');
+    if (el) el.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No data available</td></tr>';
+  }
 }
 async function renderAdminRecent() {
-  const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(10);
   const el = document.getElementById('adRecentBody');
   if (!el) return;
-  if (!data?.length) { el.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>'; return; }
-  el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
-    <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
-    <td style="padding:10px 12px">${b.service||'—'}</td>
-    <td style="padding:10px 12px">${b.date||'—'} ${b.time||''}</td>
-    <td style="padding:10px 12px">Rs. ${b.price||0}</td>
-    <td style="padding:10px 12px"><span class="badge ${b.status}">${b.status}</span></td>
-  </tr>`).join('');
+  const empty = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>';
+  try {
+    const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(10);
+    if (!data?.length) { el.innerHTML = empty; return; }
+    el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
+      <td style="padding:10px 12px">${b.service||'—'}</td>
+      <td style="padding:10px 12px">${b.date||'—'} ${b.time||''}</td>
+      <td style="padding:10px 12px">Rs. ${b.price||0}</td>
+      <td style="padding:10px 12px"><span class="badge ${b.status}">${b.status}</span></td>
+    </tr>`).join('');
+  } catch(e) { el.innerHTML = empty; }
 }
 async function renderAdminSaloons() {
-  const { data } = await _supabase.from('saloons').select('*').order('created_at',{ascending:false});
   const el = document.getElementById('adSaloonTable');
   if (!el) return;
-  if (!data?.length) { el.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No saloons yet</td></tr>'; return; }
-  el.innerHTML = data.map(s=>`<tr style="border-bottom:1px solid var(--border)">
-    <td style="padding:10px 12px"><i class="fas fa-scissors" style="color:var(--p);margin-right:6px"></i><strong>${s.name}</strong></td>
-    <td style="padding:10px 12px">${s.area||'—'}, ${s.city||'—'}</td>
-    <td style="padding:10px 12px">${s.rating}⭐ (${s.reviews})</td>
-    <td style="padding:10px 12px">Rs. ${s.price_from}</td>
-    <td style="padding:10px 12px"><span class="badge ${s.is_suspended?'cancelled':(s.is_open?'active':'')}">${s.is_suspended?'Suspended':(s.is_open?'Open':'Closed')}</span></td>
-    <td style="padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap">
-      <button class="btn btn-xs ${s.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleSalonSuspend('${s.id}',${!!s.is_suspended})">${s.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>
-      <button class="btn btn-danger btn-xs" onclick="adminDeleteSaloon('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
-    </td>
-  </tr>`).join('');
+  const empty = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No saloons yet</td></tr>';
+  try {
+    const { data } = await _supabase.from('saloons').select('*').order('created_at',{ascending:false});
+    if (!data?.length) { el.innerHTML = empty; return; }
+    el.innerHTML = data.map(s=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px"><i class="fas fa-scissors" style="color:var(--p);margin-right:6px"></i><strong>${s.name}</strong></td>
+      <td style="padding:10px 12px">${s.area||'—'}, ${s.city||'—'}</td>
+      <td style="padding:10px 12px">${s.rating||0}⭐ (${s.reviews||0})</td>
+      <td style="padding:10px 12px">Rs. ${s.price_from||0}</td>
+      <td style="padding:10px 12px"><span class="badge ${s.is_suspended?'cancelled':(s.is_open?'confirmed':'')}">${s.is_suspended?'Suspended':(s.is_open?'Open':'Closed')}</span></td>
+      <td style="padding:10px 12px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-xs ${s.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleSalonSuspend('${s.id}',${!!s.is_suspended})">${s.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>
+        <button class="btn btn-danger btn-xs" onclick="adminDeleteSaloon('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+      </td>
+    </tr>`).join('');
+  } catch(e) { el.innerHTML = empty; }
 }
 async function renderAdminUsers() {
-  const { data } = await _supabase.from('profiles').select('*').order('created_at',{ascending:false});
   const el = document.getElementById('adUserTable');
   if (!el) return;
-  if (!data?.length) { el.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No users yet</td></tr>'; return; }
-  el.innerHTML = data.map(u=>`<tr style="border-bottom:1px solid var(--border)">
-    <td style="padding:10px 12px">${u.first_name||''} ${u.last_name||''}</td>
-    <td style="padding:10px 12px">${u.phone||'—'}</td>
-    <td style="padding:10px 12px"><span class="badge ${u.role}">${u.role}</span></td>
-    <td style="padding:10px 12px">${u.city||'—'}</td>
-    <td style="padding:10px 12px">${new Date(u.created_at).toLocaleDateString()}</td>
-    <td style="padding:10px 12px"><span class="badge ${u.is_suspended?'cancelled':'active'}">${u.is_suspended?'Suspended':'Active'}</span></td>
-    <td style="padding:10px 12px">${u.role==='admin'?'<span style="color:var(--text3);font-size:12px">—</span>':`<button class="btn btn-xs ${u.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleUserSuspend('${u.id}',${!!u.is_suspended})">${u.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>`}</td>
-  </tr>`).join('');
+  const empty = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3)">No users yet</td></tr>';
+  try {
+    const { data } = await _supabase.from('profiles').select('*').order('created_at',{ascending:false});
+    if (!data?.length) { el.innerHTML = empty; return; }
+    el.innerHTML = data.map(u=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">${u.first_name||''} ${u.last_name||''}</td>
+      <td style="padding:10px 12px">${u.phone||'—'}</td>
+      <td style="padding:10px 12px"><span class="badge ${u.role}">${u.role}</span></td>
+      <td style="padding:10px 12px">${u.city||'—'}</td>
+      <td style="padding:10px 12px">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+      <td style="padding:10px 12px"><span class="badge ${u.is_suspended?'cancelled':'confirmed'}">${u.is_suspended?'Suspended':'Active'}</span></td>
+      <td style="padding:10px 12px">${u.role==='admin'?'<span style="color:var(--text3);font-size:12px">—</span>':`<button class="btn btn-xs ${u.is_suspended?'btn-outline':'btn-warning'}" onclick="adminToggleUserSuspend('${u.id}',${!!u.is_suspended})">${u.is_suspended?'<i class=\'fas fa-check\'></i> Unsuspend':'<i class=\'fas fa-ban\'></i> Suspend'}</button>`}</td>
+    </tr>`).join('');
+  } catch(e) { el.innerHTML = empty; }
 }
 async function renderAdminBookings() {
-  const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(100);
   const el = document.getElementById('adBookingTable');
   if (!el) return;
-  if (!data?.length) { el.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>'; return; }
-  el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
-    <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
-    <td style="padding:10px 12px">${b.service||'—'}</td>
-    <td style="padding:10px 12px">${b.barber||'—'}</td>
-    <td style="padding:10px 12px">${b.date||'—'} ${b.time||''}</td>
-    <td style="padding:10px 12px">Rs. ${b.price||0}</td>
-    <td style="padding:10px 12px"><span class="badge ${b.status}">${b.status}</span></td>
-  </tr>`).join('');
+  const empty = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3)">No bookings yet</td></tr>';
+  try {
+    const { data } = await _supabase.from('bookings').select('*').order('created_at',{ascending:false}).limit(100);
+    if (!data?.length) { el.innerHTML = empty; return; }
+    el.innerHTML = data.map(b=>`<tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 12px">${b.saloon_name||'—'}</td>
+      <td style="padding:10px 12px">${b.service||'—'}</td>
+      <td style="padding:10px 12px">${b.barber||'—'}</td>
+      <td style="padding:10px 12px">${b.date||'—'} ${b.time||''}</td>
+      <td style="padding:10px 12px">Rs. ${b.price||0}</td>
+      <td style="padding:10px 12px"><span class="badge ${b.status||'pending'}">${b.status||'pending'}</span></td>
+    </tr>`).join('');
+  } catch(e) { el.innerHTML = empty; }
 }
 async function adminDeleteSaloon(id) {
   if (!confirm('Delete this salon and all its data? This cannot be undone.')) return;
