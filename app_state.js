@@ -44,6 +44,7 @@ let currentUser = null;
 let currentSaloon = null;        // active saloon for owner/employee
 let _routing = false;            // prevents duplicate loadUserAndRoute calls
 let _handlingAuthDirectly = false; // set by doLogin/doRegister so onAuthStateChange doesn't race them
+let _lastRouteError = '';        // last error from loadUserAndRoute, shown in the login form
 let _approvalChannel  = null;    // Supabase Realtime channel for approval watching
 let _approvalPollInterval = null; // polling fallback
 let currentBookingSaloon = null; // saloon selected for the booking flow
@@ -147,7 +148,7 @@ async function doLogin() {
     const loginSuccess = await loadUserAndRoute(data.user);
     _handlingAuthDirectly = false;
     if (!loginSuccess) {
-      showErr('Login succeeded but profile could not be loaded — check the toast message for details, or try signing up if you have no account yet.');
+      showErr(_lastRouteError || 'Profile could not be loaded. Please sign up first or contact support.');
       return;
     }
     _sendEmail(email, currentUser?.firstName || 'there',
@@ -337,7 +338,8 @@ async function loadUserAndRoute(authUser) {
         // Even if upsert errored, maybe the row already exists — try fetching it
         ({ data: profile } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle());
         if (!profile) {
-          toast('Account setup failed: ' + (upsertErr.message || 'Could not create profile. Check Supabase permissions.'), 'error');
+          _lastRouteError = 'DB error: ' + (upsertErr.message || 'permission denied on profiles table — run the GRANT SQL in Supabase.');
+          toast(_lastRouteError, 'error');
           showPage('pgLogin');
           return false;
         }
@@ -347,12 +349,13 @@ async function loadUserAndRoute(authUser) {
       }
     }
     if (!profile) {
-      console.error('loadUserAndRoute: profile still null after all attempts. User:', authUser.id, authUser.email);
-      toast('Profile not found. Please sign up first or contact support.', 'error');
+      _lastRouteError = 'No profile found for this account. Run the backfill SQL in Supabase, or sign up via the website.';
+      console.error('loadUserAndRoute: profile still null. User:', authUser.id, authUser.email);
+      toast(_lastRouteError, 'error');
       showPage('pgLogin');
       return false;
     }
-    if (profile.is_suspended) { console.warn('loadUserAndRoute failed: suspended account', authUser.id, authUser.email); await _supabase.auth.signOut(); toast('Your account has been suspended. Please contact support.','error'); showPage('pgLogin'); return false; }
+    if (profile.is_suspended) { _lastRouteError = 'Account suspended. Contact support.'; await _supabase.auth.signOut(); toast(_lastRouteError,'error'); showPage('pgLogin'); return false; }
     currentUser = { id:authUser.id, email:authUser.email, role:profile.role, firstName:profile.first_name||'', lastName:profile.last_name||'', phone:profile.phone||'', city:profile.city||'' };
     if (profile.role === 'owner') {
       const { data: salon } = await _supabase.from('saloons').select('*').eq('owner_id', authUser.id).single();
@@ -367,8 +370,9 @@ async function loadUserAndRoute(authUser) {
     else showPage('pgHome');
     return true;
   } catch (e) {
+    _lastRouteError = 'Unexpected error: ' + (e.message || String(e));
     console.error('loadUserAndRoute error:', e);
-    toast('An error occurred loading your account. Please try again.', 'error');
+    toast(_lastRouteError, 'error');
     showPage('pgLogin');
     return false;
   } finally {

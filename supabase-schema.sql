@@ -122,6 +122,58 @@ ALTER TABLE bookings  DISABLE ROW LEVEL SECURITY;
 ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews   DISABLE ROW LEVEL SECURITY;
 
+-- ════ GRANT PERMISSIONS ════
+-- Required so the anon/authenticated roles can INSERT, UPDATE, DELETE.
+-- Supabase only auto-grants these for tables created through its UI;
+-- tables created via SQL Editor need explicit grants.
+GRANT ALL ON TABLE public.profiles  TO anon, authenticated;
+GRANT ALL ON TABLE public.saloons   TO anon, authenticated;
+GRANT ALL ON TABLE public.services  TO anon, authenticated;
+GRANT ALL ON TABLE public.seats     TO anon, authenticated;
+GRANT ALL ON TABLE public.bookings  TO anon, authenticated;
+GRANT ALL ON TABLE public.employees TO anon, authenticated;
+GRANT ALL ON TABLE public.reviews   TO anon, authenticated;
+
+-- ════ AUTO-CREATE PROFILE TRIGGER ════
+-- Creates a profile row automatically whenever a new auth user signs up.
+-- This covers users added via the Supabase dashboard or any auth method.
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, role, first_name, last_name, phone, city)
+  VALUES (
+    NEW.id,
+    'customer',
+    COALESCE(NEW.raw_user_meta_data->>'first_name', split_part(NEW.email, '@', 1)),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    '',
+    ''
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ════ BACKFILL PROFILES FOR EXISTING USERS ════
+-- Creates profiles for any auth users who don't already have one.
+-- Safe to run multiple times (ON CONFLICT DO NOTHING).
+INSERT INTO public.profiles (id, role, first_name, last_name, phone, city)
+SELECT
+  au.id,
+  'customer',
+  COALESCE(au.raw_user_meta_data->>'first_name', split_part(au.email, '@', 1)),
+  COALESCE(au.raw_user_meta_data->>'last_name', ''),
+  '',
+  ''
+FROM auth.users au
+WHERE NOT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = au.id)
+ON CONFLICT (id) DO NOTHING;
+
 
 -- ════ DELETE CURRENT USER FUNCTION ════
 -- Allows the client to fully delete the auth.users record for the signed-in user.
